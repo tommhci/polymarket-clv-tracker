@@ -2,8 +2,8 @@
 .env
 *.env
 
-# SQLite databases (local data, regenerated on first run)
-*.db
+# SQLite databases — NOT ignored (needed for GitHub Actions data persistence)
+# polymarket_tracker.db is committed to repo so Actions can accumulate scan history
 
 # Python
 __pycache__/

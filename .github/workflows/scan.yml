@@ -31,18 +31,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run scanner
+      - name: Run scanner + generate status report
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python main.py
+        run: |
+          python main.py
+          python main.py --report
 
-      - name: Commit updated database
+      - name: Commit updated database and status report
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add polymarket_tracker.db || true
+          git add polymarket_tracker.db STATUS.md || true
           git diff --cached --quiet || git commit -m "data: scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push || true

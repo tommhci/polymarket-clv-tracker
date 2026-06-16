@@ -212,9 +212,14 @@ def clear_odds_cache():
     _odds_cache = {}
 
 
-def _fetch_odds_outright(sport: str = ODDS_SPORT_KEY) -> list[dict]:
-    """Fetch tournament outright winner odds. Cached per scan run."""
-    cache_key = f"{sport}:outrights"
+def _fetch_odds(sport: str, markets: str) -> list[dict]:
+    """
+    Generic Odds API fetch. Cached per (sport, markets) tuple per scan run.
+    The Odds API uses DIFFERENT sport keys for match odds vs outright winner:
+      - soccer_fifa_world_cup         → supports h2h (match winner)
+      - soccer_fifa_world_cup_winner  → supports outrights (tournament winner)
+    """
+    cache_key = f"{sport}:{markets}"
     if cache_key in _odds_cache:
         return _odds_cache[cache_key]
 
@@ -226,25 +231,30 @@ def _fetch_odds_outright(sport: str = ODDS_SPORT_KEY) -> list[dict]:
     params = {
         "apiKey":     ODDS_API_KEY,
         "regions":    ODDS_REGIONS,
-        "markets":    "outrights",
+        "markets":    markets,
         "oddsFormat": "decimal",
     }
     try:
         resp = requests.get(url, params=params, timeout=12)
-        if resp.status_code == 404:
-            # Sport key may not support outrights; fall back to h2h
-            log.warning("Outrights not found for %s, trying h2h", sport)
-            params["markets"] = "h2h"
-            resp = requests.get(url, params=params, timeout=12)
         resp.raise_for_status()
         events = resp.json()
         _odds_cache[cache_key] = events
         remaining = resp.headers.get("x-requests-remaining", "?")
-        log.info("Odds API: %d events fetched (quota remaining: %s)", len(events), remaining)
+        log.info("Odds API [%s/%s]: %d events (quota: %s)", sport, markets, len(events), remaining)
         return events
     except requests.RequestException as e:
-        log.error("Odds API error: %s", e)
+        log.error("Odds API error [%s/%s]: %s", sport, markets, e)
         return []
+
+
+def _fetch_odds_outright() -> list[dict]:
+    """Fetch tournament winner outrights (uses soccer_fifa_world_cup_winner key)."""
+    return _fetch_odds("soccer_fifa_world_cup_winner", "outrights")
+
+
+def _fetch_odds_h2h() -> list[dict]:
+    """Fetch match-level h2h odds (uses soccer_fifa_world_cup key)."""
+    return _fetch_odds(ODDS_SPORT_KEY, "h2h")
 
 
 def _devig_multiplicative(raw_probs: list[float]) -> list[float]:

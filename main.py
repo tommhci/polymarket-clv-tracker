@@ -22,10 +22,13 @@ from datetime import datetime, timezone
 from config import SCAN_INTERVAL_MINUTES, DB_PATH
 from scanner import run_scan
 from tracker import (
-    init_db, log_scan, open_paper_trade,
+    init_db, log_scan, open_paper_trade, rebuild_from_csv,
     auto_close_expired, close_paper_trade, print_dashboard,
 )
 from alerts import alert_edge_found, alert_daily_digest, alert_scan_summary
+from glm_helper import (
+    ensure_glm_cache, analyze_pre_match, get_latest_prematch_signals,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -245,10 +248,11 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
 
 def execute_scan(send_summary: bool = False) -> list:
     """
-    Run one full scan, persist results, send edge alerts.
-    Returns list of MarketSnapshot.
+    Run one full scan, persist results, send edge alerts,
+    and trigger GLM pre-match analysis for T-24h / T-1h markets.
     """
     log.info("── Scan start ──────────────────────────────────")
+    ensure_glm_cache(DB_PATH)
     snapshots = run_scan()
 
     if not snapshots:
@@ -308,6 +312,30 @@ def execute_scan(send_summary: bool = False) -> list:
                 snap.question[:45], snap.poly_ask_vwap, snap.spread_pct * 100,
             )
 
+    # ── GLM pre-match analysis for T-24h / T-1h advancement markets ──────────
+    prematch_buckets = {"T-24h", "T-1h"}
+    glm_count = 0
+    for snap in snapshots:
+        if snap.time_bucket not in prematch_buckets:
+            continue
+        is_advance_q = any(
+            k in snap.question.lower()
+            for k in ("advance", "qualify", "knockout", "reach the")
+        )
+        if not is_advance_q:
+            continue
+        from scanner import extract_team
+        team = extract_team(snap.question)
+        if team:
+            analyze_pre_match(
+                market_id=snap.market_id, team=team,
+                poly_price=snap.poly_mid, hours_to_end=snap.hours_to_end,
+                path=DB_PATH,
+            )
+            glm_count += 1
+    if glm_count:
+        log.info("GLM pre-match: analysed %d markets", glm_count)
+
     if send_summary:
         alert_scan_summary(snapshots)
 
@@ -341,6 +369,7 @@ def parse_args():
 
 def main():
     init_db(DB_PATH)
+    rebuild_from_csv(path=DB_PATH)
     args = parse_args()
 
     # ── Report generation (no scan, just read DB) ─────────────────────────

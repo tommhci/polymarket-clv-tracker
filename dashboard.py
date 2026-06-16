@@ -198,6 +198,11 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
 
     conn.close()
 
+    # ── 9. GLM pre-match signals ─────────────────────────────────────────────
+    from glm_helper import get_latest_prematch_signals, ensure_glm_cache
+    ensure_glm_cache(path)
+    glm_signals = get_latest_prematch_signals(path, limit=12)
+
     # ── Assemble JSON ────────────────────────────────────────────────────────
     payload = {
         "generated_at":   now.isoformat(),
@@ -227,6 +232,7 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
         "open_positions": open_positions,
         "resolved":       resolved,
         "price_history":  price_history,
+        "glm_signals":    glm_signals,
     }
 
     json_path = os.path.join(docs_dir, "data.json")
@@ -240,18 +246,49 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
 
 
 def _export_csv(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
-    """Mirror the full scans table to CSV for portability / future analysis."""
+    """
+    Mirror the full scans table to docs/scans.csv for portability.
+    
+    Migration path (DuckDB, one command each):
+      scans.csv → Parquet:    duckdb -c "COPY scans TO 'scans.parquet' (FORMAT PARQUET)"
+      scans.csv → Postgres:   duckdb -c "COPY (SELECT * FROM 'scans.csv') TO 'scans.sql' (FORMAT CSV)"
+      
+    Source: DuckDB docs (Dec 2024) — CSV as universal exchange format;
+            DuckDB queries CSVs directly with no conversion needed.
+    """
     conn = sqlite3.connect(path)
-    cur = conn.execute("SELECT * FROM scans ORDER BY timestamp")
-    cols = [d[0] for d in cur.description]
-    rows = cur.fetchall()
+    for table in ("scans", "paper_trades"):
+        try:
+            cur  = conn.execute(f"SELECT * FROM {table} ORDER BY rowid")
+            cols = [d[0] for d in cur.description]
+            rows = cur.fetchall()
+            out  = os.path.join(docs_dir, f"{table}.csv")
+            with open(out, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                w.writerow(cols)
+                w.writerows(rows)
+        except Exception as e:
+            log.warning("CSV export failed for %s: %s", table, e)
     conn.close()
+    # Legacy single-file export for backwards compat
+    _export_single_csv(path, docs_dir)
 
-    csv_path = os.path.join(docs_dir, "data.csv")
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        w.writerow(cols)
-        w.writerows(rows)
+
+def _export_single_csv(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
+    """Keep docs/data.csv (scans only) for backwards compatibility."""
+    conn = sqlite3.connect(path)
+    try:
+        cur = conn.execute("SELECT * FROM scans ORDER BY timestamp")
+        cols = [d[0] for d in cur.description]
+        rows = cur.fetchall()
+        csv_path = os.path.join(docs_dir, "data.csv")
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(cols)
+            w.writerows(rows)
+    except Exception:
+        pass
+    conn.close()
 
 
 if __name__ == "__main__":

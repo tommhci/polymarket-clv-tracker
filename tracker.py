@@ -442,3 +442,55 @@ def auto_close_expired(scanner_snapshots: list[MarketSnapshot], path: str = DB_P
             log_clv_checkpoint(trade["trade_id"], mid, path)
             close_paper_trade(trade["trade_id"], mid, path)
             log.info("Auto-closed %s at %.3f (near resolution)", trade["trade_id"], mid)
+
+
+
+# ── CSV truth-source rebuild ────────────────────────────────────────────────
+
+def rebuild_from_csv(docs_dir: str = "docs", path: str = DB_PATH):
+    """
+    Rebuild SQLite from docs/scans.csv + docs/paper_trades.csv if the DB is
+    missing or empty.  Called at startup when running in GitHub Actions after a
+    fresh checkout (DB not tracked in git; CSVs are the truth source).
+
+    Migration note: the same CSVs can be loaded into any other system:
+      - DuckDB:   duckdb -c "CREATE TABLE scans AS SELECT * FROM 'docs/scans.csv'"
+      - Pandas:   pd.read_csv('docs/scans.csv')
+      - Postgres: COPY scans FROM '/path/docs/scans.csv' CSV HEADER;
+    Source: DuckDB blog (Dec 2024) — CSV as universal exchange format.
+    """
+    import csv as _csv
+    import os as _os
+
+    # Only rebuild if DB is empty
+    conn = sqlite3.connect(path)
+    n = conn.execute("SELECT COUNT(*) FROM scans").fetchone()[0]
+    conn.close()
+    if n > 0:
+        return  # DB already has data, nothing to rebuild
+
+    log.info("DB empty — rebuilding from CSV files in %s/", docs_dir)
+
+    for table in ("scans", "paper_trades"):
+        csv_path = _os.path.join(docs_dir, f"{table}.csv")
+        if not _os.path.exists(csv_path):
+            log.info("  %s.csv not found — skipping", table)
+            continue
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = _csv.DictReader(f)
+            rows = list(reader)
+        if not rows:
+            continue
+        cols = list(rows[0].keys())
+        conn = sqlite3.connect(path)
+        for row in rows:
+            vals = [row.get(c) for c in cols]
+            placeholders = ",".join(["?"] * len(cols))
+            col_str = ",".join(cols)
+            conn.execute(
+                f"INSERT OR IGNORE INTO {table} ({col_str}) VALUES ({placeholders})",
+                vals,
+            )
+        conn.commit()
+        conn.close()
+        log.info("  Rebuilt %s from %s (%d rows)", table, csv_path, len(rows))

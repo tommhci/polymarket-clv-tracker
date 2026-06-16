@@ -91,6 +91,33 @@
            text-align: center; border-top: 1px solid var(--border); padding-top: 16px; }
   a { color: var(--accent); text-decoration: none; }
   .err { color: var(--red); padding: 40px; text-align: center; }
+  /* GLM signals grid */
+  .signals { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .signal-card { background: var(--panel-2); border-radius: 10px; padding: 14px;
+                 border-left: 3px solid var(--border); }
+  .signal-card.overpriced   { border-left-color: var(--red); }
+  .signal-card.underpriced  { border-left-color: var(--green); }
+  .signal-card.fair         { border-left-color: var(--muted); }
+  .signal-card.uncertain    { border-left-color: var(--amber); }
+  .signal-card .s-team { font-weight: 650; font-size: 14px; margin-bottom: 6px; }
+  .signal-card .s-price { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .signal-card .s-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 6px;
+  }
+  .s-badge.overpriced  { background:#3a1518; color:var(--red); }
+  .s-badge.underpriced { background:#153a22; color:var(--green); }
+  .s-badge.fair        { background:#252d3f; color:var(--muted); }
+  .s-badge.uncertain   { background:#3a2e12; color:var(--amber); }
+  .s-badge.conf-low    { background:#1c2333; color:var(--muted); }
+  .s-badge.conf-medium { background:#1c2333; color:var(--accent); }
+  .s-badge.conf-high   { background:#153a22; color:var(--green); }
+  .signal-card .s-ctx { font-size: 12px; color: var(--muted); margin: 8px 0 6px; line-height: 1.5; }
+  .signal-card .s-risk { font-size: 12px; padding: 6px 8px; background: var(--panel);
+                          border-radius: 6px; color: var(--amber); margin-bottom: 6px; }
+  .signal-card .s-flags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .signal-card .s-flag { font-size: 10px; padding: 2px 6px; border-radius: 6px;
+                          background: var(--panel); color: var(--text); }
 </style>
 </head>
 <body>
@@ -140,6 +167,13 @@
     <div class="panel">
       <h2>Resolved Trades <span class="hint" id="resolved-count"></span></h2>
       <table id="resolvedTable"><thead><tr><th>Market</th><th class="num">CLV</th><th class="num">Adj</th><th>Result</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel full" id="glmPanel">
+      <h2>🤖 AI Pre-Match Intelligence <span class="hint">GLM analysis at T-24h / T-1h — not sports news, but structural price-consistency checks. Confidence and training-data limitations shown.</span></h2>
+      <div id="glmContent" style="color:var(--muted);font-size:13px;">Loading AI signals…</div>
     </div>
   </div>
 
@@ -280,6 +314,31 @@ async function load() {
     const res = t.outcome==="BEAT_LINE"?'<span class="tag" style="color:#3fdb84">beat</span>':'<span class="tag" style="color:#ff5d6c">missed</span>';
     return `<tr><td>${q}</td><td class="num" style="color:${t.clv>0?'#3fdb84':'#ff5d6c'}">${fmt(t.clv)}</td><td class="num" style="color:${adj>0?'#3fdb84':'#ff5d6c'}">${fmt(adj)}</td><td>${res}</td></tr>`;
   }).join("") : '<tr><td colspan="4" style="color:#8b97ad">No resolved trades yet.</td></tr>';
+}
+  // GLM pre-match intelligence panel
+  const gs = d.glm_signals || [];
+  const glmDiv = document.getElementById("glmContent");
+  if (!gs.length) {
+    glmDiv.innerHTML = 'No AI analysis yet. GLM runs automatically at T-24h and T-1h before each match. Requires GLM_API_KEY in GitHub Secrets.';
+  } else {
+    const aClass = a => a.includes("over")?"overpriced":a.includes("under")?"underpriced":a.includes("fair")?"fair":"uncertain";
+    const aLabel = a => a.includes("over")?"OVERPRICED":a.includes("under")?"UNDERPRICED":a.includes("fair")?"FAIR":"UNCERTAIN";
+    glmDiv.innerHTML = '<div class="signals">' + gs.map(s => {
+      const ac = aClass(s.assessment||"");
+      const flags = (s.watch_flags||[]).map(f=>`<span class="s-flag">⚑ ${f}</span>`).join("");
+      const risk  = s.narrative_risk ? `<div class="s-risk">⚠ ${s.narrative_risk}</div>` : "";
+      const ctx   = s.context ? `<div class="s-ctx">${s.context}</div>` : "";
+      const ts    = (s.created_at||"").slice(5,16).replace("T"," ");
+      return `<div class="signal-card ${ac}">
+        <div class="s-team">${s.team||"?"}</div>
+        <div class="s-price">${s.price?(s.price*100).toFixed(1)+"% implied":"?"} · ${ts}</div>
+        <span class="s-badge ${ac}">${aLabel(s.assessment||"")}</span>
+        <span class="s-badge conf-${s.confidence||"low"}">${(s.confidence||"low").toUpperCase()} CONF</span>
+        ${ctx}${risk}
+        <div class="s-flags">${flags}</div>
+      </div>`;
+    }).join("") + '</div>';
+  }
 }
 load();
 </script>

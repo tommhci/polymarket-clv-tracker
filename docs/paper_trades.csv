@@ -1,0 +1,1 @@
+trade_id,market_id,question,direction,entry_price,true_prob_entry,net_edge_entry,entry_timestamp,end_date,closing_price,clv,outcome,close_timestamp,days_held,time_value_baseline,clv_adjusted

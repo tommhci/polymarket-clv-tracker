@@ -2,8 +2,10 @@
 .env
 *.env
 
-# SQLite databases — NOT ignored (needed for GitHub Actions data persistence)
-# polymarket_tracker.db is committed to repo so Actions can accumulate scan history
+# SQLite databases — NOT tracked in git (binary, causes repo bloat antipattern)
+# Source: StackOverflow/openillumi.com — binary DB in git = unreadable diffs + bloat
+# The docs/scans.csv + docs/paper_trades.csv are the portable truth source instead
+*.db
 
 # Python
 __pycache__/

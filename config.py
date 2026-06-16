@@ -48,6 +48,12 @@ KELLY_FRACTION       = 0.25  # Quarter-Kelly when sizing real trades later
 SCAN_INTERVAL_MINUTES = 30   # cron cadence (override with --interval flag)
 MAX_MARKETS_PER_SCAN  = 60   # raised to fit advancement markets + a few winners
 
+# ── Risk-free rate for CLV time-value adjustment ───────────────────────────────
+# US 3-month T-bill rate, June 2026 ≈ 5.3%
+# clv_adjusted = clv_timing - (RISK_FREE_RATE * days_held / 365)
+# This strips out the capital-lockup premium from the raw CLV signal.
+RISK_FREE_RATE = 0.053
+
 # ── Priority event slugs (the markets where retail edge could actually exist) ──
 # Verified live (June 2026): advancement markets are $27K-250K volume, many
 # near coin-flip (Czechia 0.55, Turkiye 0.515) = narrative-sensitive, the

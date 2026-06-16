@@ -31,6 +31,7 @@ from config import (
     MIN_NET_EDGE, MAX_SPREAD_PCT, MIN_VOLUME_USD,
     PAPER_TRADE_SIZE_USD, MAX_MARKETS_PER_SCAN,
     WC_KEYWORDS, TEAM_NAMES, PRIORITY_EVENT_SLUGS,
+    RISK_FREE_RATE,
 )
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,18 @@ class MarketSnapshot:
     alertable:        bool
     skip_reason:      str = ""
     paper_trade_id:   Optional[str] = None
+    # ── Multi-timepoint tracking (new) ──────────────────────────────────────
+    # hours_to_end: time until market end_date at this scan moment.
+    # time_bucket:  classifies which time-window this snapshot falls in.
+    #   T-168h = 7 days before kickoff (far-from-resolution, bias zone)
+    #   T-24h  = 24h before kickoff    (narrative is near-peak)
+    #   T-1h   = 1h before kickoff     (market most informed, CLV baseline)
+    #   T-other = any other scan
+    # Rationale: Page & Clemen (SSRN 2013), arXiv 2602.19520 (2026) both show
+    # prediction markets are miscalibrated far from resolution; CLV at T-168h
+    # vs T-1h measures whether that drift is exploitable or just lockup discount.
+    hours_to_end:    float = -1.0
+    time_bucket:     str   = "T-other"
 
 
 # ── Module 1: Market Discovery (Gamma API) ─────────────────────────────────────
@@ -412,6 +425,49 @@ def extract_team(question: str) -> Optional[str]:
     return None
 
 
+def _classify_time_bucket(end_date: Optional[str]) -> tuple[float, str]:
+    """
+    Compute hours until end_date and classify into time bucket.
+
+    Buckets (±tolerance to catch GitHub Actions schedule drift):
+      T-168h : 162–174h  (7 days ± 6h)
+      T-24h  : 21–27h    (24h ± 3h)
+      T-1h   : 0–2h      (final approach)
+      T-other: everything else with hours_to_end > 0
+      T-expired: end_date already passed
+    """
+    if not end_date:
+        return -1.0, "T-other"
+
+    now_utc = datetime.now(timezone.utc)
+    try:
+        ed = str(end_date)
+        if "T" in ed:
+            end_dt = datetime.fromisoformat(ed.replace("Z", "+00:00"))
+        else:
+            # Date-only string like "2026-06-20" → treat as end of day UTC
+            end_dt = datetime.fromisoformat(f"{ed}T23:59:00+00:00")
+
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
+
+        hours = (end_dt - now_utc).total_seconds() / 3600
+
+    except (ValueError, TypeError):
+        return -1.0, "T-other"
+
+    if hours < 0:
+        return round(hours, 2), "T-expired"
+    elif hours <= 2:
+        return round(hours, 2), "T-1h"
+    elif 21 <= hours <= 27:
+        return round(hours, 2), "T-24h"
+    elif 162 <= hours <= 174:
+        return round(hours, 2), "T-168h"
+    else:
+        return round(hours, 2), "T-other"
+
+
 # ── Module 6: Full Scan Pipeline ──────────────────────────────────────────────
 
 def run_scan() -> list[MarketSnapshot]:
@@ -469,6 +525,9 @@ def run_scan() -> list[MarketSnapshot]:
         # ── Edge (requires baseline) ──
         net_edge, _fee, alertable, skip_reason = calculate_edge(p_true, vwap_ask, spread_pct)
 
+        # ── Multi-timepoint: classify this scan into a time bucket ──
+        hours_to_end, time_bucket = _classify_time_bucket(end_date)
+
         snap = MarketSnapshot(
             timestamp=ts,
             market_id=str(mkt.get("id", "")),
@@ -486,6 +545,8 @@ def run_scan() -> list[MarketSnapshot]:
             net_edge=round(net_edge, 4),
             alertable=alertable,
             skip_reason=skip_reason,
+            hours_to_end=hours_to_end,
+            time_bucket=time_bucket,
         )
         snapshots.append(snap)
         time.sleep(0.12)   # gentle rate-limit pause

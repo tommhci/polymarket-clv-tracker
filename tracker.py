@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Optional
 
-from config import DB_PATH
+from config import DB_PATH, RISK_FREE_RATE
 from scanner import MarketSnapshot
 
 log = logging.getLogger(__name__)
@@ -67,27 +67,47 @@ def init_db(path: str = DB_PATH):
             baseline_source  TEXT,
             net_edge         REAL,
             alertable        INTEGER,
-            skip_reason      TEXT
+            skip_reason      TEXT,
+            hours_to_end     REAL,
+            time_bucket      TEXT
         )
     """)
 
     c.execute("""
         CREATE TABLE IF NOT EXISTS paper_trades (
-            trade_id          TEXT PRIMARY KEY,
-            market_id         TEXT NOT NULL,
-            question          TEXT,
-            direction         TEXT NOT NULL,
-            entry_price       REAL NOT NULL,
-            true_prob_entry   REAL,
-            net_edge_entry    REAL,
-            entry_timestamp   TEXT NOT NULL,
-            end_date          TEXT,
-            closing_price     REAL,
-            clv               REAL,
-            outcome           TEXT DEFAULT 'PENDING',
-            close_timestamp   TEXT
+            trade_id               TEXT PRIMARY KEY,
+            market_id              TEXT NOT NULL,
+            question               TEXT,
+            direction              TEXT NOT NULL,
+            entry_price            REAL NOT NULL,
+            true_prob_entry        REAL,
+            net_edge_entry         REAL,
+            entry_timestamp        TEXT NOT NULL,
+            end_date               TEXT,
+            closing_price          REAL,
+            clv                    REAL,
+            outcome                TEXT DEFAULT 'PENDING',
+            close_timestamp        TEXT,
+            days_held              REAL,
+            time_value_baseline    REAL,
+            clv_adjusted           REAL
         )
     """)
+
+    # ── Schema migrations: add columns to existing tables if absent ──────────
+    # SQLite has no "ADD COLUMN IF NOT EXISTS"; use try/except per column.
+    new_scan_cols    = ["hours_to_end REAL", "time_bucket TEXT"]
+    new_trade_cols   = ["days_held REAL", "time_value_baseline REAL", "clv_adjusted REAL"]
+    for col in new_scan_cols:
+        try:
+            conn.execute(f"ALTER TABLE scans ADD COLUMN {col}")
+        except sqlite3.OperationalError:
+            pass   # already exists
+    for col in new_trade_cols:
+        try:
+            conn.execute(f"ALTER TABLE paper_trades ADD COLUMN {col}")
+        except sqlite3.OperationalError:
+            pass
 
     c.execute("""
         CREATE TABLE IF NOT EXISTS clv_log (
@@ -111,13 +131,15 @@ def log_scan(snap: MarketSnapshot, path: str = DB_PATH):
     conn.execute("""
         INSERT INTO scans
         (timestamp, market_id, question, volume_usd, poly_mid, poly_ask_vwap,
-         spread_pct, book_true_prob, baseline_source, net_edge, alertable, skip_reason)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+         spread_pct, book_true_prob, baseline_source, net_edge, alertable,
+         skip_reason, hours_to_end, time_bucket)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         snap.timestamp, snap.market_id, snap.question, snap.volume_usd,
         snap.poly_mid, snap.poly_ask_vwap, snap.spread_pct,
         snap.book_true_prob, snap.baseline_source, snap.net_edge,
         int(snap.alertable), snap.skip_reason,
+        snap.hours_to_end, snap.time_bucket,
     ))
     conn.commit()
     conn.close()
@@ -170,32 +192,57 @@ def log_clv_checkpoint(trade_id: str, current_price: float, path: str = DB_PATH)
 
 def close_paper_trade(trade_id: str, closing_price: float, path: str = DB_PATH):
     """
-    Close a paper trade at `closing_price` (price at resolution / match kickoff).
-    CLV = closing_price - entry_price
+    Close a paper trade.  Computes:
+      clv                 = closing_price - entry_price   (raw timing CLV)
+      days_held           = calendar days the position was open
+      time_value_baseline = RISK_FREE_RATE * days_held / 365  (lockup discount)
+      clv_adjusted        = clv - time_value_baseline   (strips capital cost)
+
+    Decision gate uses clv_adjusted, not clv.
+    Basis: Page & Clemen SSRN 2013 — far-from-resolution price drift partly
+    reflects rational lockup discount, not necessarily exploitable edge.
     """
     conn = sqlite3.connect(path)
     c = conn.cursor()
-    c.execute("SELECT entry_price FROM paper_trades WHERE trade_id = ?", (trade_id,))
+    c.execute("SELECT entry_price, entry_timestamp FROM paper_trades WHERE trade_id = ?",
+              (trade_id,))
     row = c.fetchone()
     if not row:
         log.warning("close_paper_trade: trade %s not found", trade_id)
         conn.close()
         return
 
-    entry   = row[0]
+    entry, entry_ts = row[0], row[1]
     clv     = round(closing_price - entry, 4)
     outcome = "BEAT_LINE" if clv > 0 else "MISSED_LINE"
     ts      = datetime.now(timezone.utc).isoformat()
 
+    # Time-value adjustment
+    try:
+        entry_dt = datetime.fromisoformat(str(entry_ts).replace("Z", "+00:00"))
+        if entry_dt.tzinfo is None:
+            entry_dt = entry_dt.replace(tzinfo=timezone.utc)
+        close_dt   = datetime.now(timezone.utc)
+        days_held  = max(0.0, (close_dt - entry_dt).total_seconds() / 86400)
+    except (ValueError, TypeError):
+        days_held = 0.0
+
+    time_value_baseline = round(RISK_FREE_RATE * days_held / 365, 6)
+    clv_adjusted        = round(clv - time_value_baseline, 4)
+
     conn.execute("""
         UPDATE paper_trades
-        SET closing_price=?, clv=?, outcome=?, close_timestamp=?
+        SET closing_price=?, clv=?, outcome=?, close_timestamp=?,
+            days_held=?, time_value_baseline=?, clv_adjusted=?
         WHERE trade_id=?
-    """, (closing_price, clv, outcome, ts, trade_id))
+    """, (closing_price, clv, outcome, ts,
+          round(days_held, 3), time_value_baseline, clv_adjusted,
+          trade_id))
     conn.commit()
     conn.close()
 
-    log.info("Closed trade %s | CLV=%.3f | %s", trade_id, clv, outcome)
+    log.info("Closed %s | CLV=%.3f | adj=%.3f (−%.4f lockup) | %s",
+             trade_id, clv, clv_adjusted, time_value_baseline, outcome)
 
 
 # ── Query helpers ──────────────────────────────────────────────────────────────
@@ -213,19 +260,26 @@ def get_open_trades(path: str = DB_PATH) -> list[dict]:
 def get_clv_summary(path: str = DB_PATH) -> dict:
     """
     Aggregate CLV across all resolved trades.
-    avg_clv > 0.01  → EDGE CONFIRMED  (beat closing line consistently)
-    avg_clv 0–0.01  → MARGINAL        (investigate further)
-    avg_clv < 0     → NO EDGE         (stop / reassess)
+
+    PRIMARY metric: clv_adjusted = clv_timing - time_value_baseline
+    FALLBACK:       clv (used when clv_adjusted is NULL, e.g. old rows)
+
+    Decision gate (hard, not advisory):
+      n < 30             → INSUFFICIENT SAMPLE
+      clv_adjusted ≤ 0   → PROJECT STOP SIGNAL
+      t-stat < 2.0       → NOT SIGNIFICANT
     """
     conn = sqlite3.connect(path)
     c = conn.cursor()
     c.execute("""
         SELECT
-            COUNT(*)                                          AS total,
-            SUM(CASE WHEN outcome='BEAT_LINE' THEN 1 ELSE 0 END) AS beat,
-            ROUND(AVG(clv), 4)                               AS avg_clv,
-            ROUND(MIN(clv), 4)                               AS worst,
-            ROUND(MAX(clv), 4)                               AS best
+            COUNT(*)                                                        AS total,
+            SUM(CASE WHEN outcome='BEAT_LINE' THEN 1 ELSE 0 END)           AS beat,
+            ROUND(AVG(COALESCE(clv_adjusted, clv)), 4)                     AS avg_adj,
+            ROUND(AVG(clv), 4)                                             AS avg_raw,
+            ROUND(MIN(COALESCE(clv_adjusted, clv)), 4)                     AS worst,
+            ROUND(MAX(COALESCE(clv_adjusted, clv)), 4)                     AS best,
+            ROUND(AVG(COALESCE(time_value_baseline, 0)), 6)                AS avg_lockup
         FROM paper_trades
         WHERE outcome != 'PENDING'
     """)
@@ -233,56 +287,71 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
     conn.close()
 
     if not row or row[0] == 0:
-        return {"total": 0, "verdict": "INSUFFICIENT_DATA (need ≥10 resolved trades)"}
+        return {"total": 0, "verdict": "⏳ INSUFFICIENT SAMPLE — 0 resolved trades"}
 
-    total, beat, avg_clv, worst, best = row
-    win_rate = beat / total
+    total, beat, avg_adj, avg_raw, worst, best, avg_lockup = row
+    win_rate   = beat / total if total > 0 else 0
+    avg_clv    = avg_adj if avg_adj is not None else avg_raw
 
     if avg_clv is None:
         return {"total": total, "verdict": "INSUFFICIENT_DATA"}
 
-    # ── Statistical rigour: CLV mean alone is meaningless without sample size ──
-    # Evidence: it takes HUNDREDS of bets before realised results reflect true
-    # edge; over 50 bets a true 55% edge can still show 22-28 (optimal-bet.com,
-    # Feb 2026). Single-sample "significant" effects appear even under full
-    # market efficiency (Winkelmann et al., SAGE 2024). So we gate on n + t-stat.
+    # ── t-statistic ──────────────────────────────────────────────────────────
     import statistics
-    clv_values = _get_all_clv(path)
-    stdev   = statistics.pstdev(clv_values) if len(clv_values) > 1 else 0.0
-    std_err = (stdev / (total ** 0.5)) if total > 0 and stdev > 0 else 0.0
-    t_stat  = (avg_clv / std_err) if std_err > 0 else 0.0
+    clv_values = _get_all_clv_adjusted(path)
+    stdev      = statistics.pstdev(clv_values) if len(clv_values) > 1 else 0.0
+    std_err    = (stdev / (total ** 0.5)) if total > 0 and stdev > 0 else 0.0
+    t_stat     = (avg_clv / std_err) if std_err > 0 else 0.0
 
-    # Verdict requires BOTH a positive mean AND enough evidence (sample + t-stat)
+    # ── Hard decision gate ────────────────────────────────────────────────────
+    # Gate 1: sample too small for any read
     if total < 30:
-        verdict = (f"⏳ TOO EARLY — n={total}. Need ≥100 resolved trades for a "
-                   f"valid read. World Cup alone cannot produce this.")
+        verdict = (f"⏳ INSUFFICIENT SAMPLE — n={total}/30. "
+                   f"World Cup alone cannot reach this threshold.")
+    # Gate 2: PROJECT STOP SIGNAL (the hard termination criterion)
     elif avg_clv <= 0:
-        verdict = "❌ NO EDGE — mean CLV ≤ 0. Strategy invalid at current params."
+        verdict = (f"🛑 PROJECT STOP SIGNAL — "
+                   f"clv_adjusted={avg_clv:+.3f} ≤ 0 at n={total}. "
+                   f"Strategy has no positive signal after time-value adjustment.")
     elif t_stat < 2.0:
-        verdict = (f"⚠️  NOT SIGNIFICANT — avg CLV {avg_clv:+.3f} but t={t_stat:.1f} "
-                   f"(<2.0). Likely noise; do NOT scale.")
+        verdict = (f"⚠️  NOT SIGNIFICANT — clv_adj={avg_clv:+.3f} but "
+                   f"t={t_stat:.2f} (<2.0). Noise. Do NOT scale.")
     elif total < 100:
-        verdict = (f"🟡 PROMISING — t={t_stat:.1f}, but n={total}<100. "
-                   f"Directionally positive; keep collecting before real capital.")
+        verdict = (f"🟡 PROMISING — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
+                   f"n={total}. Keep collecting (target n=100).")
     else:
-        verdict = (f"✅ EDGE SUPPORTED — avg CLV {avg_clv:+.3f}, t={t_stat:.1f}, "
-                   f"n={total}. Scale with fractional Kelly, small size.")
+        verdict = (f"✅ EDGE SUPPORTED — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
+                   f"n={total}. Scale with 0.25 Kelly.")
 
     return {
-        "total_resolved": total,
-        "beat_line":       beat,
-        "win_rate":        f"{win_rate:.0%}",
-        "avg_clv":         avg_clv,
-        "std_err":         round(std_err, 4),
-        "t_stat":          round(t_stat, 2),
-        "worst_clv":       worst,
-        "best_clv":        best,
-        "verdict":         verdict,
+        "total_resolved":      total,
+        "beat_line":           beat,
+        "win_rate":            f"{win_rate:.0%}",
+        "avg_clv_adjusted":    avg_adj,
+        "avg_clv_raw":         avg_raw,
+        "avg_lockup_discount": avg_lockup,
+        "std_err":             round(std_err, 4),
+        "t_stat":              round(t_stat, 2),
+        "worst_clv":           worst,
+        "best_clv":            best,
+        "verdict":             verdict,
     }
 
 
+def _get_all_clv_adjusted(path: str = DB_PATH) -> list[float]:
+    """Return clv_adjusted values (falling back to clv) for t-stat computation."""
+    conn = sqlite3.connect(path)
+    rows = conn.execute(
+        """SELECT COALESCE(clv_adjusted, clv) FROM paper_trades
+           WHERE outcome != 'PENDING'
+           AND COALESCE(clv_adjusted, clv) IS NOT NULL"""
+    ).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+
 def _get_all_clv(path: str = DB_PATH) -> list[float]:
-    """Return all resolved CLV values for variance / t-stat computation."""
+    """Legacy helper — raw CLV values."""
     conn = sqlite3.connect(path)
     rows = conn.execute(
         "SELECT clv FROM paper_trades WHERE outcome != 'PENDING' AND clv IS NOT NULL"
@@ -293,32 +362,60 @@ def _get_all_clv(path: str = DB_PATH) -> list[float]:
 
 def print_dashboard(path: str = DB_PATH):
     """Print a human-readable dashboard to stdout."""
-    summary = get_clv_summary(path)
+    summary     = get_clv_summary(path)
     open_trades = get_open_trades(path)
 
-    print("\n" + "═" * 55)
+    print("\n" + "═" * 60)
     print("  POLYMARKET PAPER TRADING DASHBOARD")
-    print("═" * 55)
+    print("═" * 60)
     print(f"  Open positions : {len(open_trades)}")
     if open_trades:
         for t in open_trades[:5]:
             print(f"    [{t['trade_id']}] {t['question'][:40]:40s} "
-                  f"entry={t['entry_price']:.3f}  edge={t['net_edge_entry']:.1%}")
+                  f"entry={t['entry_price']:.3f}")
         if len(open_trades) > 5:
             print(f"    … and {len(open_trades)-5} more")
 
-    print("\n  CLV Summary (resolved trades):")
+    # ── Multi-timepoint snapshot inventory ──────────────────────────────────
+    conn = sqlite3.connect(path)
+    bucket_rows = conn.execute("""
+        SELECT time_bucket, COUNT(DISTINCT market_id), COUNT(*)
+        FROM scans
+        WHERE time_bucket != 'T-other' AND time_bucket IS NOT NULL
+        GROUP BY time_bucket
+        ORDER BY time_bucket
+    """).fetchall()
+    total_scans = conn.execute("SELECT COUNT(*) FROM scans").fetchone()[0]
+    conn.close()
+
+    print(f"\n  Price snapshots  (total: {total_scans:,})")
+    if bucket_rows:
+        for bucket, n_markets, n_rows in bucket_rows:
+            print(f"    {bucket:10s}  {n_rows:4d} rows  ({n_markets} unique markets)")
+        print("    T-other      (continuous monitoring — all other scans)")
+    else:
+        print("    No T-168h/T-24h/T-1h snapshots yet (need matching run times)")
+
+    # ── CLV summary with hard decision gate ──────────────────────────────────
+    print(f"\n  CLV Summary — PRIMARY: clv_adjusted  (raw − lockup discount)")
     if summary.get("total_resolved", 0) == 0:
         print(f"    {summary['verdict']}")
     else:
-        print(f"    Resolved  : {summary['total_resolved']}")
-        print(f"    Beat line : {summary['beat_line']} ({summary['win_rate']})")
-        print(f"    Avg CLV   : {summary['avg_clv']:+.3f}  "
-              f"[worst {summary['worst_clv']:+.3f} / best {summary['best_clv']:+.3f}]")
-        print(f"    Std err   : {summary.get('std_err', 0):.4f}   "
-              f"t-stat: {summary.get('t_stat', 0):.2f}")
-        print(f"    Verdict   : {summary['verdict']}")
-    print("═" * 55 + "\n")
+        adj = summary.get("avg_clv_adjusted")
+        raw = summary.get("avg_clv_raw")
+        lkp = summary.get("avg_lockup_discount", 0)
+        print(f"    Resolved       : {summary['total_resolved']}")
+        print(f"    Beat line      : {summary['beat_line']} ({summary['win_rate']})")
+        print(f"    Avg CLV raw    : {raw:+.4f}")
+        print(f"    Avg lockup disc: {lkp:+.6f}  (RFR={RISK_FREE_RATE:.1%} × days/365)")
+        print(f"    Avg CLV adj    : {adj:+.4f}  ← decision gate uses this")
+        print(f"    Std err / t    : {summary.get('std_err', 0):.4f} / "
+              f"{summary.get('t_stat', 0):.2f}")
+        print(f"    Range          : {summary['worst_clv']:+.3f} to "
+              f"{summary['best_clv']:+.3f}")
+        print()
+        print(f"  ▶  VERDICT: {summary['verdict']}")
+    print("═" * 60 + "\n")
 
 
 # ── Auto-close trades near resolution ─────────────────────────────────────────

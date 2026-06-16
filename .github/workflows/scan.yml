@@ -6,12 +6,13 @@ name: Polymarket Scan
 
 on:
   schedule:
-    # Every 30 min, OFFSET from the top of the hour (:07 and :37).
-    # GitHub delays/drops scheduled jobs during high load, worst at :00.
-    # Source: GitHub docs + crontap.com (Dec 2025). Offset reduces drop rate
-    # but does NOT eliminate it — treat the schedule as best-effort, not exact.
+    # Every 30 min — the SmartScheduler inside main.py decides whether to
+    # actually do anything. Runs at :07 and :37 to avoid GitHub high-load at :00.
+    # Most runs will exit in <2s with "skip" (no active match window).
+    # Full scans (with news + GLM) only fire at T-24h, T-1h, halftime, T-ft.
+    # Estimated Actions usage: ~80% reduction vs naive 30-min full scan.
     - cron: '7,37 * * * *'
-  workflow_dispatch:  # Manual trigger button in GitHub UI
+  workflow_dispatch:  # Manual trigger (always runs full scan regardless of scheduler)
 
 jobs:
   scan:
@@ -35,6 +36,8 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |

@@ -29,6 +29,7 @@ from alerts import alert_edge_found, alert_daily_digest, alert_scan_summary
 from glm_helper import (
     ensure_glm_cache, analyze_pre_match, get_latest_prematch_signals,
 )
+from scheduler import compute_scan_decision, schedule_summary
 
 logging.basicConfig(
     level=logging.INFO,
@@ -250,9 +251,25 @@ def execute_scan(send_summary: bool = False) -> list:
     """
     Run one full scan, persist results, send edge alerts,
     and trigger GLM pre-match analysis for T-24h / T-1h markets.
+
+    Uses the smart scheduler to decide scan depth:
+      full_news  → everything (Polymarket + football-data + Tavily + GLM)
+      full_live  → Polymarket + football-data (match in progress)
+      full_pre   → Polymarket + football-data + GLM (no Tavily)
+      light      → Polymarket prices only
+      skip       → exit immediately (no matches in relevant window)
     """
     log.info("── Scan start ──────────────────────────────────")
     ensure_glm_cache(DB_PATH)
+
+    # ── Smart scheduling decision ─────────────────────────────────────────────
+    decision = compute_scan_decision(DB_PATH)
+    log.info(schedule_summary(decision))
+
+    if decision.mode == "skip":
+        log.info("── Skipped (no active match window) — %s", decision.reason)
+        return []
+
     snapshots = run_scan()
 
     if not snapshots:
@@ -313,35 +330,39 @@ def execute_scan(send_summary: bool = False) -> list:
             )
 
     # ── GLM pre-match analysis for T-24h / T-1h advancement markets ──────────
+    # Only run if scheduler says use_glm (mode=full_news or full_pre)
     prematch_buckets = {"T-24h", "T-1h"}
     glm_count = 0
-    for snap in snapshots:
-        if snap.time_bucket not in prematch_buckets:
-            continue
-        is_advance_q = any(
-            k in snap.question.lower()
-            for k in ("advance", "qualify", "knockout", "reach the")
-        )
-        if not is_advance_q:
-            continue
-        from scanner import extract_team
-        team = extract_team(snap.question)
-        if team:
-            # Fetch live context (standings + news) to ground GLM in real data
-            try:
-                from news_fetcher import fetch_live_context
-                live_ctx = fetch_live_context(team)
-            except Exception as e:
-                log.debug("news_fetcher unavailable for %s: %s", team, e)
-                live_ctx = None
-            analyze_pre_match(
-                market_id=snap.market_id, team=team,
-                poly_price=snap.poly_mid, hours_to_end=snap.hours_to_end,
-                path=DB_PATH, live_context=live_ctx,
+    if decision.use_glm:
+        for snap in snapshots:
+            if snap.time_bucket not in prematch_buckets:
+                continue
+            is_advance_q = any(
+                k in snap.question.lower()
+                for k in ("advance", "qualify", "knockout", "reach the")
             )
-            glm_count += 1
+            if not is_advance_q:
+                continue
+            from scanner import extract_team
+            team = extract_team(snap.question)
+            if team:
+                # Fetch live context only if scheduler says use_news
+                live_ctx = None
+                if decision.use_news:
+                    try:
+                        from news_fetcher import fetch_live_context
+                        live_ctx = fetch_live_context(team)
+                    except Exception as e:
+                        log.debug("news_fetcher unavailable for %s: %s", team, e)
+                analyze_pre_match(
+                    market_id=snap.market_id, team=team,
+                    poly_price=snap.poly_mid, hours_to_end=snap.hours_to_end,
+                    path=DB_PATH, live_context=live_ctx,
+                )
+                glm_count += 1
     if glm_count:
-        log.info("GLM analysed %d pre-match markets (with live context)", glm_count)
+        log.info("GLM analysed %d markets (mode=%s, news=%s)",
+                 glm_count, decision.mode, decision.use_news)
 
     if send_summary:
         alert_scan_summary(snapshots)

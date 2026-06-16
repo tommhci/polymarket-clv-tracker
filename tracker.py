@@ -241,24 +241,54 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
     if avg_clv is None:
         return {"total": total, "verdict": "INSUFFICIENT_DATA"}
 
-    if avg_clv >= 0.02:
-        verdict = "✅ EDGE CONFIRMED — scale up carefully"
-    elif avg_clv >= 0.005:
-        verdict = "⚠️  MARGINAL — monitor 10 more trades before scaling"
-    elif avg_clv >= 0:
-        verdict = "⚠️  WEAK — noise or small sample; do not scale"
+    # ── Statistical rigour: CLV mean alone is meaningless without sample size ──
+    # Evidence: it takes HUNDREDS of bets before realised results reflect true
+    # edge; over 50 bets a true 55% edge can still show 22-28 (optimal-bet.com,
+    # Feb 2026). Single-sample "significant" effects appear even under full
+    # market efficiency (Winkelmann et al., SAGE 2024). So we gate on n + t-stat.
+    import statistics
+    clv_values = _get_all_clv(path)
+    stdev   = statistics.pstdev(clv_values) if len(clv_values) > 1 else 0.0
+    std_err = (stdev / (total ** 0.5)) if total > 0 and stdev > 0 else 0.0
+    t_stat  = (avg_clv / std_err) if std_err > 0 else 0.0
+
+    # Verdict requires BOTH a positive mean AND enough evidence (sample + t-stat)
+    if total < 30:
+        verdict = (f"⏳ TOO EARLY — n={total}. Need ≥100 resolved trades for a "
+                   f"valid read. World Cup alone cannot produce this.")
+    elif avg_clv <= 0:
+        verdict = "❌ NO EDGE — mean CLV ≤ 0. Strategy invalid at current params."
+    elif t_stat < 2.0:
+        verdict = (f"⚠️  NOT SIGNIFICANT — avg CLV {avg_clv:+.3f} but t={t_stat:.1f} "
+                   f"(<2.0). Likely noise; do NOT scale.")
+    elif total < 100:
+        verdict = (f"🟡 PROMISING — t={t_stat:.1f}, but n={total}<100. "
+                   f"Directionally positive; keep collecting before real capital.")
     else:
-        verdict = "❌ NO EDGE — strategy invalid at current params; reassess"
+        verdict = (f"✅ EDGE SUPPORTED — avg CLV {avg_clv:+.3f}, t={t_stat:.1f}, "
+                   f"n={total}. Scale with fractional Kelly, small size.")
 
     return {
         "total_resolved": total,
         "beat_line":       beat,
         "win_rate":        f"{win_rate:.0%}",
         "avg_clv":         avg_clv,
+        "std_err":         round(std_err, 4),
+        "t_stat":          round(t_stat, 2),
         "worst_clv":       worst,
         "best_clv":        best,
         "verdict":         verdict,
     }
+
+
+def _get_all_clv(path: str = DB_PATH) -> list[float]:
+    """Return all resolved CLV values for variance / t-stat computation."""
+    conn = sqlite3.connect(path)
+    rows = conn.execute(
+        "SELECT clv FROM paper_trades WHERE outcome != 'PENDING' AND clv IS NOT NULL"
+    ).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
 
 
 def print_dashboard(path: str = DB_PATH):
@@ -285,6 +315,8 @@ def print_dashboard(path: str = DB_PATH):
         print(f"    Beat line : {summary['beat_line']} ({summary['win_rate']})")
         print(f"    Avg CLV   : {summary['avg_clv']:+.3f}  "
               f"[worst {summary['worst_clv']:+.3f} / best {summary['best_clv']:+.3f}]")
+        print(f"    Std err   : {summary.get('std_err', 0):.4f}   "
+              f"t-stat: {summary.get('t_stat', 0):.2f}")
         print(f"    Verdict   : {summary['verdict']}")
     print("═" * 55 + "\n")
 

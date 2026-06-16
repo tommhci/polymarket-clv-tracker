@@ -6,8 +6,11 @@ name: Polymarket Scan
 
 on:
   schedule:
-    # Every 30 minutes during World Cup matchdays (UTC)
-    - cron: '*/30 * * * *'
+    # Every 30 min, OFFSET from the top of the hour (:07 and :37).
+    # GitHub delays/drops scheduled jobs during high load, worst at :00.
+    # Source: GitHub docs + crontap.com (Dec 2025). Offset reduces drop rate
+    # but does NOT eliminate it — treat the schedule as best-effort, not exact.
+    - cron: '7,37 * * * *'
   workflow_dispatch:  # Manual trigger button in GitHub UI
 
 jobs:

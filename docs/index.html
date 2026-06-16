@@ -120,6 +120,13 @@
 
   <div class="grid">
     <div class="panel full">
+      <h2>Price Trend Over Time <span class="hint">implied probability trajectory — the CLV thesis visualised (line, not candlestick: we sample points, not OHLC)</span></h2>
+      <div class="chart-wrap" style="height:340px"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel full">
       <h2>Advancement Markets <span class="hint">sorted by distance from 0.50 — nearest = most narrative-sensitive</span></h2>
       <div class="chart-wrap" style="height:320px"><canvas id="marketChart"></canvas></div>
     </div>
@@ -221,6 +228,39 @@ async function load() {
         tooltip:{callbacks:{afterLabel:(c)=>{const m=mk[c.dataIndex];return `vol ${fmtUsd(m.volume)} · spread ${fmtPct(m.spread_pct)}`;}}}},
       scales:{ y:{min:0,max:1,ticks:{callback:v=>v.toFixed(1)}} } }
   });
+
+  // Price trend over time (line chart — the CLV thesis visualised)
+  const palette = ["#4d9fff","#3fdb84","#ffb84d","#b07cff","#ff5d6c","#5dd5d5","#ff9f4d","#9d8cff"];
+  const ph = d.price_history || [];
+  if (ph.length) {
+    // Union of all timestamps as x-axis labels
+    const allTimes = [...new Set(ph.flatMap(m=>m.series.map(s=>s.t)))].sort();
+    const datasets = ph.map((m,i)=>({
+      label: m.team,
+      data: allTimes.map(t=>{ const pt=m.series.find(s=>s.t===t); return pt?pt.p:null; }),
+      borderColor: palette[i%palette.length],
+      backgroundColor: "transparent",
+      borderWidth: 2, pointRadius: 0, tension: 0.25, spanGaps: true,
+    }));
+    new Chart(document.getElementById("trendChart"), {
+      type:"line",
+      data:{ labels: allTimes.map(t=>t.slice(5).replace("T"," ")), datasets },
+      options:{
+        interaction:{mode:"index",intersect:false},
+        plugins:{ legend:{position:"bottom",labels:{boxWidth:12,padding:10,font:{size:11}}} },
+        scales:{
+          y:{min:0,max:1,title:{display:true,text:"implied probability"},
+             ticks:{callback:v=>v.toFixed(1)},
+             grid:{color:"#1c2333"}},
+          x:{ticks:{maxTicksLimit:10,maxRotation:0},grid:{display:false}}
+        }
+      }
+    });
+    // 0.5 reference line via annotation-free approach: draw on a second pass
+  } else {
+    document.getElementById("trendChart").parentElement.innerHTML =
+      '<div style="color:#8b97ad;text-align:center;padding-top:130px">Trend builds as scans accumulate (need ≥2 scans per market)</div>';
+  }
 
   // Open positions table
   const ob = document.querySelector("#openTable tbody");

@@ -146,6 +146,56 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     """)
     resolved = _rows_to_dicts(resolved_rows)
 
+    # ── 8. Price history (time series per market — for the trend chart) ──────
+    # The CLV thesis IS about price drift over time. We expose the implied-prob
+    # trajectory of the most interesting markets (nearest 0.5 = most narrative-
+    # sensitive). Line series, NOT candlestick: we sample one point per scan,
+    # not OHLC, so candlesticks would be fabricated precision.
+    #
+    # To keep data.json small, limit to top N markets by interest and cap points.
+    HISTORY_MARKETS = 8
+    HISTORY_POINTS  = 200
+
+    # Pick the markets nearest 0.5 from the latest snapshot set
+    focus_ids = [
+        r[0] for r in conn.execute("""
+            SELECT s.market_id
+            FROM scans s
+            INNER JOIN (
+                SELECT market_id, MAX(timestamp) AS latest
+                FROM scans GROUP BY market_id
+            ) L ON s.market_id = L.market_id AND s.timestamp = L.latest
+            WHERE lower(s.question) LIKE '%advance%'
+               OR lower(s.question) LIKE '%qualify%'
+               OR lower(s.question) LIKE '%knockout%'
+            ORDER BY ABS(s.poly_mid - 0.5) ASC
+            LIMIT ?
+        """, (HISTORY_MARKETS,)).fetchall()
+    ]
+
+    price_history = []
+    for mid_id in focus_ids:
+        rows = conn.execute("""
+            SELECT timestamp, poly_mid, time_bucket
+            FROM scans WHERE market_id = ?
+            ORDER BY timestamp
+        """, (mid_id,)).fetchall()
+        if not rows:
+            continue
+        # Downsample if too many points (keep newest HISTORY_POINTS)
+        rows = rows[-HISTORY_POINTS:]
+        # Get team label
+        q = conn.execute(
+            "SELECT question FROM scans WHERE market_id=? LIMIT 1", (mid_id,)
+        ).fetchone()[0]
+        team = (q.replace("Will ", "")
+                 .replace(" advance to the knockout stages at the 2026 FIFA World Cup?", "")
+                 .replace(" advance to the knockout stages at the 2026 FIFA World Cup", ""))
+        price_history.append({
+            "team":   team,
+            "series": [{"t": r[0][:16], "p": round(r[1], 4), "bucket": r[2]} for r in rows],
+        })
+
     conn.close()
 
     # ── Assemble JSON ────────────────────────────────────────────────────────
@@ -176,6 +226,7 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
         "markets":        markets,
         "open_positions": open_positions,
         "resolved":       resolved,
+        "price_history":  price_history,
     }
 
     json_path = os.path.join(docs_dir, "data.json")

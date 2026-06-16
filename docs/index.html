@@ -314,7 +314,7 @@ async function load() {
     const res = t.outcome==="BEAT_LINE"?'<span class="tag" style="color:#3fdb84">beat</span>':'<span class="tag" style="color:#ff5d6c">missed</span>';
     return `<tr><td>${q}</td><td class="num" style="color:${t.clv>0?'#3fdb84':'#ff5d6c'}">${fmt(t.clv)}</td><td class="num" style="color:${adj>0?'#3fdb84':'#ff5d6c'}">${fmt(adj)}</td><td>${res}</td></tr>`;
   }).join("") : '<tr><td colspan="4" style="color:#8b97ad">No resolved trades yet.</td></tr>';
-}
+
   // GLM pre-match intelligence panel
   const gs = d.glm_signals || [];
   const glmDiv = document.getElementById("glmContent");

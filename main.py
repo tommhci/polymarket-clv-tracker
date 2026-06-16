@@ -266,9 +266,22 @@ def execute_scan(send_summary: bool = False) -> list:
     decision = compute_scan_decision(DB_PATH)
     log.info(schedule_summary(decision))
 
+    # ── Bootstrap guard: if DB has no scan data yet, run regardless ───────────
+    # On first-ever run (or after complete data loss), the scheduler returns
+    # "skip" because there are no advancement markets to derive kickoff times
+    # from. Without this bypass, the system would never populate itself.
     if decision.mode == "skip":
-        log.info("── Skipped (no active match window) — %s", decision.reason)
-        return []
+        import sqlite3 as _sq
+        n = _sq.connect(DB_PATH).execute("SELECT COUNT(*) FROM scans").fetchone()[0]
+        if n == 0:
+            log.info("Bootstrap: empty DB — running initial full scan to populate")
+            decision.mode          = "light"   # minimal: just get market data
+            decision.use_news      = False
+            decision.use_glm       = False
+            decision.use_football_data = False
+        else:
+            log.info("── Skipped (no active match window) — %s", decision.reason)
+            return []
 
     snapshots = run_scan()
 

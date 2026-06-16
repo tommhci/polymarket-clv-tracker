@@ -1,0 +1,6 @@
+# Polymarket edge scanner — Python dependencies
+# Install: pip install -r requirements.txt
+
+requests>=2.31.0       # HTTP calls (Gamma API, CLOB, Odds API, Telegram)
+python-dotenv>=1.0.0   # Load .env file into os.environ
+openai>=1.0.0          # GLM API client (OpenAI-compatible, same SDK)

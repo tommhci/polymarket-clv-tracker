@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket CLV Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:       #0b0e14;
+    --panel:    #141925;
+    --panel-2:  #1c2333;
+    --border:   #252d3f;
+    --text:     #e4e9f2;
+    --muted:    #8b97ad;
+    --accent:   #4d9fff;
+    --green:    #3fdb84;
+    --amber:    #ffb84d;
+    --red:      #ff5d6c;
+    --purple:   #b07cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", "Inter", system-ui, sans-serif;
+    line-height: 1.5;
+    padding: 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 6px;
+  }
+  h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.3px; }
+  h1 .dot { color: var(--accent); }
+  .meta { color: var(--muted); font-size: 13px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+  /* Gate banner */
+  .gate {
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 24px;
+    font-size: 15px; font-weight: 600; border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .gate .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+                 color: var(--muted); font-weight: 500; }
+  .gate.neutral   { background: linear-gradient(135deg,#1c2333,#141925); }
+  .gate.stop      { background: linear-gradient(135deg,#2a1518,#141925); border-color:#5a2730; color:var(--red); }
+  .gate.warn      { background: linear-gradient(135deg,#2a2415,#141925); color:var(--amber); }
+  .gate.promising { background: linear-gradient(135deg,#1a2a20,#141925); color:var(--green); }
+  .gate.good      { background: linear-gradient(135deg,#15291f,#141925); border-color:#2c5a40; color:var(--green); }
+
+  /* Metric cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+           gap: 12px; margin-bottom: 24px; }
+  .card { background: var(--panel); border: 1px solid var(--border);
+          border-radius: 12px; padding: 16px; }
+  .card .k { font-size: 12px; color: var(--muted); text-transform: uppercase;
+             letter-spacing: 0.5px; margin-bottom: 6px; }
+  .card .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .card .v.pos { color: var(--green); }
+  .card .v.neg { color: var(--red); }
+  .card .s { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Layout grid */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--border);
+           border-radius: 12px; padding: 18px; }
+  .panel h2 { font-size: 14px; font-weight: 600; margin-bottom: 14px;
+              color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .panel h2 .hint { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .chart-wrap { position: relative; height: 260px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px;
+          font-variant-numeric: tabular-nums; }
+  th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px;
+       text-transform: uppercase; letter-spacing: 0.5px;
+       padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--panel-2); }
+  tr:last-child td { border-bottom: none; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 99px;
+         background: var(--panel-2); color: var(--muted); }
+  .flame { color: var(--amber); }
+  .num { text-align: right; }
+  .full { grid-column: 1 / -1; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 24px;
+           text-align: center; border-top: 1px solid var(--border); padding-top: 16px; }
+  a { color: var(--accent); text-decoration: none; }
+  .err { color: var(--red); padding: 40px; text-align: center; }
+</style>
+</head>
+<body>
+  <header>
+    <h1><span class="dot">●</span> Polymarket CLV Tracker</h1>
+    <div class="meta" id="meta">loading…</div>
+  </header>
+  <div class="sub">Paper-trading research · measuring Closing Line Value on World Cup advancement markets</div>
+
+  <div class="gate neutral" id="gate">
+    <span class="label">Decision Gate</span>
+    <span id="gate-text">loading…</span>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>CLV Distribution <span class="hint">adjusted, per resolved trade</span></h2>
+      <div class="chart-wrap"><canvas id="histChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Snapshot Inventory <span class="hint">by time-to-kickoff bucket</span></h2>
+      <div class="chart-wrap"><canvas id="bucketChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel full">
+      <h2>Advancement Markets <span class="hint">sorted by distance from 0.50 — nearest = most narrative-sensitive</span></h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="marketChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Open Positions <span class="hint" id="open-count"></span></h2>
+      <table id="openTable"><thead><tr><th>Market</th><th class="num">Entry</th><th>Opened</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Resolved Trades <span class="hint" id="resolved-count"></span></h2>
+      <table id="resolvedTable"><thead><tr><th>Market</th><th class="num">CLV</th><th class="num">Adj</th><th>Result</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <footer>
+    Data: <a href="data.json">data.json</a> · <a href="data.csv">data.csv</a> (portable)
+    · Source of truth: SQLite · Auto-updated by GitHub Actions
+    · <span id="foot-time"></span>
+  </footer>
+
+<script>
+const fmt = (n, d=3) => (n === null || n === undefined) ? "—" : Number(n).toFixed(d);
+const fmtUsd = n => "$" + Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+const fmtPct = n => (n*100).toFixed(1) + "%";
+
+Chart.defaults.color = "#8b97ad";
+Chart.defaults.borderColor = "#252d3f";
+Chart.defaults.font.family = "-apple-system, Segoe UI, Inter, sans-serif";
+
+async function load() {
+  let d;
+  try {
+    const r = await fetch("data.json?t=" + Date.now());
+    d = await r.json();
+  } catch (e) {
+    document.body.innerHTML = '<div class="err">⚠️ data.json not found yet. The first GitHub Actions scan will generate it.</div>';
+    return;
+  }
+
+  // Meta
+  const scan = d.last_scan ? d.last_scan.slice(0,16).replace("T"," ") : "never";
+  document.getElementById("meta").textContent = `last scan ${scan} UTC · ${d.total_scans.toLocaleString()} snapshots`;
+  document.getElementById("foot-time").textContent = "generated " + (d.generated_at||"").slice(0,16).replace("T"," ") + " UTC";
+
+  // Gate
+  const s = d.summary;
+  const gate = document.getElementById("gate");
+  gate.className = "gate " + (s.gate_class || "neutral");
+  document.getElementById("gate-text").textContent = s.gate;
+
+  // Cards
+  const adjClass = s.avg_clv_adj === null ? "" : (s.avg_clv_adj > 0 ? "pos" : "neg");
+  const cards = [
+    {k:"Resolved Trades", v: s.n_resolved, s:`target ≥30 for read`},
+    {k:"Avg CLV (adj)", v: s.avg_clv_adj===null?"—":fmt(s.avg_clv_adj), cls:adjClass, s:`raw ${fmt(s.avg_clv_raw)} − lockup ${fmt(s.avg_lockup,5)}`},
+    {k:"t-statistic", v: fmt(s.t_stat,2), s:`need ≥2.0 for significance`},
+    {k:"Win Rate", v: s.win_rate===null?"—":fmtPct(s.win_rate), s:`${s.beat_line}/${s.n_resolved} beat line`},
+    {k:"Open Positions", v: d.open_positions.length, s:`awaiting resolution`},
+    {k:"Markets Tracked", v: d.markets.length, s:`advancement contracts`},
+  ];
+  document.getElementById("cards").innerHTML = cards.map(c =>
+    `<div class="card"><div class="k">${c.k}</div><div class="v ${c.cls||''}">${c.v}</div><div class="s">${c.s||''}</div></div>`
+  ).join("");
+
+  // Histogram
+  if (d.histogram.length) {
+    new Chart(document.getElementById("histChart"), {
+      type: "bar",
+      data: { labels: d.histogram.map(h=>h.bin),
+        datasets: [{ data: d.histogram.map(h=>h.count),
+          backgroundColor: d.histogram.map(h=>h.bin>0?"#3fdb84":"#ff5d6c"), borderRadius:4 }] },
+      options: { plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{precision:0}} } }
+    });
+  } else {
+    document.getElementById("histChart").parentElement.innerHTML =
+      '<div style="color:#8b97ad;text-align:center;padding-top:100px">No resolved trades yet</div>';
+  }
+
+  // Buckets
+  const bOrder = {"T-1h":1,"T-24h":2,"T-168h":3,"T-other":4,"T-expired":5};
+  const bs = [...d.buckets].sort((a,b)=>(bOrder[a.bucket]||9)-(bOrder[b.bucket]||9));
+  new Chart(document.getElementById("bucketChart"), {
+    type: "bar",
+    data: { labels: bs.map(b=>b.bucket),
+      datasets: [{ label:"rows", data: bs.map(b=>b.rows), backgroundColor:"#4d9fff", borderRadius:4 }] },
+    options: { indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,ticks:{precision:0}}} }
+  });
+
+  // Market chart (top 20 nearest 0.5)
+  const mk = d.markets.slice(0,20);
+  new Chart(document.getElementById("marketChart"), {
+    type:"bar",
+    data:{ labels: mk.map(m=>m.team),
+      datasets:[{ label:"implied prob (mid)", data: mk.map(m=>m.mid),
+        backgroundColor: mk.map(m=>m.distance<0.08?"#ffb84d":"#4d9fff"), borderRadius:4 }] },
+    options:{ plugins:{legend:{display:false},
+        tooltip:{callbacks:{afterLabel:(c)=>{const m=mk[c.dataIndex];return `vol ${fmtUsd(m.volume)} · spread ${fmtPct(m.spread_pct)}`;}}}},
+      scales:{ y:{min:0,max:1,ticks:{callback:v=>v.toFixed(1)}} } }
+  });
+
+  // Open positions table
+  const ob = document.querySelector("#openTable tbody");
+  document.getElementById("open-count").textContent = `(${d.open_positions.length})`;
+  ob.innerHTML = d.open_positions.length ? d.open_positions.slice(0,15).map(p=>{
+    const q = p.question.replace("Will ","").replace(/ advance to the knockout stages.*/,"");
+    return `<tr><td>${q}</td><td class="num">${fmt(p.entry_price)}</td><td>${(p.entry_timestamp||"").slice(5,16).replace("T"," ")}</td></tr>`;
+  }).join("") : '<tr><td colspan="3" style="color:#8b97ad">Positions open automatically at T-1h before each match.</td></tr>';
+
+  // Resolved table
+  const rb = document.querySelector("#resolvedTable tbody");
+  document.getElementById("resolved-count").textContent = `(${d.resolved.length})`;
+  rb.innerHTML = d.resolved.length ? d.resolved.slice(0,15).map(t=>{
+    const q = t.question.replace("Will ","").replace(/ advance to the knockout stages.*/,"");
+    const adj = t.clv_adjusted!==null?t.clv_adjusted:t.clv;
+    const cls = adj>0?"pos":"neg";
+    const res = t.outcome==="BEAT_LINE"?'<span class="tag" style="color:#3fdb84">beat</span>':'<span class="tag" style="color:#ff5d6c">missed</span>';
+    return `<tr><td>${q}</td><td class="num" style="color:${t.clv>0?'#3fdb84':'#ff5d6c'}">${fmt(t.clv)}</td><td class="num" style="color:${adj>0?'#3fdb84':'#ff5d6c'}">${fmt(adj)}</td><td>${res}</td></tr>`;
+  }).join("") : '<tr><td colspan="4" style="color:#8b97ad">No resolved trades yet.</td></tr>';
+}
+load();
+</script>
+</body>
+</html>

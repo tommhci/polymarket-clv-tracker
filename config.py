@@ -14,11 +14,18 @@ TELEGRAM_BOT_TOKEN  = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID    = os.environ.get("TELEGRAM_CHAT_ID", "")
 
 # ── GLM (智谱AI) ───────────────────────────────────────────────────────────────
-# OpenAI-compatible API. Endpoint: https://open.bigmodel.cn/api/paas/v4
-# Source: apidog.com/blog/how-to-use-glm-5-1-api (May 2026)
 GLM_API_KEY  = os.environ.get("GLM_API_KEY", "")
-GLM_MODEL    = os.environ.get("GLM_MODEL", "glm-4-flash")   # cheapest tier
+GLM_MODEL    = os.environ.get("GLM_MODEL", "glm-4-flash")
 GLM_BASE_URL = os.environ.get("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
+
+# ── Real-time grounding ────────────────────────────────────────────────────────
+# football-data.org — free, structured WC standings/results
+# Docs: https://docs.football-data.org/general/v4/ (May 2022)
+FOOTBALL_DATA_API_KEY = os.environ.get("FOOTBALL_DATA_API_KEY", "")
+
+# Tavily — LLM-optimised news search, free 1000 calls/month
+# Verified: designed for RAG/LLM grounding (Tavily docs, 2025)
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
 # ── Polymarket endpoints (read-only, no auth required) ─────────────────────────
 GAMMA_API_BASE = "https://gamma-api.polymarket.com"

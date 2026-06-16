@@ -310,20 +310,23 @@ def analyze_pre_match(
     hours_to_end: float,
     path:         str = DB_PATH,
     max_age_h:    float = 6.0,      # re-analyse at most every 6 hours
+    live_context: Optional[dict] = None,
 ) -> PreMatchSignal:
     """
     Generate a pre-match trading intelligence signal using GLM.
 
-    Called when time_bucket is T-24h or T-1h. Results are cached in the
-    glm_prematch table (one fresh analysis per market per ~6h window).
+    Called when time_bucket is T-24h or T-1h.
 
-    GLM is used here for what LLMs are genuinely good at: extracting structured
-    signals from historical/contextual knowledge. It is NOT asked to predict
-    outcomes — it is asked whether the CURRENT PRICE seems consistent with what
-    it knows about this team.
+    If live_context is provided (from news_fetcher.fetch_live_context()),
+    it is injected into the prompt so GLM can reason from CURRENT data:
+      - actual standings (position, points, GD)
+      - recent match results
+      - latest news headlines
 
-    Source: NVIDIA blog on LLM financial signal discovery (June 2026);
-            Squawka AI methodology — structured signals from weighted inputs.
+    Without live_context, GLM falls back to its training data (historical
+    patterns, squad knowledge). Training cutoff: ~late 2024, so no live data.
+
+    Results cached in glm_prematch table (one fresh analysis per market per 6h).
     """
     ensure_glm_cache(path)
     now = datetime.now(timezone.utc)
@@ -378,17 +381,36 @@ def analyze_pre_match(
         "slightly below 50%"      if poly_price > 0.35 else
         "significantly below 50%"
     )
+
+    # ── Build live context section (if provided) ──────────────────────────────
+    ctx_section = ""
+    if live_context:
+        standing_text = live_context.get("standing_text", "")
+        match_text    = live_context.get("match_text", "")
+        news_answer   = live_context.get("news_answer", "")
+        n_articles    = len(live_context.get("news_articles", []))
+        sources       = live_context.get("sources_used", {})
+
+        if standing_text or match_text or news_answer:
+            ctx_section = "\n\n--- LIVE DATA (retrieved now, not training memory) ---\n"
+            if standing_text:
+                ctx_section += f"Current standings: {standing_text}\n"
+            if match_text:
+                ctx_section += f"{match_text}\n"
+            if news_answer:
+                ctx_section += f"Recent news summary: {news_answer[:400]}\n"
+            ctx_section += f"(Sources: football_data={sources.get('football_data')}, tavily_news={sources.get('tavily')}, {n_articles} articles)"
+            ctx_section += "\n--- END LIVE DATA ---"
+
     user_msg = (
         f"Market: Will {team} advance to the knockout stages at the 2026 FIFA World Cup?\n"
         f"Current Polymarket implied probability: {pct} ({direction})\n"
-        f"Hours until market resolution: {hours_to_end:.1f}h\n\n"
-        f"Analyse whether this price appears well-calibrated given:\n"
-        f"1. {team}'s historical World Cup record and typical performance level\n"
-        f"2. Their group composition and likely opponents\n"
-        f"3. The 2026 format: top 2 per group qualify + 8 best 3rd-place teams\n"
-        f"4. Any known factors (squad strength, playing style, historical patterns)\n\n"
-        f"If you lack current tournament data, reason from base rates and structure.\n"
-        f"Focus on: is {pct} a reasonable price, or does it seem inconsistent?"
+        f"Hours until market resolution: {hours_to_end:.1f}h\n"
+        f"2026 format: top 2 per group qualify automatically + 8 best 3rd-place teams."
+        f"{ctx_section}\n\n"
+        f"Your task: determine if {pct} is a reasonable probability for {team} advancing.\n"
+        f"{'Use the live data above as primary evidence.' if ctx_section else 'Note: no live data available — reason from historical base rates and structural arguments only.'}\n"
+        f"Flag the single most important reason the market might be systematically wrong."
     )
 
     try:

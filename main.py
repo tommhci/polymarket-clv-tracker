@@ -327,14 +327,21 @@ def execute_scan(send_summary: bool = False) -> list:
         from scanner import extract_team
         team = extract_team(snap.question)
         if team:
+            # Fetch live context (standings + news) to ground GLM in real data
+            try:
+                from news_fetcher import fetch_live_context
+                live_ctx = fetch_live_context(team)
+            except Exception as e:
+                log.debug("news_fetcher unavailable for %s: %s", team, e)
+                live_ctx = None
             analyze_pre_match(
                 market_id=snap.market_id, team=team,
                 poly_price=snap.poly_mid, hours_to_end=snap.hours_to_end,
-                path=DB_PATH,
+                path=DB_PATH, live_context=live_ctx,
             )
             glm_count += 1
     if glm_count:
-        log.info("GLM pre-match: analysed %d markets", glm_count)
+        log.info("GLM analysed %d pre-match markets (with live context)", glm_count)
 
     if send_summary:
         alert_scan_summary(snapshots)

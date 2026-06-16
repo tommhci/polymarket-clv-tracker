@@ -56,21 +56,58 @@ def execute_scan(send_summary: bool = False) -> list:
     # Auto-close trades that have reached resolution
     auto_close_expired(snapshots)
 
-    # Open paper trades + alert for new signals
-    new_signals = 0
+    # ── Open paper trades ──────────────────────────────────────────────────
+    #
+    # Two distinct triggers:
+    #
+    # 1. ALERT TRADE (alertable=True): a genuine edge signal exists
+    #    (net_edge > 4%, spread < 3%). Send Telegram alert + open position.
+    #
+    # 2. CLV TEST ENTRY (T-1h advancement market): no edge signal required.
+    #    Open a virtual position for EVERY advancement market at T-1h.
+    #    This is the primary data collection mechanism — entry price at T-1h
+    #    vs. resolution price = CLV. Without this, the system collects zero
+    #    CLV data (all advancement markets have no_advance_baseline, so
+    #    alertable is always False for them).
+    #
+    # Both types use open_paper_trade() and are tracked identically.
+    # Only alert trades generate Telegram notifications.
+
+    new_signals   = 0
+    clv_entries   = 0
+
     for snap in snapshots:
+        is_advance = any(
+            k in snap.question.lower()
+            for k in ("advance", "qualify", "knockout", "reach the")
+        )
+
         if snap.alertable:
+            # ── Edge signal: alert + open ──
             trade_id = open_paper_trade(snap, direction="YES")
             snap.paper_trade_id = trade_id
             alert_edge_found(snap, trade_id)
             new_signals += 1
 
+        elif is_advance and snap.time_bucket == "T-1h":
+            # ── CLV test entry: open without alerting ──
+            # This is the 1-hour-before-kickoff virtual position.
+            # Resolution price (auto-closed when price ≥ 0.95 or ≤ 0.05)
+            # minus this entry price = CLV timing signal.
+            trade_id = open_paper_trade(snap, direction="YES")
+            snap.paper_trade_id = trade_id
+            clv_entries += 1
+            log.info(
+                "CLV entry [T-1h] %s @ %.3f (spread=%.1f%%)",
+                snap.question[:45], snap.poly_ask_vwap, snap.spread_pct * 100,
+            )
+
     if send_summary:
         alert_scan_summary(snapshots)
 
     log.info(
-        "── Scan done: %d markets, %d new signals ─────────",
-        len(snapshots), new_signals,
+        "── Scan done: %d markets | %d edge signals | %d CLV test entries ──",
+        len(snapshots), new_signals, clv_entries,
     )
     return snapshots
 

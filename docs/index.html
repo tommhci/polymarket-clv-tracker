@@ -177,6 +177,13 @@
     </div>
   </div>
 
+  <div class="grid">
+    <div class="panel full" id="calPanel">
+      <h2>📐 Calibration Study <span class="hint">the actual Phase-1 measurement: is Polymarket well-calibrated on advancement? (Brier + bootstrap, activates when markets resolve ~Jun 28)</span></h2>
+      <div id="calContent" style="color:var(--muted);font-size:13px;">Loading calibration…</div>
+    </div>
+  </div>
+
   <footer>
     Data: <a href="data.json">data.json</a> · <a href="data.csv">data.csv</a> (portable)
     · Source of truth: SQLite · Auto-updated by GitHub Actions
@@ -338,6 +345,45 @@ async function load() {
         <div class="s-flags">${flags}</div>
       </div>`;
     }).join("") + '</div>';
+  }
+
+  // Calibration study panel
+  const cal = d.calibration || {};
+  const calDiv = document.getElementById("calContent");
+  if (!cal.n_resolved) {
+    calDiv.innerHTML = `<div style="padding:8px 0">${cal.note || "Activates when markets resolve (~Jun 28)."}</div>
+      <div style="color:var(--muted);font-size:12px">This is the core Phase-1 metric: Brier score + bootstrap CI measuring whether Polymarket is well-calibrated on advancement. Pre-registered before outcomes are known.</div>`;
+  } else {
+    const bs = cal.bootstrap || {};
+    const bssColor = cal.brier_skill > 0 ? "var(--green)" : cal.brier_skill < 0 ? "var(--red)" : "var(--muted)";
+    let verdictColor = "var(--muted)";
+    if (bs.verdict) {
+      if (bs.verdict.includes("MISPRICING")) verdictColor = "var(--green)";
+      else if (bs.verdict.includes("SKILL DETECTED")) verdictColor = "var(--accent)";
+    }
+    // Calibration curve as text rows
+    const curveRows = (cal.curve||[]).filter(b=>b.n>0).map(b=>{
+      const gap = b.actual_rate - b.mean_pred;
+      const dir = Math.abs(gap)<0.03 ? "✓ calibrated" : gap>0 ? "↑ underpriced" : "↓ overpriced";
+      const c = Math.abs(gap)<0.03 ? "var(--muted)" : gap>0 ? "var(--green)" : "var(--red)";
+      return `<tr><td>${(b.bin_lo*100).toFixed(0)}–${(b.bin_hi*100).toFixed(0)}%</td>
+        <td class="num">${b.n}</td>
+        <td class="num">${(b.mean_pred*100).toFixed(1)}%</td>
+        <td class="num">${(b.actual_rate*100).toFixed(1)}%</td>
+        <td style="color:${c}">${dir}</td></tr>`;
+    }).join("");
+    calDiv.innerHTML = `
+      <div class="cards" style="margin-bottom:14px">
+        <div class="card"><div class="k">Resolved</div><div class="v">${cal.n_resolved}</div></div>
+        <div class="card"><div class="k">Brier Score</div><div class="v">${cal.brier!==null?cal.brier.toFixed(3):"—"}</div><div class="s">lower=better, 0.25=naive</div></div>
+        <div class="card"><div class="k">Brier Skill</div><div class="v" style="color:${bssColor}">${cal.brier_skill!==null?(cal.brier_skill>0?"+":"")+cal.brier_skill.toFixed(3):"—"}</div><div class="s">vs base rate 66.7%</div></div>
+        <div class="card"><div class="k">ECE</div><div class="v">${cal.ece!==null?cal.ece.toFixed(3):"—"}</div><div class="s">calibration error</div></div>
+      </div>
+      ${bs.verdict?`<div style="padding:10px 14px;border-radius:8px;background:var(--panel-2);margin-bottom:14px;border-left:3px solid ${verdictColor}">
+        <b style="color:${verdictColor}">${bs.verdict}</b><br>
+        <span style="font-size:12px;color:var(--muted)">Bootstrap 95% CI for Brier Skill: [${bs.ci_low}, ${bs.ci_high}] · n=${bs.n} · 10k resamples</span></div>`:""}
+      <table><thead><tr><th>Implied Prob</th><th class="num">n</th><th class="num">Predicted</th><th class="num">Actual</th><th>Calibration</th></tr></thead><tbody>${curveRows}</tbody></table>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px">${cal.note||""}</div>`;
   }
 }
 load();

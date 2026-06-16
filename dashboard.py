@@ -203,6 +203,22 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     ensure_glm_cache(path)
     glm_signals = get_latest_prematch_signals(path, limit=12)
 
+    # ── 10. Calibration analysis (pre-registered; activates at resolution) ────
+    from analytics import run_calibration_analysis
+    cal = run_calibration_analysis(path)
+    calibration = {
+        "n_resolved":  cal.n_resolved,
+        "brier":       cal.brier,
+        "brier_skill": cal.brier_skill,
+        "log_loss":    cal.log_loss,
+        "ece":         cal.ece,
+        "base_rate":   round(cal.base_rate, 4),
+        "actual_rate": cal.actual_rate,
+        "curve":       cal.curve,
+        "bootstrap":   cal.bootstrap,
+        "note":        cal.note,
+    }
+
     # ── Assemble JSON ────────────────────────────────────────────────────────
     payload = {
         "generated_at":   now.isoformat(),
@@ -233,6 +249,7 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
         "resolved":       resolved,
         "price_history":  price_history,
         "glm_signals":    glm_signals,
+        "calibration":    calibration,
     }
 
     json_path = os.path.join(docs_dir, "data.json")

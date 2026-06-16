@@ -46,7 +46,16 @@ KELLY_FRACTION       = 0.25  # Quarter-Kelly when sizing real trades later
 
 # ── Scan behaviour ────────────────────────────────────────────────────────────
 SCAN_INTERVAL_MINUTES = 30   # cron cadence (override with --interval flag)
-MAX_MARKETS_PER_SCAN  = 30   # cap to respect rate limits
+MAX_MARKETS_PER_SCAN  = 60   # raised to fit advancement markets + a few winners
+
+# ── Priority event slugs (the markets where retail edge could actually exist) ──
+# Verified live (June 2026): advancement markets are $27K-250K volume, many
+# near coin-flip (Czechia 0.55, Turkiye 0.515) = narrative-sensitive, the
+# mid-liquidity tier institutions/bots under-cover. These are the TARGET.
+# The "Win World Cup" outright markets ($50-70M) are efficient — negative edge.
+PRIORITY_EVENT_SLUGS = [
+    "world-cup-team-to-advance-to-knockout-stages",
+]
 
 # ── Database ──────────────────────────────────────────────────────────────────
 DB_PATH = os.environ.get("DB_PATH", "polymarket_tracker.db")
@@ -64,7 +73,9 @@ TEAM_NAMES = [
     "Germany", "Ghana", "Iran", "Italy", "Japan", "Mexico", "Morocco",
     "Netherlands", "Nigeria", "Poland", "Portugal", "Saudi Arabia",
     "Scotland", "Senegal", "Serbia", "South Korea", "Spain", "Sweden",
-    "Switzerland", "Tunisia", "Turkey", "Ukraine", "Uruguay", "USA",
+    "Switzerland", "Tunisia", "Turkey", "Turkiye", "Ukraine", "Uruguay", "USA",
     "Wales", "Ivory Coast", "Curacao", "Haiti", "Paraguay", "Bosnia",
-    "Qatar",
+    "Bosnia and Herzegovina", "Qatar", "Czechia", "Czech Republic",
+    "Norway", "New Zealand", "Egypt", "Uzbekistan", "Algeria", "Austria",
+    "Congo DR", "Cape Verde", "Jordan", "Panama", "South Africa", "Iraq",
 ]

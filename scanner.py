@@ -30,7 +30,7 @@ from config import (
     SPORTS_TAKER_FEE_RATE,
     MIN_NET_EDGE, MAX_SPREAD_PCT, MIN_VOLUME_USD,
     PAPER_TRADE_SIZE_USD, MAX_MARKETS_PER_SCAN,
-    WC_KEYWORDS, TEAM_NAMES,
+    WC_KEYWORDS, TEAM_NAMES, PRIORITY_EVENT_SLUGS,
 )
 
 log = logging.getLogger(__name__)
@@ -70,11 +70,73 @@ def get_world_cup_markets() -> list[dict]:
     Primary universe: "Will X win the 2026 FIFA World Cup?" outright markets.
     Returns raw dicts with corrected field names.
     """
-    url    = f"{GAMMA_API_BASE}/markets"
-    found  = []
-    offset = 0
+def get_event_markets(slug: str) -> list[dict]:
+    """
+    Fetch all sub-markets under a Polymarket EVENT by slug.
 
-    while len(found) < MAX_MARKETS_PER_SCAN:
+    This is the FIX for the scan-direction defect: advancement markets
+    ("Will X advance to knockout stages?") live as sub-markets under an event,
+    NOT as standalone entries in the flat /markets feed. The flat feed, sorted
+    by volume, is dominated by the 48 × $50-70M "Win World Cup" outright markets
+    (highly efficient → negative edge), which crowd out the $27-250K advancement
+    markets (mid-liquidity, narrative-sensitive → where retail edge can exist).
+    """
+    try:
+        resp = requests.get(
+            f"{GAMMA_API_BASE}/events",
+            params={"slug": slug},
+            timeout=12,
+        )
+        resp.raise_for_status()
+        events = resp.json()
+    except requests.RequestException as e:
+        log.error("Gamma events error for slug %s: %s", slug, e)
+        return []
+
+    if not events:
+        return []
+
+    markets = events[0].get("markets", [])
+    # Keep only markets that are active, have tokens, and clear volume floor
+    out = []
+    for m in markets:
+        vol = float(m.get("volume", 0) or 0)
+        tok = m.get("clobTokenIds", "[]")
+        if vol >= MIN_VOLUME_USD and tok and tok != "[]":
+            out.append(m)
+    log.info("Event '%s': %d sub-markets above $%s", slug, len(out), f"{MIN_VOLUME_USD:,}")
+    return out
+
+
+def get_world_cup_markets() -> list[dict]:
+    """
+    Build the scan universe, PRIORITISING advancement markets over outright winners.
+
+    Order:
+      1. Priority event sub-markets (advancement to knockout) — the real target
+      2. Flat /markets WC entries (fills remaining slots; mostly outright winners)
+
+    Deduplicated by market id. Capped at MAX_MARKETS_PER_SCAN.
+    """
+    found: list[dict] = []
+    seen_ids: set = set()
+
+    # ── 1. Priority: advancement markets via event endpoint ──
+    for slug in PRIORITY_EVENT_SLUGS:
+        for m in get_event_markets(slug):
+            mid = str(m.get("id", ""))
+            if mid and mid not in seen_ids:
+                seen_ids.add(mid)
+                found.append(m)
+
+    n_priority = len(found)
+
+    # ── 2. Fill remaining slots from flat /markets feed ──
+    url    = f"{GAMMA_API_BASE}/markets"
+    offset = 0
+    flat: list[dict] = []
+
+    while len(found) + len(flat) < MAX_MARKETS_PER_SCAN:
         try:
             resp = requests.get(url, params={
                 "active": "true", "closed": "false",
@@ -93,22 +155,29 @@ def get_world_cup_markets() -> list[dict]:
             q   = m.get("question", "").lower()
             vol = float(m.get("volume", 0) or 0)
             tok = m.get("clobTokenIds", "[]")
+            mid = str(m.get("id", ""))
 
-            # Volume floor + keyword filter + has token IDs
-            if (vol >= MIN_VOLUME_USD
+            if (mid not in seen_ids
+                    and vol >= MIN_VOLUME_USD
                     and any(kw in q for kw in WC_KEYWORDS)
                     and tok and tok != "[]"):
-                found.append(m)
+                seen_ids.add(mid)
+                flat.append(m)
 
         if len(batch) < 100:
             break
         offset += 100
         time.sleep(0.1)
 
-    # Sort by volume desc, take top MAX_MARKETS_PER_SCAN
-    found.sort(key=lambda m: float(m.get("volume", 0) or 0), reverse=True)
+    # Sort flat fillers by volume desc, append after priority markets
+    flat.sort(key=lambda m: float(m.get("volume", 0) or 0), reverse=True)
+    found.extend(flat)
     result = found[:MAX_MARKETS_PER_SCAN]
-    log.info("Discovered %d WC markets (vol > $%s)", len(result), f"{MIN_VOLUME_USD:,}")
+
+    log.info(
+        "Universe: %d markets (%d priority advancement + %d flat fillers)",
+        len(result), n_priority, len(result) - n_priority,
+    )
     return result
 
 
@@ -374,11 +443,25 @@ def run_scan() -> list[MarketSnapshot]:
             vwap_ask = best_ask
 
         # ── External baseline ──
-        team = extract_team(question)
-        if team:
-            p_true, source = get_devigged_win_prob(team)
+        # IMPORTANT: advancement markets ("Will X advance to knockout?") need
+        # "to qualify" odds. The free Odds API only provides tournament-WINNER
+        # outrights + match h2h — NOT advancement odds. Comparing an advance
+        # market (e.g. 0.49) to winner odds (e.g. 0.005) is meaningless, so we
+        # do NOT fabricate an edge signal for these. They are still logged every
+        # scan, which is all CLV needs (CLV = entry price vs closing price, both
+        # from Polymarket — no sportsbook baseline required).
+        q_lower = question.lower()
+        is_advance = any(k in q_lower for k in
+                         ("advance", "qualify", "knockout", "reach the", "group stage"))
+
+        if is_advance:
+            p_true, source = 0.0, "no_advance_baseline (qualification odds unavailable)"
         else:
-            p_true, source = 0.0, "no_team_match"
+            team = extract_team(question)
+            if team:
+                p_true, source = get_devigged_win_prob(team)
+            else:
+                p_true, source = 0.0, "no_team_match"
 
         # ── Fee (always computed, regardless of baseline) ──
         fee_always = taker_fee_fraction(vwap_ask)

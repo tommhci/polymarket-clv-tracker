@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T06:10:46.481795+00:00",
+  "generated_at": "2026-06-16T08:33:14.425225+00:00",
   "last_scan": "2026-06-16T05:13:01.595619+00:00",
   "total_scans": 120,
   "config": {
@@ -246,20 +246,20 @@
       "distance": 0.365
     },
     {
-      "team": "Norway",
-      "mid": 0.865,
-      "ask": 0.872,
-      "volume": 87861.0,
-      "spread_pct": 0.0115,
-      "bucket": "T-other",
-      "distance": 0.365
-    },
-    {
       "team": "Iraq",
       "mid": 0.135,
       "ask": 0.14,
       "volume": 189357.0,
       "spread_pct": 0.0714,
+      "bucket": "T-other",
+      "distance": 0.365
+    },
+    {
+      "team": "Norway",
+      "mid": 0.865,
+      "ask": 0.872,
+      "volume": 87861.0,
+      "spread_pct": 0.0115,
       "bucket": "T-other",
       "distance": 0.365
     },

@@ -7,6 +7,7 @@ Usage:
   python main.py --digest         # send daily CLV digest to Telegram
   python main.py --close TRADE_ID PRICE   # manually close a paper trade
   python main.py --dashboard      # print CLV dashboard to terminal
+  python main.py --force          # bypass the smart scheduler, scan now regardless
 
 The system runs in PAPER TRADING mode only.
 No wallet, no pUSD, no real orders placed.
@@ -248,7 +249,7 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
 
 # ── Core single-scan orchestration ────────────────────────────────────────────
 
-def execute_scan(send_summary: bool = False) -> list:
+def execute_scan(send_summary: bool = False, force: bool = False) -> list:
     """
     Run one full scan, persist results, send edge alerts,
     and trigger GLM pre-match analysis for T-24h / T-1h markets.
@@ -259,6 +260,17 @@ def execute_scan(send_summary: bool = False) -> list:
       full_pre   → Polymarket + football-data + GLM (no Tavily)
       light      → Polymarket prices only
       skip       → exit immediately (no matches in relevant window)
+
+    force: bypass the scheduler's "skip" decision (see --force CLI flag /
+      FIXLOG.md "post-deploy fix"). Needed because the scheduler derives its
+      window estimate from the MOST RECENT scans already on file — right
+      after deploying the P0-1 fix, those rows still reflect the OLD bug
+      (every team sharing one stale, far-off date), so the scheduler keeps
+      deciding "skip" for days even though a real scan right now would
+      already produce correct, useful per-team data. The pre-existing
+      bootstrap bypass below only fires when the scans table is fully
+      empty (n==0), which isn't true here (420 historical rows already
+      exist) — force covers the "data exists but is stale/wrong" case too.
     """
     log.info("── Scan start ──────────────────────────────────")
     ensure_glm_cache(DB_PATH)
@@ -271,7 +283,14 @@ def execute_scan(send_summary: bool = False) -> list:
     # On first-ever run (or after complete data loss), the scheduler returns
     # "skip" because there are no advancement markets to derive kickoff times
     # from. Without this bypass, the system would never populate itself.
-    if decision.mode == "skip":
+    if decision.mode == "skip" and force:
+        log.info("Force flag set — running a full scan despite scheduler "
+                  "saying 'skip' (reason: %s)", decision.reason)
+        decision.mode          = "light"
+        decision.use_news      = False
+        decision.use_glm       = False
+        decision.use_football_data = False
+    elif decision.mode == "skip":
         import sqlite3 as _sq
         n = _sq.connect(DB_PATH).execute("SELECT COUNT(*) FROM scans").fetchone()[0]
         if n == 0:
@@ -457,6 +476,12 @@ def parse_args():
                    help="Also send scan-summary Telegram ping each run")
     p.add_argument("--report",    action="store_true",
                    help="Write STATUS.md dashboard (readable on GitHub, no scan)")
+    p.add_argument("--force",     action="store_true",
+                   help="Bypass the smart scheduler's skip decision and run a "
+                        "full scan regardless (see FIXLOG.md). Use for manual "
+                        "workflow_dispatch runs or right after deploying a fix "
+                        "to scanner.py's time-bucket logic, when existing scans "
+                        "data still reflects the old behavior.")
     return p.parse_args()
 
 
@@ -494,7 +519,7 @@ def main():
 
     # ── Single scan ───────────────────────────────────────────────────────────
     if not args.loop:
-        execute_scan(send_summary=args.summary)
+        execute_scan(send_summary=args.summary, force=args.force)
         print_dashboard()
         return
 
@@ -508,7 +533,7 @@ def main():
     scan_count = 0
     while True:
         try:
-            execute_scan(send_summary=args.summary)
+            execute_scan(send_summary=args.summary, force=args.force)
             scan_count += 1
 
             # Print dashboard every 4 scans (~2 hours at default interval)

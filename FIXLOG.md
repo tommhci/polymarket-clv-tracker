@@ -281,3 +281,56 @@ Either way: **after deploying, check the Actions log of the next run**
 for (a) the P1 football-data.org health-check line, and (b) any
 `scanner.py` warnings about unmatched team names — both are called out
 above as the two things this session could not verify live.
+
+---
+
+## Addendum (post-deploy) — `--force` flag
+
+Tom deployed the bundle above (merge + push confirmed in the live repo's
+history: `d7181d3 Merge branch 'fix-from-claude'`), and the P1 health check
+ran for real and passed: `✅ football-data.org OK (200) — key is valid and
+working.` Good — that confirms the secret and the API call both work.
+
+**However**, re-cloning the live repo directly afterward (not just reading
+the pasted log) showed `docs/scans.csv` still frozen at `2026-06-21T23:53:19`
+(421 lines, unchanged) and `docs/paper_trades.csv` still at 1 line (header
+only) — i.e. `run_scan()` never actually executed on that run, despite the
+health check passing and a manual `workflow_dispatch` trigger. Initial
+read of the situation ("the catch-up mechanism must have fired") was
+**incorrect** — it had not been exercised at all yet.
+
+**Root cause:** `scheduler.compute_scan_decision()` reconstructs its
+window estimate from the *existing* rows in the `scans` table — and every
+existing row was written under the old bug (every team's `hours_to_end`
+computed from the shared, frozen, ~168h-out `endDateIso`). So the
+scheduler kept returning `"skip"` based on that stale wrong timeline. The
+pre-existing bootstrap bypass only fires when the table is fully empty
+(`n==0`), which wasn't the case (420 historical rows). Separately,
+`scan.yml` already *claimed* in a comment that `workflow_dispatch` "always
+runs full scan regardless of scheduler" — but the code never implemented
+that; the manual trigger behaved identically to a regular cron tick.
+
+**Fix (new commit, `4c62b79`):** added a `--force` flag to `main.py` that
+bypasses the skip decision the same way the bootstrap guard does, and
+wired `.github/workflows/scan.yml` to pass `--force` automatically when
+`github.event_name == 'workflow_dispatch'` — making the workflow's own
+pre-existing comment actually true. Regular 30-min cron ticks are
+unaffected (`force=False`, identical to before). Verified offline with a
+new `tests/test_force_flag.py` (seeds a non-empty `scans` table + a
+scheduler mock forced to `"skip"`; confirms `force=False` correctly does
+nothing and `force=True` correctly runs a real scan and writes the new
+row) — full existing test suite re-run, no regressions.
+
+This is a **one-time bootstrap problem**: once a single forced run
+completes, `scanner.py` writes fresh correct per-team `hours_to_end`
+values, and the scheduler reads from that same (now-correct) table going
+forward — so regular cron ticks should self-correct after that, no
+repeated forcing needed.
+
+**Still not deployed** (same constraint as before — no push access from
+this sandbox). Tom needs to merge this on top of the already-deployed
+branch and push again, then run `workflow_dispatch` one more time, then
+check `docs/scans.csv`'s latest timestamp and `docs/paper_trades.csv`'s
+row count directly (not just the health-check log) to confirm a real scan
+actually ran this time.
+

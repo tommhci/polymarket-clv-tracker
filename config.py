@@ -47,6 +47,16 @@ MIN_NET_EDGE   = 0.04    # 4% minimum net edge to log a paper trade or alert
 MAX_SPREAD_PCT = 0.03    # 3% max bid-ask spread; wider = skip (too illiquid)
 MIN_VOLUME_USD = 20_000  # ignore markets with < $20K total volume
 
+# ── Strategy pre-registration (FIXLOG.md "P0-2") ────────────────────────────────
+# Locked BEFORE paper_trades had any real rows (0 rows at the time this was
+# written) — the whole point of pre-registration is committing to the entry
+# rule before seeing outcomes, so results can't be cherry-picked after the
+# fact. Do not add a 4th strategy or change these thresholds once real data
+# has started accumulating; see tracker.classify_strategies().
+STRATEGY_B_DISCOUNT_MAX     = 0.62   # B_discount: poly_mid <  this
+STRATEGY_C_UNCERTAIN_LO     = 0.38   # C_uncertain: this <  poly_mid
+STRATEGY_C_UNCERTAIN_HI     = 0.65   #              poly_mid <  this
+
 # ── Paper trade sizing (CLV tracking only — zero real money) ───────────────────
 PAPER_TRADE_SIZE_USD = 200   # virtual position size for VWAP calculation
 KELLY_FRACTION       = 0.25  # Quarter-Kelly when sizing real trades later

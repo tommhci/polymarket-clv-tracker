@@ -21,10 +21,46 @@ from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Optional
 
-from config import DB_PATH, RISK_FREE_RATE
+from config import (
+    DB_PATH, RISK_FREE_RATE,
+    STRATEGY_B_DISCOUNT_MAX, STRATEGY_C_UNCERTAIN_LO, STRATEGY_C_UNCERTAIN_HI,
+)
 from scanner import MarketSnapshot
 
 log = logging.getLogger(__name__)
+
+
+# ── Strategy pre-registration (FIXLOG.md "P0-2") ─────────────────────────────
+#
+# Locked before paper_trades had any real rows. Three independent entry
+# rules, each evaluated against the SAME snapshot — a single market can
+# qualify for more than one, in which case it gets one separate paper_trade
+# row PER qualifying label (same entry price/timestamp, different trade_id
+# and strategy_label), so each hypothesis's sample never overlaps/leaks into
+# another's and can be analysed completely independently:
+#
+#   A_all       — every advancement market, YES, no filter.
+#                 Tests: is Polymarket's advancement pricing well
+#                 calibrated overall?
+#   B_discount  — only poly_mid < STRATEGY_B_DISCOUNT_MAX (0.62).
+#                 Tests: are mid-tier teams under-priced in the 48-team
+#                 format?
+#   C_uncertain — only STRATEGY_C_UNCERTAIN_LO < poly_mid < STRATEGY_C_UNCERTAIN_HI
+#                 (0.38–0.65).
+#                 Tests: is narrative bias strongest in genuinely uncertain
+#                 markets?
+#
+# Do not add a 4th strategy or edit these thresholds (see config.py) — that
+# would defeat the purpose of pre-registration once real data exists.
+
+def classify_strategies(poly_mid: float) -> list[str]:
+    """Return every pre-registered strategy label this poly_mid qualifies for."""
+    labels = ["A_all"]
+    if poly_mid < STRATEGY_B_DISCOUNT_MAX:
+        labels.append("B_discount")
+    if STRATEGY_C_UNCERTAIN_LO < poly_mid < STRATEGY_C_UNCERTAIN_HI:
+        labels.append("C_uncertain")
+    return labels
 
 
 # ── Data structure ─────────────────────────────────────────────────────────────
@@ -97,7 +133,14 @@ def init_db(path: str = DB_PATH):
     # ── Schema migrations: add columns to existing tables if absent ──────────
     # SQLite has no "ADD COLUMN IF NOT EXISTS"; use try/except per column.
     new_scan_cols    = ["hours_to_end REAL", "time_bucket TEXT"]
-    new_trade_cols   = ["days_held REAL", "time_value_baseline REAL", "clv_adjusted REAL"]
+    new_trade_cols   = [
+        "days_held REAL", "time_value_baseline REAL", "clv_adjusted REAL",
+        # FIXLOG P0-2: pre-registered strategy label (A_all/B_discount/
+        # C_uncertain/EDGE_ALERT) + catch-up-backfill approximation flags.
+        "strategy_label TEXT",
+        "entry_is_approx INTEGER DEFAULT 0",
+        "entry_note TEXT",
+    ]
     for col in new_scan_cols:
         try:
             conn.execute(f"ALTER TABLE scans ADD COLUMN {col}")
@@ -147,12 +190,37 @@ def log_scan(snap: MarketSnapshot, path: str = DB_PATH):
 
 # ── Paper trade lifecycle ──────────────────────────────────────────────────────
 
-def open_paper_trade(snap: MarketSnapshot, direction: str = "YES", path: str = DB_PATH) -> str:
+def open_paper_trade(
+    snap: MarketSnapshot,
+    direction: str = "YES",
+    strategy_label: Optional[str] = None,
+    entry_price_override: Optional[float] = None,
+    is_approx: bool = False,
+    approx_note: Optional[str] = None,
+    path: str = DB_PATH,
+) -> str:
     """
     Open a virtual position. Returns trade_id.
     direction: "YES" uses poly_ask_vwap; "NO" uses 1 - poly_bid.
+
+    strategy_label: which pre-registered strategy this row belongs to (see
+      classify_strategies() — "A_all" / "B_discount" / "C_uncertain" for
+      advancement-market CLV/calibration entries, "EDGE_ALERT" for the
+      separate genuine-edge-vs-sportsbook trigger). Callers SHOULD always
+      pass this explicitly for new code (FIXLOG.md "P0-2"); left optional
+      only so this signature stays backward compatible.
+
+    entry_price_override / is_approx / approx_note: used by the catch-up
+      backfill path (FIXLOG.md "P0-1" item 4) — when a team's last group
+      match already happened before we could record a clean T-1h price,
+      the caller supplies the best available historical price instead of
+      `snap`'s live (already-resolved) price, and marks the row so it's
+      never silently mistaken for a precise T-1h entry downstream.
     """
-    entry_price = snap.poly_ask_vwap if direction == "YES" else (1.0 - snap.poly_bid)
+    entry_price = (
+        entry_price_override if entry_price_override is not None
+        else (snap.poly_ask_vwap if direction == "YES" else (1.0 - snap.poly_bid))
+    )
     trade_id    = uuid.uuid4().hex[:10]
     ts          = datetime.now(timezone.utc).isoformat()
 
@@ -160,18 +228,82 @@ def open_paper_trade(snap: MarketSnapshot, direction: str = "YES", path: str = D
     conn.execute("""
         INSERT OR IGNORE INTO paper_trades
         (trade_id, market_id, question, direction, entry_price,
-         true_prob_entry, net_edge_entry, entry_timestamp, end_date)
-        VALUES (?,?,?,?,?,?,?,?,?)
+         true_prob_entry, net_edge_entry, entry_timestamp, end_date,
+         strategy_label, entry_is_approx, entry_note)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         trade_id, snap.market_id, snap.question, direction,
         entry_price, snap.book_true_prob, snap.net_edge, ts, snap.end_date,
+        strategy_label, int(is_approx), approx_note,
     ))
     conn.commit()
     conn.close()
 
-    log.info("Opened paper trade %s | %s | entry=%.3f | edge=%.1f%%",
-             trade_id, snap.question[:45], entry_price, snap.net_edge * 100)
+    log.info("Opened paper trade %s | %s | entry=%.3f | strategy=%s%s",
+             trade_id, snap.question[:45], entry_price, strategy_label,
+             "  [APPROX]" if is_approx else "")
     return trade_id
+
+
+def has_paper_trade(market_id: str, strategy_label: Optional[str] = None, path: str = DB_PATH) -> bool:
+    """
+    Whether a paper trade already exists for this market (optionally scoped
+    to one strategy_label). Guards against duplicate entries when the same
+    market is seen across multiple scan ticks within its entry window — at
+    the default 30-min cron cadence, a market can sit inside the 0-2h T-1h
+    bucket for several consecutive ticks; without this check each tick would
+    open a brand new (duplicate) trade, corrupting the "one entry price per
+    market per strategy" assumption the whole CLV/calibration analysis
+    depends on. Also used by the catch-up backfill path to avoid re-opening
+    a position every single run for a match that finished long ago.
+    """
+    conn = sqlite3.connect(path)
+    if strategy_label is None:
+        row = conn.execute(
+            "SELECT 1 FROM paper_trades WHERE market_id=? LIMIT 1", (market_id,)
+        ).fetchone()
+    else:
+        row = conn.execute(
+            "SELECT 1 FROM paper_trades WHERE market_id=? AND strategy_label=? LIMIT 1",
+            (market_id, strategy_label),
+        ).fetchone()
+    conn.close()
+    return row is not None
+
+
+def get_latest_historical_price(
+    market_id: str, before_ts: Optional[str] = None, path: str = DB_PATH,
+) -> Optional[tuple[float, str]]:
+    """
+    Return (poly_ask_vwap, timestamp) of the most recent `scans` row for this
+    market, optionally restricted to strictly before `before_ts`.
+
+    Used by the catch-up backfill (FIXLOG.md "P0-1" item 4): when a team's
+    last group match already happened before this fix was deployed/ran,
+    today's freshly-scanned live price has likely already converged to the
+    known outcome — using it as the "entry price" would make the
+    calibration input trivially correct (entry≈outcome) and useless. The
+    most recent price we already had on file from BEFORE today is a better
+    (though still explicitly-flagged-as-approximate) stand-in for what a
+    clean T-1h price would have looked like.
+    """
+    conn = sqlite3.connect(path)
+    if before_ts:
+        row = conn.execute(
+            """SELECT poly_ask_vwap, timestamp FROM scans
+               WHERE market_id=? AND timestamp < ?
+               ORDER BY timestamp DESC LIMIT 1""",
+            (market_id, before_ts),
+        ).fetchone()
+    else:
+        row = conn.execute(
+            """SELECT poly_ask_vwap, timestamp FROM scans
+               WHERE market_id=?
+               ORDER BY timestamp DESC LIMIT 1""",
+            (market_id,),
+        ).fetchone()
+    conn.close()
+    return (row[0], row[1]) if row else None
 
 
 def log_clv_checkpoint(trade_id: str, current_price: float, path: str = DB_PATH):

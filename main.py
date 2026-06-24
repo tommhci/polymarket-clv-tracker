@@ -24,6 +24,7 @@ from scanner import run_scan
 from tracker import (
     init_db, log_scan, open_paper_trade, rebuild_from_csv,
     auto_close_expired, close_paper_trade, print_dashboard,
+    classify_strategies, has_paper_trade, get_latest_historical_price,
 )
 from alerts import alert_edge_found, alert_daily_digest, alert_scan_summary
 from glm_helper import (
@@ -298,23 +299,40 @@ def execute_scan(send_summary: bool = False) -> list:
 
     # ── Open paper trades ──────────────────────────────────────────────────
     #
-    # Two distinct triggers:
+    # Three distinct triggers:
     #
     # 1. ALERT TRADE (alertable=True): a genuine edge signal exists
     #    (net_edge > 4%, spread < 3%). Send Telegram alert + open position.
+    #    Labelled "EDGE_ALERT" — separate from the three pre-registered
+    #    A_all/B_discount/C_uncertain calibration strategies (FIXLOG.md
+    #    "P0-2"), since this is a different, older mechanism (genuine edge
+    #    vs. sportsbook baseline on the WIN-outright markets, not the
+    #    advancement-market calibration study).
     #
-    # 2. CLV TEST ENTRY (T-1h advancement market): no edge signal required.
-    #    Open a virtual position for EVERY advancement market at T-1h.
-    #    This is the primary data collection mechanism — entry price at T-1h
-    #    vs. resolution price = CLV. Without this, the system collects zero
-    #    CLV data (all advancement markets have no_advance_baseline, so
-    #    alertable is always False for them).
+    # 2. CLV/CALIBRATION ENTRY (T-1h advancement market): no edge signal
+    #    required. Open a virtual position for EVERY advancement market at
+    #    T-1h before THAT TEAM'S OWN last group-stage match (FIXLOG.md
+    #    "P0-1" — scanner.py now derives time_bucket from each team's real
+    #    kickoff via football-data.org, not Polymarket's shared endDateIso).
+    #    This is the primary data collection mechanism: entry price before
+    #    the outcome is known, vs. resolution price = the calibration input.
     #
-    # Both types use open_paper_trade() and are tracked identically.
-    # Only alert trades generate Telegram notifications.
+    # 3. CATCH-UP BACKFILL (T-expired advancement market, never entered):
+    #    this team's last group match already happened and we missed the
+    #    clean T-1h window for it — most likely because of the historical
+    #    scan gap (FIXLOG.md) or because this fix was deployed after the
+    #    fact. Open it now anyway, using the best available pre-match price
+    #    on file (not today's live, already-converged price) and flag it
+    #    explicitly as approximate so it's never mistaken for a precise
+    #    T-1h entry downstream.
+    #
+    # All three use open_paper_trade() and are tracked identically in
+    # paper_trades; has_paper_trade() prevents duplicate entries for the
+    # same (market_id, strategy_label) across repeated scan ticks.
 
-    new_signals   = 0
-    clv_entries   = 0
+    new_signals     = 0
+    clv_entries     = 0
+    catchup_entries = 0
 
     for snap in snapshots:
         is_advance = any(
@@ -324,23 +342,57 @@ def execute_scan(send_summary: bool = False) -> list:
 
         if snap.alertable:
             # ── Edge signal: alert + open ──
-            trade_id = open_paper_trade(snap, direction="YES")
+            trade_id = open_paper_trade(snap, direction="YES", strategy_label="EDGE_ALERT")
             snap.paper_trade_id = trade_id
             alert_edge_found(snap, trade_id)
             new_signals += 1
+            continue
 
-        elif is_advance and snap.time_bucket == "T-1h":
-            # ── CLV test entry: open without alerting ──
-            # This is the 1-hour-before-kickoff virtual position.
-            # Resolution price (auto-closed when price ≥ 0.95 or ≤ 0.05)
-            # minus this entry price = CLV timing signal.
-            trade_id = open_paper_trade(snap, direction="YES")
-            snap.paper_trade_id = trade_id
-            clv_entries += 1
-            log.info(
-                "CLV entry [T-1h] %s @ %.3f (spread=%.1f%%)",
-                snap.question[:45], snap.poly_ask_vwap, snap.spread_pct * 100,
-            )
+        if not is_advance:
+            continue
+
+        strategies = classify_strategies(snap.poly_mid)
+
+        if snap.time_bucket == "T-1h":
+            # ── Clean CLV/calibration entry ──
+            opened_any = False
+            for label in strategies:
+                if has_paper_trade(snap.market_id, label):
+                    continue  # already entered this market for this strategy
+                trade_id = open_paper_trade(snap, direction="YES", strategy_label=label)
+                snap.paper_trade_id = trade_id
+                clv_entries += 1
+                opened_any = True
+            if opened_any:
+                log.info(
+                    "CLV entry [T-1h] %s @ %.3f (spread=%.1f%%) labels=%s",
+                    snap.question[:45], snap.poly_ask_vwap, snap.spread_pct * 100, strategies,
+                )
+
+        elif snap.time_bucket == "T-expired":
+            # ── Catch-up backfill (FIXLOG.md "P0-1" item 4) ──
+            for label in strategies:
+                if has_paper_trade(snap.market_id, label):
+                    continue  # normal T-1h path already caught this one
+                hist = get_latest_historical_price(snap.market_id, before_ts=snap.timestamp)
+                if hist is not None:
+                    approx_price, approx_ts = hist
+                    note = f"approx entry: backfilled from scan @ {approx_ts} (T-1h window missed)"
+                else:
+                    approx_price = None
+                    note = "approx entry: no pre-resolution scan on file, used live (already-resolved) price"
+                trade_id = open_paper_trade(
+                    snap, direction="YES", strategy_label=label,
+                    entry_price_override=approx_price, is_approx=True, approx_note=note,
+                )
+                snap.paper_trade_id = trade_id
+                catchup_entries += 1
+                log.warning(
+                    "Catch-up entry [%s] %s @ %s — %s",
+                    label, snap.question[:45],
+                    f"{approx_price:.3f}" if approx_price is not None else f"{snap.poly_ask_vwap:.3f} (live)",
+                    note,
+                )
 
     # ── GLM pre-match analysis for T-24h / T-1h advancement markets ──────────
     # Only run if scheduler says use_glm (mode=full_news or full_pre)
@@ -381,8 +433,8 @@ def execute_scan(send_summary: bool = False) -> list:
         alert_scan_summary(snapshots)
 
     log.info(
-        "── Scan done: %d markets | %d edge signals | %d CLV test entries ──",
-        len(snapshots), new_signals, clv_entries,
+        "── Scan done: %d markets | %d edge signals | %d CLV entries | %d catch-up entries ──",
+        len(snapshots), new_signals, clv_entries, catchup_entries,
     )
     return snapshots
 

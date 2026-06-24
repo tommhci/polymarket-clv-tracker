@@ -28,7 +28,9 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
+import unicodedata
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -53,7 +55,9 @@ _TEAM_ALIASES = {
     "turkiye":      "Türkiye",
     "turkey":       "Türkiye",
     "congo dr":     "DR Congo",
-    "boss and herzegovina": "Bosnia and Herzegovina",
+    # FIXLOG P0-1: fixed typo ("boss" → "bosnia") — this alias was silently
+    # dead code before (key never matched "Bosnia and Herzegovina" lookups).
+    "bosnia and herzegovina": "Bosnia and Herzegovina",
 }
 
 
@@ -76,6 +80,168 @@ def _fd_get(path: str) -> Optional[dict]:
     except requests.RequestException as e:
         log.warning("football-data.org error [%s]: %s", path, e)
         return None
+
+
+def check_football_data_health() -> tuple[bool, str]:
+    """
+    P1 health check — confirms FOOTBALL_DATA_API_KEY is present AND actually
+    works (not just "the env var exists"). Makes one lightweight call
+    (competition metadata, not the full match list) and checks for a real
+    200 response.
+
+    Returns (ok, message). Designed to be called from a dedicated CI step
+    (see .github/workflows/scan.yml) so failures are visible in the Actions
+    log without silently degrading data quality.
+    """
+    if not FOOTBALL_DATA_API_KEY:
+        return False, "FOOTBALL_DATA_API_KEY is not set (missing secret)."
+    try:
+        resp = requests.get(
+            f"{_FD_BASE}/competitions/{_WC_COMPETITION_CODE}",
+            headers=_fd_headers(),
+            timeout=8,
+        )
+    except requests.RequestException as e:
+        return False, f"football-data.org request failed: {e}"
+
+    if resp.status_code == 200:
+        return True, "football-data.org OK (200) — key is valid and working."
+    if resp.status_code in (401, 403):
+        return False, (
+            f"football-data.org rejected the key (HTTP {resp.status_code}) — "
+            f"FOOTBALL_DATA_API_KEY is set but invalid/expired."
+        )
+    if resp.status_code == 429:
+        return False, "football-data.org rate-limited us (HTTP 429) — key is valid, just throttled."
+    return False, f"football-data.org returned unexpected HTTP {resp.status_code}: {resp.text[:200]}"
+
+
+# ── Team name normalisation helpers ──────────────────────────────────────────
+
+def _normalize_team_key(name: str) -> str:
+    """
+    Lowercase, strip diacritics/punctuation, collapse whitespace.
+    Used to match our internal team names (config.TEAM_NAMES / extract_team())
+    against whatever spelling football-data.org happens to use
+    (e.g. "Côte d'Ivoire", "Türkiye", "Korea Republic").
+    """
+    if not name:
+        return ""
+    n = unicodedata.normalize("NFKD", name)
+    n = "".join(c for c in n if not unicodedata.combining(c))
+    n = n.lower().strip()
+    n = re.sub(r"[^a-z0-9 ]", " ", n)
+    n = re.sub(r"\s+", " ", n).strip()
+    return n
+
+
+# ── Group-stage fixture list (single call, in-process cache) ────────────────
+#
+# Fetched ONCE per process (each cron invocation is a fresh process anyway,
+# so there is no point persisting this to disk — see FIXLOG.md "P0-1").
+# Critically: this is ONE API call for the whole competition, reused for
+# every team, instead of one call per team (free tier is 10 req/min and
+# there are 46+ advancement markets per scan — see FIXLOG.md).
+
+_GROUP_STAGE_MATCHES_CACHE: Optional[list[dict]] = None
+_TEAM_LAST_KICKOFF_CACHE: Optional[dict[str, datetime]] = None
+
+
+def get_wc_group_fixtures(force_refresh: bool = False) -> Optional[list[dict]]:
+    """
+    Fetch the full WC 2026 group-stage fixture list (scheduled + finished)
+    in a single API call. Cached in-process for the lifetime of this run.
+    """
+    global _GROUP_STAGE_MATCHES_CACHE
+    if _GROUP_STAGE_MATCHES_CACHE is not None and not force_refresh:
+        return _GROUP_STAGE_MATCHES_CACHE
+
+    data = _fd_get(f"/competitions/{_WC_COMPETITION_CODE}/matches?stage=GROUP_STAGE")
+    if not data:
+        return None
+
+    matches = data.get("matches", [])
+    _GROUP_STAGE_MATCHES_CACHE = matches
+    log.info("Fetched %d WC2026 group-stage fixtures from football-data.org", len(matches))
+    return matches
+
+
+def get_team_last_group_kickoff_map(force_refresh: bool = False) -> dict[str, datetime]:
+    """
+    Build {normalized_team_key: last_group_stage_match_kickoff_utc}.
+
+    "Last" = the team's latest-dated group-stage fixture — i.e. their 3rd
+    (final) group match, whose result is what actually determines whether
+    they advance. This is the per-team replacement for Polymarket's shared
+    endDateIso (see FIXLOG.md "P0-1" for why that was the bug).
+    """
+    global _TEAM_LAST_KICKOFF_CACHE
+    if _TEAM_LAST_KICKOFF_CACHE is not None and not force_refresh:
+        return _TEAM_LAST_KICKOFF_CACHE
+
+    matches = get_wc_group_fixtures(force_refresh=force_refresh)
+    if not matches:
+        _TEAM_LAST_KICKOFF_CACHE = {}
+        return _TEAM_LAST_KICKOFF_CACHE
+
+    last_kickoff: dict[str, datetime] = {}
+    for m in matches:
+        utc_date = m.get("utcDate")
+        if not utc_date:
+            continue
+        try:
+            dt = datetime.fromisoformat(utc_date.replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            continue
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+
+        for side in ("homeTeam", "awayTeam"):
+            team_obj = m.get(side) or {}
+            for name_field in ("name", "shortName"):
+                raw_name = team_obj.get(name_field)
+                if not raw_name:
+                    continue
+                key = _normalize_team_key(raw_name)
+                if not key:
+                    continue
+                if key not in last_kickoff or dt > last_kickoff[key]:
+                    last_kickoff[key] = dt
+
+    _TEAM_LAST_KICKOFF_CACHE = last_kickoff
+    return last_kickoff
+
+
+def get_team_last_group_kickoff(team: str) -> Optional[datetime]:
+    """
+    Look up `team`'s (our internal naming, e.g. config.TEAM_NAMES spelling)
+    last group-stage match kickoff time (UTC), or None if no fixture data
+    is available / no match found (caller should fall back gracefully).
+    """
+    kickoff_map = get_team_last_group_kickoff_map()
+    if not kickoff_map:
+        return None
+
+    candidates = [team]
+    alias = _TEAM_ALIASES.get(team.lower())
+    if alias:
+        candidates.append(alias)
+
+    for cand in candidates:
+        key = _normalize_team_key(cand)
+        if key in kickoff_map:
+            return kickoff_map[key]
+
+    # Fallback: fuzzy containment match for naming variants not covered by
+    # the alias table (football-data.org's exact spelling can't be verified
+    # without live network access — see FIXLOG.md known limitations).
+    team_key = _normalize_team_key(team)
+    if team_key:
+        for map_key, dt in kickoff_map.items():
+            if team_key in map_key or map_key in team_key:
+                return dt
+
+    return None
 
 
 # ── Live match context ─────────────────────────────────────────────────────────

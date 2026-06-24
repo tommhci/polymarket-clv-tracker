@@ -32,6 +32,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: football-data.org health check (P1 — FIXLOG.md)
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+        run: |
+          python -c "
+          from news_fetcher import check_football_data_health
+          ok, msg = check_football_data_health()
+          print(('✅ ' if ok else '⚠️  ') + msg)
+          if not ok:
+              print('⚠️  Continuing anyway — scanner.py falls back to the old '
+                    'shared-endDateIso behavior per advancement-market team '
+                    'when football-data.org is unavailable (degraded, not fatal). '
+                    'See FIXLOG.md \"P1\".')
+          "
+        continue-on-error: true
+        # Intentionally non-blocking: a transient football-data.org outage
+        # should not stop the whole cron run (Polymarket price collection is
+        # still valuable on its own). scanner.py already degrades gracefully
+        # per-team when this lookup is unavailable. This step exists purely
+        # to make key failures VISIBLE in the Actions log instead of silent.
+
       - name: Run scanner + generate status report
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}

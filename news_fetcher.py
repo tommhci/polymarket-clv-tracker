@@ -45,19 +45,28 @@ log = logging.getLogger(__name__)
 _WC_COMPETITION_CODE = "WC"
 _FD_BASE = "https://api.football-data.org/v4"
 
-# Team name normalisation (football-data.org uses full FIFA names)
-_TEAM_ALIASES = {
-    "usa":          "USA",
-    "south korea":  "Korea Republic",
-    "ivory coast":  "Côte d'Ivoire",
-    "cote d'ivoire": "Côte d'Ivoire",
-    "czechia":      "Czech Republic",
-    "turkiye":      "Türkiye",
-    "turkey":       "Türkiye",
-    "congo dr":     "DR Congo",
+# Team name normalisation (football-data.org uses full FIFA names).
+# Each entry is a LIST of candidate spellings to try, not a single string —
+# verified necessary live (FIXLOG.md "post-deploy: Turkiye mismatch"): the
+# real API turned out to use a different spelling than assumed for at least
+# one team, and a single fixed alias has no fallback when that assumption
+# is wrong. Listing multiple candidates costs nothing (first match wins).
+_TEAM_ALIASES: dict[str, list[str]] = {
+    "usa":          ["USA", "United States"],
+    "south korea":  ["Korea Republic", "South Korea"],
+    "ivory coast":  ["Côte d'Ivoire", "Ivory Coast"],
+    "cote d'ivoire": ["Côte d'Ivoire", "Ivory Coast"],
+    "czechia":      ["Czech Republic", "Czechia"],
+    # FIXLOG (post-deploy): live run showed football-data.org did NOT match
+    # "Türkiye" for this team — confirmed by the resulting warning in the
+    # Actions log. Most likely the API still uses the older English
+    # spelling "Turkey". Trying both costs nothing.
+    "turkiye":      ["Türkiye", "Turkey"],
+    "turkey":       ["Türkiye", "Turkey"],
+    "congo dr":     ["DR Congo"],
     # FIXLOG P0-1: fixed typo ("boss" → "bosnia") — this alias was silently
     # dead code before (key never matched "Bosnia and Herzegovina" lookups).
-    "bosnia and herzegovina": "Bosnia and Herzegovina",
+    "bosnia and herzegovina": ["Bosnia and Herzegovina"],
 }
 
 
@@ -223,9 +232,9 @@ def get_team_last_group_kickoff(team: str) -> Optional[datetime]:
         return None
 
     candidates = [team]
-    alias = _TEAM_ALIASES.get(team.lower())
-    if alias:
-        candidates.append(alias)
+    aliases = _TEAM_ALIASES.get(team.lower())
+    if aliases:
+        candidates.extend(aliases)
 
     for cand in candidates:
         key = _normalize_team_key(cand)

@@ -334,3 +334,61 @@ check `docs/scans.csv`'s latest timestamp and `docs/paper_trades.csv`'s
 row count directly (not just the health-check log) to confirm a real scan
 actually ran this time.
 
+---
+
+## Addendum 2 (post-deploy) — first real `--force` run: confirmed working, one alias gap found and fixed
+
+Tom deployed the `--force` fix and ran `workflow_dispatch` again. Re-cloned
+the live repo afterward and verified directly (not just from the pasted
+log):
+
+- `STATUS.md`: `Last scan` moved from the stuck `2026-06-21T23:53:19` to
+  `2026-06-24T02:24:11` — the scheduler bootstrap problem is resolved.
+- `docs/scans.csv`: 481 rows (420 historical + 60 new this run — `news_fetcher`
+  log confirms `Fetched 72 WC2026 group-stage fixtures` = 48 teams × 12
+  groups × 6 round-robin matches/group, the right scale for a 48-team
+  format). **Confirmed the core fix works**: this run's advancement-market
+  rows show genuinely different `hours_to_end` values (16.6h, 19.6h,
+  22.6h, 41.6h, 44.6h, 47.6h, 69.6h, 72.6h, ...) instead of one shared
+  number. Pairs of opponents in the same final-group match correctly
+  share the same value (e.g. South Korea & Czechia both 22.6h) — strong
+  evidence the fixture data is being parsed and matched correctly, not
+  just "some numbers that happen to differ."
+- `docs/paper_trades.csv`: still 0 rows. **Correct, not a bug** — the
+  lowest `hours_to_end` seen this run was ~16.6h, well above the T-1h
+  (0-2h) window, and the scan log explicitly logged
+  `0 CLV entries | 0 catch-up entries`. Nothing should have opened yet.
+
+**One real gap found, from the Actions log itself:**
+`WARNING No football-data.org fixture match for advancement-market
+team='Turkiye'` — the only mismatch out of 48 teams; fell back to the old
+shared-endDateIso behavior for that team only (confirmed: its logged
+`hours_to_end=117.58` = `168.09 − elapsed time`, exactly the expected
+fallback value, not a crash).
+
+**Root cause:** `_TEAM_ALIASES` assumed football-data.org uses the newer
+spelling `"Türkiye"`; live evidence says it almost certainly still uses
+`"Turkey"`. `"Turkiye"` and `"Turkey"` share a 5-character prefix but
+aren't substrings of each other, so the fuzzy fallback didn't catch it.
+
+**Fix (commit `7e7b8b3`):** `_TEAM_ALIASES` values are now lists of
+candidate spellings (was a single string) — added `"Turkey"` alongside
+`"Türkiye"`. Also speculatively broadened a few other entries (USA →
++"United States", etc.) as cheap insurance against the same class of gap
+for teams not yet exercised live — **these are unverified guesses**, only
+the Turkiye fix is confirmed-needed by actual production evidence.
+Verified offline by reproducing the exact scenario (a fixture list using
+"Turkey" not "Türkiye") and confirming the lookup now resolves; full
+existing test suite re-run, no regressions.
+
+**Net assessment so far:** the P0-1 diagnosis and fix are confirmed
+correct against real production data — 47/48 teams matched correctly on
+the very first live run, the one gap was a narrow, well-understood naming
+issue (now fixed), not a flaw in the underlying approach. Still worth a
+light eyeball spot-check of a few more teams' `hours_to_end` against the
+real WC2026 schedule after the next deploy, since "no warning logged"
+proves no team was left *unmatched*, not that every match was necessarily
+to the *correct* fixture (a same-prefix false-positive collision is a
+theoretical residual risk the fuzzy fallback doesn't fully rule out).
+
+

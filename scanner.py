@@ -510,10 +510,11 @@ def run_scan() -> list[MarketSnapshot]:
         is_advance = any(k in q_lower for k in
                          ("advance", "qualify", "knockout", "reach the", "group stage"))
 
+        team = extract_team(question)
+
         if is_advance:
             p_true, source = 0.0, "no_advance_baseline (qualification odds unavailable)"
         else:
-            team = extract_team(question)
             if team:
                 p_true, source = get_devigged_win_prob(team)
             else:
@@ -526,7 +527,58 @@ def run_scan() -> list[MarketSnapshot]:
         net_edge, _fee, alertable, skip_reason = calculate_edge(p_true, vwap_ask, spread_pct)
 
         # ── Multi-timepoint: classify this scan into a time bucket ──
-        hours_to_end, time_bucket = _classify_time_bucket(end_date)
+        #
+        # FIXLOG P0-1: Polymarket sets ONE shared endDateIso for every
+        # advancement market (the group-stage-wide deadline, ~6/28), not
+        # each team's own last group match. Feeding that shared date into
+        # _classify_time_bucket() collapses every team into the same bucket
+        # regardless of when they actually play — verified directly against
+        # docs/scans.csv (all 46 advancement markets showed identical
+        # hours_to_end=168.09 at the same scan timestamp). That breaks the
+        # T-1h CLV/calibration entry trigger below: by the time the shared
+        # deadline's T-1h window arrives, every match has long since been
+        # played and prices have already converged to the known outcome.
+        #
+        # Fix: for advancement markets, look up this specific team's own
+        # last group-stage match kickoff (football-data.org — one fetch for
+        # the whole tournament, see news_fetcher.get_team_last_group_kickoff)
+        # and classify against an end_date derived from THAT instead. The
+        # bucket thresholds in _classify_time_bucket() itself are unchanged —
+        # only the input end_date changes for advancement markets.
+        effective_end_date = end_date
+        if is_advance and team:
+            try:
+                from news_fetcher import get_team_last_group_kickoff
+                real_kickoff = get_team_last_group_kickoff(team)
+            except Exception as e:
+                real_kickoff = None
+                log.warning("football-data.org lookup failed for %s: %s", team, e)
+            if real_kickoff is not None:
+                # Feed the team's own kickoff time directly — NOT kickoff
+                # plus a resolution lag. _classify_time_bucket()'s "T-1h"
+                # bucket (hours_to_end ∈ [0,2]) is meant to mean "0-2h
+                # BEFORE the moment that matters" (final lineups, highest
+                # narrative bias, entry before the outcome is known — see
+                # the bucket_desc comments in main.py). For advancement
+                # markets that moment IS kickoff: once the match starts,
+                # the live price already reflects in-game events, so the
+                # clean pre-match entry window is [kickoff-2h, kickoff],
+                # not [kickoff, kickoff+2h]. An earlier draft of this fix
+                # added scheduler.py's RESOLUTION_LAG_H here, which shifted
+                # "T-1h" to fire AFTER kickoff instead of before it — caught
+                # by tests/test_p0_1_time_bucket.py, reverted.
+                effective_end_date = real_kickoff.isoformat()
+            else:
+                log.warning(
+                    "No football-data.org fixture match for advancement-market "
+                    "team=%r (%s) — falling back to Polymarket's shared "
+                    "endDateIso for this team only. time_bucket will be "
+                    "inaccurate until football-data.org coverage improves "
+                    "(see FIXLOG.md known limitations).",
+                    team, question[:60],
+                )
+
+        hours_to_end, time_bucket = _classify_time_bucket(effective_end_date)
 
         snap = MarketSnapshot(
             timestamp=ts,

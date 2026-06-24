@@ -62,7 +62,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python main.py
+          FORCE_FLAG=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual workflow_dispatch run — forcing a full scan regardless of the scheduler."
+            FORCE_FLAG="--force"
+          fi
+          python main.py $FORCE_FLAG
           python main.py --report
           python -c "import dashboard; dashboard.export_all()"
 

@@ -1,1 +1,6 @@
 trade_id,market_id,question,direction,entry_price,true_prob_entry,net_edge_entry,entry_timestamp,end_date,closing_price,clv,outcome,close_timestamp,days_held,time_value_baseline,clv_adjusted,strategy_label,entry_is_approx,entry_note
+474cfcf2bd,2070736,Will Switzerland advance to the knockout stages at the 2026 FIFA World Cup?,YES,1.0,0.0,0.0,2026-06-24T17:29:33.384336+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+46b4c12fb7,2070738,Will Bosnia and Herzegovina advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.7038,0.0,0.0,2026-06-24T17:29:33.385924+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+8e386b94e8,2070735,Will Canada advance to the knockout stages at the 2026 FIFA World Cup?,YES,1.0,0.0,0.0,2026-06-24T17:29:33.387525+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+696a4e43da,2070737,Will Qatar advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.1953,0.0,0.0,2026-06-24T17:29:33.388967+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+6504127e94,2070737,Will Qatar advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.1953,0.0,0.0,2026-06-24T17:29:33.390466+00:00,2026-06-28,,,PENDING,,,,,B_discount,0,

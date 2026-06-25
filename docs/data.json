@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-25T13:38:27.579181+00:00",
-  "last_scan": "2026-06-25T13:38:11.132690+00:00",
-  "total_scans": 1260,
+  "generated_at": "2026-06-25T18:35:30.920056+00:00",
+  "last_scan": "2026-06-25T18:35:09.647331+00:00",
+  "total_scans": 1320,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -28,23 +28,23 @@
     },
     {
       "bucket": "T-1h",
-      "markets": 12,
-      "rows": 12
+      "markets": 16,
+      "rows": 16
     },
     {
       "bucket": "T-24h",
-      "markets": 16,
-      "rows": 40
+      "markets": 20,
+      "rows": 44
     },
     {
       "bucket": "T-expired",
       "markets": 12,
-      "rows": 68
+      "rows": 80
     },
     {
       "bucket": "T-other",
       "markets": 68,
-      "rows": 952
+      "rows": 992
     }
   ],
   "histogram": [
@@ -68,54 +68,54 @@
   "markets": [
     {
       "team": "DR Congo",
-      "mid": 0.565,
-      "ask": 0.57,
-      "volume": 91144.0,
-      "spread_pct": 0.0175,
+      "mid": 0.555,
+      "ask": 0.5697,
+      "volume": 91417.0,
+      "spread_pct": 0.0179,
       "bucket": "T-other",
-      "distance": 0.065
+      "distance": 0.055
     },
     {
       "team": "Iran",
-      "mid": 0.5725,
-      "ask": 0.5743,
-      "volume": 94226.0,
-      "spread_pct": 0.0017,
+      "mid": 0.5645,
+      "ask": 0.5734,
+      "volume": 94787.0,
+      "spread_pct": 0.0018,
       "bucket": "T-other",
-      "distance": 0.0725
+      "distance": 0.0645
     },
     {
       "team": "Uruguay",
       "mid": 0.355,
-      "ask": 0.3618,
-      "volume": 72872.0,
+      "ask": 0.3643,
+      "volume": 73079.0,
       "spread_pct": 0.0278,
       "bucket": "T-other",
       "distance": 0.145
     },
     {
       "team": "Saudi Arabia",
-      "mid": 0.325,
-      "ask": 0.3371,
-      "volume": 199940.0,
-      "spread_pct": 0.0303,
+      "mid": 0.33,
+      "ask": 0.34,
+      "volume": 203141.0,
+      "spread_pct": 0.0588,
       "bucket": "T-other",
-      "distance": 0.175
+      "distance": 0.17
     },
     {
       "team": "Senegal",
-      "mid": 0.685,
-      "ask": 0.6982,
-      "volume": 143384.0,
-      "spread_pct": 0.0145,
-      "bucket": "T-other",
-      "distance": 0.185
+      "mid": 0.68,
+      "ask": 0.69,
+      "volume": 147355.0,
+      "spread_pct": 0.029,
+      "bucket": "T-24h",
+      "distance": 0.18
     },
     {
       "team": "Cape Verde",
       "mid": 0.695,
       "ask": 0.7,
-      "volume": 143706.0,
+      "volume": 145194.0,
       "spread_pct": 0.0143,
       "bucket": "T-other",
       "distance": 0.195
@@ -124,7 +124,7 @@
       "team": "Scotland",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 312550.0,
+      "volume": 318301.0,
       "spread_pct": 0.0385,
       "bucket": "T-expired",
       "distance": 0.245
@@ -132,143 +132,143 @@
     {
       "team": "Algeria",
       "mid": 0.745,
-      "ask": 0.76,
-      "volume": 130086.0,
+      "ask": 0.75,
+      "volume": 132535.0,
       "spread_pct": 0.0133,
       "bucket": "T-other",
       "distance": 0.245
     },
     {
       "team": "Ecuador",
-      "mid": 0.185,
-      "ask": 0.19,
-      "volume": 144902.0,
-      "spread_pct": 0.0526,
-      "bucket": "T-other",
-      "distance": 0.315
+      "mid": 0.195,
+      "ask": 0.2,
+      "volume": 151312.0,
+      "spread_pct": 0.05,
+      "bucket": "T-1h",
+      "distance": 0.305
     },
     {
       "team": "Paraguay",
       "mid": 0.855,
       "ask": 0.86,
-      "volume": 106881.0,
+      "volume": 108335.0,
       "spread_pct": 0.0116,
       "bucket": "T-other",
       "distance": 0.355
     },
     {
       "team": "South Korea",
-      "mid": 0.885,
-      "ask": 0.89,
-      "volume": 184208.0,
-      "spread_pct": 0.0112,
+      "mid": 0.875,
+      "ask": 0.88,
+      "volume": 198608.0,
+      "spread_pct": 0.0114,
       "bucket": "T-expired",
-      "distance": 0.385
+      "distance": 0.375
     },
     {
       "team": "Australia",
       "mid": 0.905,
       "ask": 0.91,
-      "volume": 159038.0,
+      "volume": 159788.0,
       "spread_pct": 0.011,
       "bucket": "T-other",
       "distance": 0.405
     },
     {
       "team": "Sweden",
-      "mid": 0.9115,
-      "ask": 0.913,
-      "volume": 264111.0,
-      "spread_pct": 0.0033,
+      "mid": 0.9205,
+      "ask": 0.9229,
+      "volume": 299623.0,
+      "spread_pct": 0.0011,
       "bucket": "T-other",
-      "distance": 0.4115
+      "distance": 0.4205
     },
     {
       "team": "Croatia",
       "mid": 0.935,
-      "ask": 0.9407,
-      "volume": 183423.0,
+      "ask": 0.9485,
+      "volume": 183645.0,
       "spread_pct": 0.0106,
       "bucket": "T-other",
       "distance": 0.435
     },
     {
+      "team": "Curacao",
+      "mid": 0.061,
+      "ask": 0.0688,
+      "volume": 218866.0,
+      "spread_pct": 0.0323,
+      "bucket": "T-1h",
+      "distance": 0.439
+    },
+    {
       "team": "Belgium",
-      "mid": 0.9405,
-      "ask": 0.941,
-      "volume": 129499.0,
-      "spread_pct": 0.0011,
+      "mid": 0.941,
+      "ask": 0.9449,
+      "volume": 130784.0,
+      "spread_pct": 0.0021,
       "bucket": "T-other",
-      "distance": 0.4405
+      "distance": 0.441
     },
     {
       "team": "New Zealand",
       "mid": 0.055,
       "ask": 0.06,
-      "volume": 160213.0,
+      "volume": 160711.0,
       "spread_pct": 0.1667,
       "bucket": "T-other",
       "distance": 0.445
     },
     {
-      "team": "Curacao",
-      "mid": 0.054,
-      "ask": 0.0632,
-      "volume": 218356.0,
-      "spread_pct": 0.1379,
-      "bucket": "T-other",
-      "distance": 0.446
-    },
-    {
-      "team": "Austria",
+      "team": "Ivory Coast",
       "mid": 0.9655,
-      "ask": 0.9724,
-      "volume": 68487.0,
-      "spread_pct": 0.0093,
-      "bucket": "T-other",
+      "ask": 0.9847,
+      "volume": 81187.0,
+      "spread_pct": 0.0256,
+      "bucket": "T-1h",
       "distance": 0.4655
     },
     {
-      "team": "Uzbekistan",
-      "mid": 0.0265,
-      "ask": 0.0347,
-      "volume": 76653.0,
-      "spread_pct": 0.1071,
+      "team": "Austria",
+      "mid": 0.966,
+      "ask": 0.9718,
+      "volume": 68947.0,
+      "spread_pct": 0.0103,
       "bucket": "T-other",
-      "distance": 0.4735
+      "distance": 0.466
     },
     {
-      "team": "Ivory Coast",
-      "mid": 0.9785,
-      "ask": 0.985,
-      "volume": 79357.0,
-      "spread_pct": 0.0112,
+      "team": "Uzbekistan",
+      "mid": 0.025,
+      "ask": 0.0305,
+      "volume": 76855.0,
+      "spread_pct": 0.0769,
       "bucket": "T-other",
-      "distance": 0.4785
+      "distance": 0.475
     },
     {
       "team": "Iraq",
-      "mid": 0.015,
-      "ask": 0.021,
-      "volume": 261054.0,
-      "spread_pct": 0.125,
-      "bucket": "T-other",
-      "distance": 0.485
+      "mid": 0.016,
+      "ask": 0.0204,
+      "volume": 261251.0,
+      "spread_pct": 0.1176,
+      "bucket": "T-24h",
+      "distance": 0.484
     },
     {
       "team": "Ghana",
-      "mid": 0.9955,
-      "ask": 0.998,
-      "volume": 454187.0,
-      "spread_pct": 0.005,
+      "mid": 0.998,
+      "ask": 0.999,
+      "volume": 509658.0,
+      "spread_pct": 0.002,
       "bucket": "T-other",
-      "distance": 0.4955
+      "distance": 0.498
     },
     {
       "team": "Japan",
       "mid": 0.9985,
       "ask": 0.999,
-      "volume": 562831.0,
+      "volume": 567232.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4985
@@ -277,7 +277,7 @@
       "team": "Egypt",
       "mid": 0.9985,
       "ask": 0.999,
-      "volume": 911697.0,
+      "volume": 912737.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4985
@@ -286,7 +286,7 @@
       "team": "Spain",
       "mid": 0.9985,
       "ask": 0.999,
-      "volume": 558961.0,
+      "volume": 559462.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4985
@@ -295,7 +295,7 @@
       "team": "Portugal",
       "mid": 0.9985,
       "ask": 0.999,
-      "volume": 712231.0,
+      "volume": 712731.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4985
@@ -304,7 +304,7 @@
       "team": "England",
       "mid": 0.999,
       "ask": 1.0,
-      "volume": 374680.0,
+      "volume": 374763.0,
       "spread_pct": 0.002,
       "bucket": "T-other",
       "distance": 0.499
@@ -459,14 +459,14 @@
       "ask": 1.0,
       "volume": 74751.0,
       "spread_pct": 0.001,
-      "bucket": "T-other",
+      "bucket": "T-1h",
       "distance": 0.4995
     },
     {
       "team": "Netherlands",
       "mid": 0.9995,
       "ask": 1.0,
-      "volume": 680077.0,
+      "volume": 680079.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4995
@@ -477,7 +477,7 @@
       "ask": 1.0,
       "volume": 256675.0,
       "spread_pct": 0.001,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.4995
     },
     {
@@ -486,7 +486,7 @@
       "ask": 1.0,
       "volume": 177204.0,
       "spread_pct": 0.001,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.4995
     },
     {
@@ -500,6 +500,36 @@
     }
   ],
   "open_positions": [
+    {
+      "question": "Will Ivory Coast advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.9847,
+      "entry_timestamp": "2026-06-25T18:35:30.676157+00:00"
+    },
+    {
+      "question": "Will Germany advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 1.0,
+      "entry_timestamp": "2026-06-25T18:35:30.674661+00:00"
+    },
+    {
+      "question": "Will Curacao advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.0688,
+      "entry_timestamp": "2026-06-25T18:35:30.671878+00:00"
+    },
+    {
+      "question": "Will Curacao advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.0688,
+      "entry_timestamp": "2026-06-25T18:35:30.670383+00:00"
+    },
+    {
+      "question": "Will Ecuador advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.2,
+      "entry_timestamp": "2026-06-25T18:35:30.668954+00:00"
+    },
+    {
+      "question": "Will Ecuador advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.2,
+      "entry_timestamp": "2026-06-25T18:35:30.667328+00:00"
+    },
     {
       "question": "Will Scotland advance to the knockout stages at the 2026 FIFA World Cup?",
       "entry_price": 0.6623,
@@ -771,6 +801,11 @@
           "t": "2026-06-25T13:38",
           "p": 0.565,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.555,
+          "bucket": "T-other"
         }
       ]
     },
@@ -881,6 +916,11 @@
           "t": "2026-06-25T13:38",
           "p": 0.5725,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.5645,
+          "bucket": "T-other"
         }
       ]
     },
@@ -979,6 +1019,11 @@
         },
         {
           "t": "2026-06-25T13:38",
+          "p": 0.355,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
           "p": 0.355,
           "bucket": "T-other"
         }
@@ -1091,6 +1136,11 @@
           "t": "2026-06-25T13:38",
           "p": 0.325,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.33,
+          "bucket": "T-other"
         }
       ]
     },
@@ -1201,6 +1251,11 @@
           "t": "2026-06-25T13:38",
           "p": 0.685,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.68,
+          "bucket": "T-24h"
         }
       ]
     },
@@ -1309,6 +1364,11 @@
         },
         {
           "t": "2026-06-25T13:38",
+          "p": 0.695,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
           "p": 0.695,
           "bucket": "T-other"
         }
@@ -1421,6 +1481,11 @@
           "t": "2026-06-25T13:38",
           "p": 0.255,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.255,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -1529,6 +1594,11 @@
         },
         {
           "t": "2026-06-25T13:38",
+          "p": 0.745,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T18:35",
           "p": 0.745,
           "bucket": "T-other"
         }

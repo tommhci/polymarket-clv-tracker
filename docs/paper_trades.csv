@@ -17,3 +17,9 @@ f82cc2f792,2070740,Will Morocco advance to the knockout stages at the 2026 FIFA 
 ab301555ec,2070733,Will South Africa advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.1489,0.0,0.0,2026-06-25T00:20:10.854559+00:00,2026-06-28,0.9995,0.8506,BEAT_LINE,2026-06-25T04:48:29.715231+00:00,0.186,2.7e-05,0.8506,A_all,0,
 940fc01aa9,2070733,Will South Africa advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.1489,0.0,0.0,2026-06-25T00:20:10.856009+00:00,2026-06-28,0.9995,0.8506,BEAT_LINE,2026-06-25T04:48:29.717249+00:00,0.186,2.7e-05,0.8506,B_discount,0,
 998d565aab,2070741,Will Scotland advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.6623,0.0,0.0,2026-06-25T00:20:10.858092+00:00,2026-06-28,,,PENDING,,,,,B_discount,1,approx entry: backfilled from scan @ 2026-06-24T22:49:50.548350+00:00 (T-1h window missed)
+6ff8cef3a4,2070748,Will Ecuador advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.2,0.0,0.0,2026-06-25T18:35:30.667328+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+8302c6f46a,2070748,Will Ecuador advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.2,0.0,0.0,2026-06-25T18:35:30.668954+00:00,2026-06-28,,,PENDING,,,,,B_discount,0,
+cc45d40de3,2070750,Will Curacao advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.0688,0.0,0.0,2026-06-25T18:35:30.670383+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+6c3f835440,2070750,Will Curacao advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.0688,0.0,0.0,2026-06-25T18:35:30.671878+00:00,2026-06-28,,,PENDING,,,,,B_discount,0,
+6687d17867,2070747,Will Germany advance to the knockout stages at the 2026 FIFA World Cup?,YES,1.0,0.0,0.0,2026-06-25T18:35:30.674661+00:00,2026-06-28,,,PENDING,,,,,A_all,0,
+b583bab234,2070749,Will Ivory Coast advance to the knockout stages at the 2026 FIFA World Cup?,YES,0.9847,0.0,0.0,2026-06-25T18:35:30.676157+00:00,2026-06-28,,,PENDING,,,,,A_all,0,

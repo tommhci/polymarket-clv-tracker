@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-25T08:30:03.502850+00:00",
-  "last_scan": "2026-06-25T08:29:42.370321+00:00",
-  "total_scans": 1140,
+  "generated_at": "2026-06-25T11:17:38.310211+00:00",
+  "last_scan": "2026-06-25T11:17:18.728507+00:00",
+  "total_scans": 1200,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -39,12 +39,12 @@
     {
       "bucket": "T-expired",
       "markets": 12,
-      "rows": 44
+      "rows": 56
     },
     {
       "bucket": "T-other",
-      "markets": 67,
-      "rows": 856
+      "markets": 68,
+      "rows": 904
     }
   ],
   "histogram": [
@@ -69,53 +69,53 @@
     {
       "team": "DR Congo",
       "mid": 0.565,
-      "ask": 0.5771,
-      "volume": 90679.0,
+      "ask": 0.57,
+      "volume": 90771.0,
       "spread_pct": 0.0175,
       "bucket": "T-other",
       "distance": 0.065
     },
     {
       "team": "Iran",
-      "mid": 0.573,
-      "ask": 0.5769,
-      "volume": 92788.0,
-      "spread_pct": 0.0035,
+      "mid": 0.5725,
+      "ask": 0.5776,
+      "volume": 94149.0,
+      "spread_pct": 0.0017,
       "bucket": "T-other",
-      "distance": 0.073
+      "distance": 0.0725
     },
     {
       "team": "Uruguay",
       "mid": 0.355,
-      "ask": 0.36,
-      "volume": 71859.0,
+      "ask": 0.3633,
+      "volume": 72558.0,
       "spread_pct": 0.0278,
       "bucket": "T-other",
       "distance": 0.145
     },
     {
       "team": "Saudi Arabia",
-      "mid": 0.315,
-      "ask": 0.32,
-      "volume": 196155.0,
-      "spread_pct": 0.0313,
+      "mid": 0.325,
+      "ask": 0.3382,
+      "volume": 199769.0,
+      "spread_pct": 0.0303,
       "bucket": "T-other",
-      "distance": 0.185
+      "distance": 0.175
     },
     {
-      "team": "Cape Verde",
+      "team": "Senegal",
       "mid": 0.685,
-      "ask": 0.69,
-      "volume": 142830.0,
+      "ask": 0.6982,
+      "volume": 142845.0,
       "spread_pct": 0.0145,
       "bucket": "T-other",
       "distance": 0.185
     },
     {
-      "team": "Senegal",
+      "team": "Cape Verde",
       "mid": 0.69,
       "ask": 0.7,
-      "volume": 141418.0,
+      "volume": 143502.0,
       "spread_pct": 0.0286,
       "bucket": "T-other",
       "distance": 0.19
@@ -124,70 +124,70 @@
       "team": "Scotland",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 305632.0,
+      "volume": 311391.0,
       "spread_pct": 0.0385,
       "bucket": "T-expired",
       "distance": 0.245
     },
     {
-      "team": "Ecuador",
-      "mid": 0.205,
-      "ask": 0.216,
-      "volume": 139994.0,
-      "spread_pct": 0.0476,
-      "bucket": "T-other",
-      "distance": 0.295
-    },
-    {
       "team": "Algeria",
       "mid": 0.815,
       "ask": 0.82,
-      "volume": 115083.0,
+      "volume": 115216.0,
       "spread_pct": 0.0122,
       "bucket": "T-other",
       "distance": 0.315
     },
     {
+      "team": "Ecuador",
+      "mid": 0.185,
+      "ask": 0.1929,
+      "volume": 144115.0,
+      "spread_pct": 0.0526,
+      "bucket": "T-other",
+      "distance": 0.315
+    },
+    {
       "team": "South Korea",
-      "mid": 0.845,
-      "ask": 0.8545,
-      "volume": 170330.0,
-      "spread_pct": 0.0118,
+      "mid": 0.855,
+      "ask": 0.86,
+      "volume": 177401.0,
+      "spread_pct": 0.0116,
       "bucket": "T-expired",
-      "distance": 0.345
+      "distance": 0.355
     },
     {
       "team": "Paraguay",
-      "mid": 0.865,
-      "ask": 0.87,
-      "volume": 105821.0,
-      "spread_pct": 0.0115,
+      "mid": 0.855,
+      "ask": 0.86,
+      "volume": 106508.0,
+      "spread_pct": 0.0116,
       "bucket": "T-other",
-      "distance": 0.365
+      "distance": 0.355
+    },
+    {
+      "team": "Sweden",
+      "mid": 0.9135,
+      "ask": 0.9147,
+      "volume": 263493.0,
+      "spread_pct": 0.0011,
+      "bucket": "T-other",
+      "distance": 0.4135
     },
     {
       "team": "Australia",
       "mid": 0.915,
       "ask": 0.92,
-      "volume": 157274.0,
+      "volume": 157359.0,
       "spread_pct": 0.0109,
       "bucket": "T-other",
       "distance": 0.415
     },
     {
-      "team": "Sweden",
-      "mid": 0.9155,
-      "ask": 0.9198,
-      "volume": 261995.0,
-      "spread_pct": 0.0054,
-      "bucket": "T-other",
-      "distance": 0.4155
-    },
-    {
       "team": "Croatia",
       "mid": 0.935,
-      "ask": 0.94,
-      "volume": 183364.0,
+      "ask": 0.9452,
+      "volume": 183403.0,
       "spread_pct": 0.0106,
       "bucket": "T-other",
       "distance": 0.435
@@ -195,8 +195,8 @@
     {
       "team": "Belgium",
       "mid": 0.941,
-      "ask": 0.941,
-      "volume": 102499.0,
+      "ask": 0.9436,
+      "volume": 129224.0,
       "spread_pct": 0.0021,
       "bucket": "T-other",
       "distance": 0.441
@@ -205,7 +205,7 @@
       "team": "New Zealand",
       "mid": 0.055,
       "ask": 0.06,
-      "volume": 159873.0,
+      "volume": 160113.0,
       "spread_pct": 0.1667,
       "bucket": "T-other",
       "distance": 0.445
@@ -213,53 +213,53 @@
     {
       "team": "Curacao",
       "mid": 0.0475,
-      "ask": 0.0512,
-      "volume": 204949.0,
+      "ask": 0.0514,
+      "volume": 205650.0,
       "spread_pct": 0.0612,
       "bucket": "T-other",
       "distance": 0.4525
     },
     {
       "team": "Austria",
-      "mid": 0.965,
-      "ask": 0.9698,
-      "volume": 66943.0,
-      "spread_pct": 0.0083,
+      "mid": 0.967,
+      "ask": 0.9718,
+      "volume": 67017.0,
+      "spread_pct": 0.0082,
       "bucket": "T-other",
-      "distance": 0.465
+      "distance": 0.467
     },
     {
       "team": "Uzbekistan",
-      "mid": 0.0265,
-      "ask": 0.0362,
-      "volume": 76409.0,
-      "spread_pct": 0.2333,
+      "mid": 0.027,
+      "ask": 0.0342,
+      "volume": 76633.0,
+      "spread_pct": 0.1379,
       "bucket": "T-other",
-      "distance": 0.4735
+      "distance": 0.473
     },
     {
       "team": "Ivory Coast",
       "mid": 0.98,
       "ask": 0.9815,
-      "volume": 79009.0,
+      "volume": 79143.0,
       "spread_pct": 0.002,
       "bucket": "T-other",
       "distance": 0.48
     },
     {
       "team": "Iraq",
-      "mid": 0.0155,
-      "ask": 0.0212,
-      "volume": 259076.0,
-      "spread_pct": 0.0625,
+      "mid": 0.015,
+      "ask": 0.0213,
+      "volume": 259211.0,
+      "spread_pct": 0.125,
       "bucket": "T-other",
-      "distance": 0.4845
+      "distance": 0.485
     },
     {
       "team": "Ghana",
       "mid": 0.997,
       "ask": 0.999,
-      "volume": 319688.0,
+      "volume": 338072.0,
       "spread_pct": 0.004,
       "bucket": "T-other",
       "distance": 0.497
@@ -268,19 +268,19 @@
       "team": "Egypt",
       "mid": 0.998,
       "ask": 0.999,
-      "volume": 718645.0,
+      "volume": 786113.0,
       "spread_pct": 0.002,
       "bucket": "T-other",
       "distance": 0.498
     },
     {
-      "team": "Netherlands",
-      "mid": 0.9985,
+      "team": "Portugal",
+      "mid": 0.998,
       "ask": 0.999,
-      "volume": 678518.0,
-      "spread_pct": 0.001,
+      "volume": 566627.0,
+      "spread_pct": 0.002,
       "bucket": "T-other",
-      "distance": 0.4985
+      "distance": 0.498
     },
     {
       "team": "Spain",
@@ -292,19 +292,10 @@
       "distance": 0.4985
     },
     {
-      "team": "Portugal",
-      "mid": 0.9985,
-      "ask": 0.999,
-      "volume": 566617.0,
-      "spread_pct": 0.001,
-      "bucket": "T-other",
-      "distance": 0.4985
-    },
-    {
       "team": "Japan",
       "mid": 0.999,
       "ask": 1.0,
-      "volume": 523079.0,
+      "volume": 530304.0,
       "spread_pct": 0.002,
       "bucket": "T-other",
       "distance": 0.499
@@ -313,7 +304,7 @@
       "team": "England",
       "mid": 0.999,
       "ask": 1.0,
-      "volume": 374180.0,
+      "volume": 374680.0,
       "spread_pct": 0.002,
       "bucket": "T-other",
       "distance": 0.499
@@ -467,6 +458,15 @@
       "mid": 0.9995,
       "ask": 1.0,
       "volume": 74751.0,
+      "spread_pct": 0.001,
+      "bucket": "T-other",
+      "distance": 0.4995
+    },
+    {
+      "team": "Netherlands",
+      "mid": 0.9995,
+      "ask": 1.0,
+      "volume": 680077.0,
       "spread_pct": 0.001,
       "bucket": "T-other",
       "distance": 0.4995
@@ -761,6 +761,11 @@
           "t": "2026-06-25T08:29",
           "p": 0.565,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.565,
+          "bucket": "T-other"
         }
       ]
     },
@@ -861,6 +866,11 @@
           "t": "2026-06-25T08:29",
           "p": 0.573,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.5725,
+          "bucket": "T-other"
         }
       ]
     },
@@ -949,6 +959,11 @@
         },
         {
           "t": "2026-06-25T08:29",
+          "p": 0.355,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
           "p": 0.355,
           "bucket": "T-other"
         }
@@ -1051,6 +1066,116 @@
           "t": "2026-06-25T08:29",
           "p": 0.315,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.325,
+          "bucket": "T-other"
+        }
+      ]
+    },
+    {
+      "team": "Senegal",
+      "series": [
+        {
+          "t": "2026-06-16T04:58",
+          "p": 0.705,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-16T05:13",
+          "p": 0.705,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-21T17:09",
+          "p": 0.695,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-21T19:04",
+          "p": 0.71,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T20:44",
+          "p": 0.71,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T22:21",
+          "p": 0.71,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T23:53",
+          "p": 0.71,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-24T02:24",
+          "p": 0.675,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T02:32",
+          "p": 0.675,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T05:46",
+          "p": 0.685,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T09:48",
+          "p": 0.685,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T12:25",
+          "p": 0.685,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T15:20",
+          "p": 0.685,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T17:29",
+          "p": 0.67,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T21:11",
+          "p": 0.665,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T22:49",
+          "p": 0.665,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T00:19",
+          "p": 0.705,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T04:48",
+          "p": 0.685,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T08:29",
+          "p": 0.69,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.685,
+          "bucket": "T-other"
         }
       ]
     },
@@ -1151,104 +1276,9 @@
           "t": "2026-06-25T08:29",
           "p": 0.685,
           "bucket": "T-other"
-        }
-      ]
-    },
-    {
-      "team": "Senegal",
-      "series": [
-        {
-          "t": "2026-06-16T04:58",
-          "p": 0.705,
-          "bucket": "T-other"
         },
         {
-          "t": "2026-06-16T05:13",
-          "p": 0.705,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-21T17:09",
-          "p": 0.695,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-21T19:04",
-          "p": 0.71,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T20:44",
-          "p": 0.71,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T22:21",
-          "p": 0.71,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T23:53",
-          "p": 0.71,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-24T02:24",
-          "p": 0.675,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T02:32",
-          "p": 0.675,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T05:46",
-          "p": 0.685,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T09:48",
-          "p": 0.685,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T12:25",
-          "p": 0.685,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T15:20",
-          "p": 0.685,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T17:29",
-          "p": 0.67,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T21:11",
-          "p": 0.665,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T22:49",
-          "p": 0.665,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-25T00:19",
-          "p": 0.705,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-25T04:48",
-          "p": 0.685,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-25T08:29",
+          "t": "2026-06-25T11:17",
           "p": 0.69,
           "bucket": "T-other"
         }
@@ -1351,105 +1381,115 @@
           "t": "2026-06-25T08:29",
           "p": 0.255,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.255,
+          "bucket": "T-expired"
         }
       ]
     },
     {
-      "team": "Ecuador",
+      "team": "Algeria",
       "series": [
         {
           "t": "2026-06-16T04:58",
-          "p": 0.805,
+          "p": 0.66,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-16T05:13",
-          "p": 0.805,
+          "p": 0.66,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-21T17:09",
-          "p": 0.255,
+          "p": 0.555,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-21T19:04",
-          "p": 0.255,
+          "p": 0.555,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T20:44",
-          "p": 0.25,
+          "p": 0.555,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T22:21",
-          "p": 0.245,
+          "p": 0.555,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T23:53",
-          "p": 0.245,
+          "p": 0.56,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-24T02:24",
-          "p": 0.265,
+          "p": 0.805,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T02:32",
-          "p": 0.265,
+          "p": 0.805,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T05:46",
-          "p": 0.265,
+          "p": 0.815,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T09:48",
-          "p": 0.245,
+          "p": 0.805,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T12:25",
-          "p": 0.245,
+          "p": 0.805,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T15:20",
-          "p": 0.245,
+          "p": 0.81,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T17:29",
-          "p": 0.235,
-          "bucket": "T-24h"
+          "p": 0.805,
+          "bucket": "T-other"
         },
         {
           "t": "2026-06-24T21:11",
-          "p": 0.235,
-          "bucket": "T-24h"
+          "p": 0.805,
+          "bucket": "T-other"
         },
         {
           "t": "2026-06-24T22:49",
-          "p": 0.235,
-          "bucket": "T-24h"
+          "p": 0.805,
+          "bucket": "T-other"
         },
         {
           "t": "2026-06-25T00:19",
-          "p": 0.235,
+          "p": 0.835,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-25T04:48",
-          "p": 0.195,
+          "p": 0.815,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-25T08:29",
-          "p": 0.205,
+          "p": 0.815,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.815,
           "bucket": "T-other"
         }
       ]

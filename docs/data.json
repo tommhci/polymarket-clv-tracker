@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-27T11:59:13.914922+00:00",
-  "last_scan": "2026-06-27T11:58:57.888228+00:00",
-  "total_scans": 2280,
+  "generated_at": "2026-06-27T14:02:17.864395+00:00",
+  "last_scan": "2026-06-27T14:01:58.322069+00:00",
+  "total_scans": 2340,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -39,12 +39,12 @@
     {
       "bucket": "T-expired",
       "markets": 36,
-      "rows": 508
+      "rows": 544
     },
     {
       "bucket": "T-other",
       "markets": 68,
-      "rows": 1463
+      "rows": 1487
     }
   ],
   "histogram": [
@@ -104,72 +104,72 @@
   "markets": [
     {
       "team": "DR Congo",
-      "mid": 0.605,
-      "ask": 0.61,
-      "volume": 111014.0,
-      "spread_pct": 0.0164,
+      "mid": 0.61,
+      "ask": 0.62,
+      "volume": 113104.0,
+      "spread_pct": 0.0323,
       "bucket": "T-other",
-      "distance": 0.105
+      "distance": 0.11
     },
     {
       "team": "Algeria",
       "mid": 0.675,
       "ask": 0.68,
-      "volume": 166448.0,
+      "volume": 167153.0,
       "spread_pct": 0.0147,
       "bucket": "T-other",
       "distance": 0.175
     },
     {
       "team": "Iran",
-      "mid": 0.753,
-      "ask": 0.7576,
-      "volume": 198144.0,
-      "spread_pct": 0.0132,
+      "mid": 0.7505,
+      "ask": 0.7556,
+      "volume": 205389.0,
+      "spread_pct": 0.0119,
       "bucket": "T-expired",
-      "distance": 0.253
+      "distance": 0.2505
     },
     {
       "team": "South Korea",
       "mid": 0.175,
-      "ask": 0.18,
-      "volume": 533953.0,
+      "ask": 0.19,
+      "volume": 554278.0,
       "spread_pct": 0.0556,
       "bucket": "T-expired",
       "distance": 0.325
     },
     {
       "team": "Croatia",
-      "mid": 0.83,
-      "ask": 0.84,
-      "volume": 207521.0,
-      "spread_pct": 0.0238,
+      "mid": 0.845,
+      "ask": 0.85,
+      "volume": 211921.0,
+      "spread_pct": 0.0118,
       "bucket": "T-other",
-      "distance": 0.33
+      "distance": 0.345
     },
     {
       "team": "Austria",
-      "mid": 0.853,
-      "ask": 0.86,
-      "volume": 94705.0,
-      "spread_pct": 0.0163,
+      "mid": 0.8525,
+      "ask": 0.859,
+      "volume": 96915.0,
+      "spread_pct": 0.0151,
       "bucket": "T-other",
-      "distance": 0.353
+      "distance": 0.3525
     },
     {
       "team": "Scotland",
-      "mid": 0.0045,
-      "ask": 0.0092,
-      "volume": 505444.0,
-      "spread_pct": 0.7143,
+      "mid": 0.0025,
+      "ask": 0.0087,
+      "volume": 506531.0,
+      "spread_pct": 0.3333,
       "bucket": "T-expired",
-      "distance": 0.4955
+      "distance": 0.4975
     },
     {
       "team": "Uzbekistan",
       "mid": 0.0025,
-      "ask": 0.0057,
-      "volume": 104807.0,
+      "ask": 0.006,
+      "volume": 105234.0,
       "spread_pct": 0.75,
       "bucket": "T-other",
       "distance": 0.4975
@@ -1282,6 +1282,11 @@
           "t": "2026-06-27T11:58",
           "p": 0.605,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.61,
+          "bucket": "T-other"
         }
       ]
     },
@@ -1475,6 +1480,11 @@
         },
         {
           "t": "2026-06-27T11:58",
+          "p": 0.675,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T14:01",
           "p": 0.675,
           "bucket": "T-other"
         }
@@ -1672,6 +1682,11 @@
           "t": "2026-06-27T11:58",
           "p": 0.753,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.7505,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -1865,6 +1880,11 @@
         },
         {
           "t": "2026-06-27T11:58",
+          "p": 0.175,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T14:01",
           "p": 0.175,
           "bucket": "T-expired"
         }
@@ -2062,6 +2082,11 @@
           "t": "2026-06-27T11:58",
           "p": 0.83,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.845,
+          "bucket": "T-other"
         }
       ]
     },
@@ -2256,6 +2281,11 @@
         {
           "t": "2026-06-27T11:58",
           "p": 0.853,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.8525,
           "bucket": "T-other"
         }
       ]
@@ -2452,6 +2482,11 @@
           "t": "2026-06-27T11:58",
           "p": 0.0045,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.0025,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -2645,6 +2680,11 @@
         },
         {
           "t": "2026-06-27T11:58",
+          "p": 0.0025,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T14:01",
           "p": 0.0025,
           "bucket": "T-other"
         }

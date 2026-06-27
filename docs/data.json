@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-27T19:54:56.100746+00:00",
-  "last_scan": "2026-06-27T19:54:36.774689+00:00",
-  "total_scans": 2580,
+  "generated_at": "2026-06-27T21:15:23.821976+00:00",
+  "last_scan": "2026-06-27T21:15:07.445470+00:00",
+  "total_scans": 2640,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
   },
   "summary": {
-    "n_resolved": 52,
+    "n_resolved": 56,
     "beat_line": 18,
-    "win_rate": 0.346,
-    "avg_clv_raw": 0.0404,
-    "avg_clv_adj": 0.0404,
-    "avg_lockup": 3.4e-05,
-    "std_err": 0.0467,
-    "t_stat": 0.87,
+    "win_rate": 0.321,
+    "avg_clv_raw": 0.0375,
+    "avg_clv_adj": 0.0375,
+    "avg_lockup": 3.2e-05,
+    "std_err": 0.0434,
+    "t_stat": 0.86,
     "worst": -0.7038,
     "best": 0.8506,
-    "gate": "NOT SIGNIFICANT (t=0.87)",
+    "gate": "NOT SIGNIFICANT (t=0.86)",
     "gate_class": "warn"
   },
   "buckets": [
@@ -33,18 +33,18 @@
     },
     {
       "bucket": "T-24h",
-      "markets": 39,
-      "rows": 89
+      "markets": 40,
+      "rows": 90
     },
     {
       "bucket": "T-expired",
-      "markets": 36,
-      "rows": 688
+      "markets": 40,
+      "rows": 728
     },
     {
       "bucket": "T-other",
       "markets": 68,
-      "rows": 1579
+      "rows": 1598
     }
   ],
   "histogram": [
@@ -74,7 +74,7 @@
     },
     {
       "bin": -0.0,
-      "count": 24
+      "count": 28
     },
     {
       "bin": 0.1,
@@ -104,75 +104,66 @@
   "markets": [
     {
       "team": "DR Congo",
-      "mid": 0.585,
-      "ask": 0.59,
-      "volume": 119679.0,
-      "spread_pct": 0.0169,
-      "bucket": "T-other",
-      "distance": 0.085
+      "mid": 0.59,
+      "ask": 0.6,
+      "volume": 121691.0,
+      "spread_pct": 0.0333,
+      "bucket": "T-24h",
+      "distance": 0.09
     },
     {
       "team": "Algeria",
       "mid": 0.72,
-      "ask": 0.7361,
-      "volume": 176823.0,
+      "ask": 0.73,
+      "volume": 177133.0,
       "spread_pct": 0.0274,
       "bucket": "T-other",
       "distance": 0.22
     },
     {
       "team": "Iran",
-      "mid": 0.7505,
-      "ask": 0.7516,
-      "volume": 239063.0,
-      "spread_pct": 0.0013,
+      "mid": 0.7485,
+      "ask": 0.7481,
+      "volume": 244909.0,
+      "spread_pct": 0.012,
       "bucket": "T-expired",
-      "distance": 0.2505
-    },
-    {
-      "team": "South Korea",
-      "mid": 0.165,
-      "ask": 0.17,
-      "volume": 786513.0,
-      "spread_pct": 0.0588,
-      "bucket": "T-expired",
-      "distance": 0.335
+      "distance": 0.2485
     },
     {
       "team": "Austria",
-      "mid": 0.848,
-      "ask": 0.8546,
-      "volume": 100670.0,
-      "spread_pct": 0.0071,
+      "mid": 0.8475,
+      "ask": 0.8541,
+      "volume": 102016.0,
+      "spread_pct": 0.0129,
       "bucket": "T-other",
-      "distance": 0.348
+      "distance": 0.3475
+    },
+    {
+      "team": "South Korea",
+      "mid": 0.14,
+      "ask": 0.1565,
+      "volume": 1019130.0,
+      "spread_pct": 0.1333,
+      "bucket": "T-expired",
+      "distance": 0.36
     },
     {
       "team": "Croatia",
-      "mid": 0.85,
-      "ask": 0.8577,
-      "volume": 233442.0,
-      "spread_pct": 0.0233,
-      "bucket": "T-1h",
-      "distance": 0.35
+      "mid": 0.875,
+      "ask": 0.88,
+      "volume": 235879.0,
+      "spread_pct": 0.0114,
+      "bucket": "T-expired",
+      "distance": 0.375
     },
     {
       "team": "Scotland",
-      "mid": 0.0025,
-      "ask": 0.0137,
-      "volume": 552281.0,
-      "spread_pct": 0.3333,
+      "mid": 0.0065,
+      "ask": 0.0143,
+      "volume": 554673.0,
+      "spread_pct": 0.8182,
       "bucket": "T-expired",
-      "distance": 0.4975
-    },
-    {
-      "team": "Uzbekistan",
-      "mid": 0.0015,
-      "ask": 0.004,
-      "volume": 105898.0,
-      "spread_pct": 1.0,
-      "bucket": "T-other",
-      "distance": 0.4985
+      "distance": 0.4935
     },
     {
       "team": "Czechia",
@@ -274,12 +265,21 @@
       "distance": 0.4995
     },
     {
+      "team": "Uzbekistan",
+      "mid": 0.0005,
+      "ask": 0.0048,
+      "volume": 105898.0,
+      "spread_pct": 1.0,
+      "bucket": "T-other",
+      "distance": 0.4995
+    },
+    {
       "team": "Panama",
       "mid": 0.0005,
       "ask": 0.001,
       "volume": 129605.0,
       "spread_pct": 1.0,
-      "bucket": "T-1h",
+      "bucket": "T-expired",
       "distance": 0.4995
     },
     {
@@ -522,7 +522,7 @@
       "ask": 1.0,
       "volume": 409841.0,
       "spread_pct": 0.001,
-      "bucket": "T-1h",
+      "bucket": "T-expired",
       "distance": 0.4995
     },
     {
@@ -531,35 +531,15 @@
       "ask": 1.0,
       "volume": 785660.0,
       "spread_pct": 0.001,
-      "bucket": "T-1h",
+      "bucket": "T-expired",
       "distance": 0.4995
     }
   ],
   "open_positions": [
     {
-      "question": "Will Ghana advance to the knockout stages at the 2026 FIFA World Cup?",
-      "entry_price": 1.0,
-      "entry_timestamp": "2026-06-27T19:54:55.849423+00:00"
-    },
-    {
       "question": "Will Croatia advance to the knockout stages at the 2026 FIFA World Cup?",
       "entry_price": 0.8577,
       "entry_timestamp": "2026-06-27T19:54:55.847660+00:00"
-    },
-    {
-      "question": "Will Panama advance to the knockout stages at the 2026 FIFA World Cup?",
-      "entry_price": 0.001,
-      "entry_timestamp": "2026-06-27T19:54:55.846171+00:00"
-    },
-    {
-      "question": "Will Panama advance to the knockout stages at the 2026 FIFA World Cup?",
-      "entry_price": 0.001,
-      "entry_timestamp": "2026-06-27T19:54:55.844800+00:00"
-    },
-    {
-      "question": "Will England advance to the knockout stages at the 2026 FIFA World Cup?",
-      "entry_price": 1.0,
-      "entry_timestamp": "2026-06-27T19:54:55.843243+00:00"
     },
     {
       "question": "Will Iran advance to the knockout stages at the 2026 FIFA World Cup?",
@@ -593,6 +573,46 @@
     }
   ],
   "resolved": [
+    {
+      "question": "Will Ghana advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 1.0,
+      "closing_price": 0.9995,
+      "clv": -0.0005,
+      "clv_adjusted": -0.0005,
+      "days_held": 0.056,
+      "outcome": "MISSED_LINE",
+      "close_timestamp": "2026-06-27T21:15:23.565104+00:00"
+    },
+    {
+      "question": "Will Panama advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.001,
+      "closing_price": 0.0005,
+      "clv": -0.0005,
+      "clv_adjusted": -0.0005,
+      "days_held": 0.056,
+      "outcome": "MISSED_LINE",
+      "close_timestamp": "2026-06-27T21:15:23.562366+00:00"
+    },
+    {
+      "question": "Will Panama advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 0.001,
+      "closing_price": 0.0005,
+      "clv": -0.0005,
+      "clv_adjusted": -0.0005,
+      "days_held": 0.056,
+      "outcome": "MISSED_LINE",
+      "close_timestamp": "2026-06-27T21:15:23.559702+00:00"
+    },
+    {
+      "question": "Will England advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 1.0,
+      "closing_price": 0.9995,
+      "clv": -0.0005,
+      "clv_adjusted": -0.0005,
+      "days_held": 0.056,
+      "outcome": "MISSED_LINE",
+      "close_timestamp": "2026-06-27T21:15:23.556828+00:00"
+    },
     {
       "question": "Will Egypt advance to the knockout stages at the 2026 FIFA World Cup?",
       "entry_price": 1.0,
@@ -1332,6 +1352,11 @@
           "t": "2026-06-27T19:54",
           "p": 0.585,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.59,
+          "bucket": "T-24h"
         }
       ]
     },
@@ -1550,6 +1575,11 @@
         },
         {
           "t": "2026-06-27T19:54",
+          "p": 0.72,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T21:15",
           "p": 0.72,
           "bucket": "T-other"
         }
@@ -1772,225 +1802,10 @@
           "t": "2026-06-27T19:54",
           "p": 0.7505,
           "bucket": "T-expired"
-        }
-      ]
-    },
-    {
-      "team": "South Korea",
-      "series": [
-        {
-          "t": "2026-06-16T04:58",
-          "p": 0.935,
-          "bucket": "T-other"
         },
         {
-          "t": "2026-06-16T05:13",
-          "p": 0.935,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-21T17:09",
-          "p": 0.935,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-21T19:04",
-          "p": 0.935,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T20:44",
-          "p": 0.935,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T22:21",
-          "p": 0.935,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-21T23:53",
-          "p": 0.935,
-          "bucket": "T-168h"
-        },
-        {
-          "t": "2026-06-24T02:24",
-          "p": 0.935,
-          "bucket": "T-24h"
-        },
-        {
-          "t": "2026-06-24T02:32",
-          "p": 0.935,
-          "bucket": "T-24h"
-        },
-        {
-          "t": "2026-06-24T05:46",
-          "p": 0.935,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T09:48",
-          "p": 0.935,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T12:25",
-          "p": 0.925,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T15:20",
-          "p": 0.925,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T17:29",
-          "p": 0.925,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T21:11",
-          "p": 0.935,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-24T22:49",
-          "p": 0.94,
-          "bucket": "T-other"
-        },
-        {
-          "t": "2026-06-25T00:19",
-          "p": 0.93,
-          "bucket": "T-1h"
-        },
-        {
-          "t": "2026-06-25T04:48",
-          "p": 0.795,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T08:29",
-          "p": 0.845,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T11:17",
-          "p": 0.855,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T13:38",
-          "p": 0.885,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T18:35",
-          "p": 0.875,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T20:34",
-          "p": 0.88,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T22:08",
-          "p": 0.715,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-25T23:55",
-          "p": 0.695,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T04:25",
-          "p": 0.455,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T08:09",
-          "p": 0.425,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T11:27",
-          "p": 0.455,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T13:34",
-          "p": 0.445,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T15:57",
-          "p": 0.44,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T18:00",
-          "p": 0.455,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T21:37",
-          "p": 0.225,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-26T23:17",
-          "p": 0.195,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T01:30",
-          "p": 0.315,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T05:32",
-          "p": 0.185,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T08:12",
-          "p": 0.18,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T10:34",
-          "p": 0.18,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T11:58",
-          "p": 0.175,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T14:01",
-          "p": 0.175,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T15:22",
-          "p": 0.185,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T16:41",
-          "p": 0.18,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T18:13",
-          "p": 0.165,
-          "bucket": "T-expired"
-        },
-        {
-          "t": "2026-06-27T19:54",
-          "p": 0.165,
+          "t": "2026-06-27T21:15",
+          "p": 0.7485,
           "bucket": "T-expired"
         }
       ]
@@ -2212,6 +2027,236 @@
           "t": "2026-06-27T19:54",
           "p": 0.848,
           "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.8475,
+          "bucket": "T-other"
+        }
+      ]
+    },
+    {
+      "team": "South Korea",
+      "series": [
+        {
+          "t": "2026-06-16T04:58",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-16T05:13",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-21T17:09",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-21T19:04",
+          "p": 0.935,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T20:44",
+          "p": 0.935,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T22:21",
+          "p": 0.935,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-21T23:53",
+          "p": 0.935,
+          "bucket": "T-168h"
+        },
+        {
+          "t": "2026-06-24T02:24",
+          "p": 0.935,
+          "bucket": "T-24h"
+        },
+        {
+          "t": "2026-06-24T02:32",
+          "p": 0.935,
+          "bucket": "T-24h"
+        },
+        {
+          "t": "2026-06-24T05:46",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T09:48",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T12:25",
+          "p": 0.925,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T15:20",
+          "p": 0.925,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T17:29",
+          "p": 0.925,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T21:11",
+          "p": 0.935,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-24T22:49",
+          "p": 0.94,
+          "bucket": "T-other"
+        },
+        {
+          "t": "2026-06-25T00:19",
+          "p": 0.93,
+          "bucket": "T-1h"
+        },
+        {
+          "t": "2026-06-25T04:48",
+          "p": 0.795,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T08:29",
+          "p": 0.845,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T11:17",
+          "p": 0.855,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T13:38",
+          "p": 0.885,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T18:35",
+          "p": 0.875,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T20:34",
+          "p": 0.88,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T22:08",
+          "p": 0.715,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-25T23:55",
+          "p": 0.695,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T04:25",
+          "p": 0.455,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T08:09",
+          "p": 0.425,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T11:27",
+          "p": 0.455,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T13:34",
+          "p": 0.445,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T15:57",
+          "p": 0.44,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T18:00",
+          "p": 0.455,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T21:37",
+          "p": 0.225,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-26T23:17",
+          "p": 0.195,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T01:30",
+          "p": 0.315,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T05:32",
+          "p": 0.185,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T08:12",
+          "p": 0.18,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T10:34",
+          "p": 0.18,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T11:58",
+          "p": 0.175,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T14:01",
+          "p": 0.175,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T15:22",
+          "p": 0.185,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T16:41",
+          "p": 0.18,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T18:13",
+          "p": 0.165,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T19:54",
+          "p": 0.165,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.14,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -2432,6 +2477,11 @@
           "t": "2026-06-27T19:54",
           "p": 0.85,
           "bucket": "T-1h"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.875,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -2652,246 +2702,256 @@
           "t": "2026-06-27T19:54",
           "p": 0.0025,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.0065,
+          "bucket": "T-expired"
         }
       ]
     },
     {
-      "team": "Uzbekistan",
+      "team": "Czechia",
       "series": [
         {
           "t": "2026-06-16T04:58",
-          "p": 0.305,
+          "p": 0.555,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-16T05:13",
-          "p": 0.305,
+          "p": 0.555,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-21T17:09",
-          "p": 0.165,
+          "p": 0.265,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-21T19:04",
-          "p": 0.165,
+          "p": 0.265,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T20:44",
-          "p": 0.165,
+          "p": 0.265,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T22:21",
-          "p": 0.165,
+          "p": 0.265,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-21T23:53",
-          "p": 0.165,
+          "p": 0.265,
           "bucket": "T-168h"
         },
         {
           "t": "2026-06-24T02:24",
-          "p": 0.065,
-          "bucket": "T-other"
+          "p": 0.245,
+          "bucket": "T-24h"
         },
         {
           "t": "2026-06-24T02:32",
-          "p": 0.065,
-          "bucket": "T-other"
+          "p": 0.245,
+          "bucket": "T-24h"
         },
         {
           "t": "2026-06-24T05:46",
-          "p": 0.065,
+          "p": 0.235,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T09:48",
-          "p": 0.06,
+          "p": 0.245,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T12:25",
-          "p": 0.06,
+          "p": 0.245,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T15:20",
-          "p": 0.06,
+          "p": 0.245,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T17:29",
-          "p": 0.06,
+          "p": 0.245,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T21:11",
-          "p": 0.045,
+          "p": 0.25,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-24T22:49",
-          "p": 0.045,
+          "p": 0.25,
           "bucket": "T-other"
         },
         {
           "t": "2026-06-25T00:19",
-          "p": 0.045,
-          "bucket": "T-other"
+          "p": 0.235,
+          "bucket": "T-1h"
         },
         {
           "t": "2026-06-25T04:48",
-          "p": 0.035,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T08:29",
-          "p": 0.0265,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T11:17",
-          "p": 0.027,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T13:38",
-          "p": 0.0265,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T18:35",
-          "p": 0.025,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T20:34",
-          "p": 0.035,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T22:08",
-          "p": 0.0315,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-25T23:55",
-          "p": 0.0255,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T04:25",
-          "p": 0.0135,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T08:09",
-          "p": 0.0115,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T11:27",
-          "p": 0.011,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T13:34",
-          "p": 0.009,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T15:57",
-          "p": 0.009,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T18:00",
-          "p": 0.009,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T21:37",
-          "p": 0.0065,
-          "bucket": "T-24h"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-26T23:17",
-          "p": 0.0075,
-          "bucket": "T-24h"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T01:30",
-          "p": 0.0065,
-          "bucket": "T-24h"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T05:32",
-          "p": 0.0045,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T08:12",
-          "p": 0.0015,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T10:34",
-          "p": 0.003,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T11:58",
-          "p": 0.0025,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T14:01",
-          "p": 0.0025,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T15:22",
           "p": 0.0005,
-          "bucket": "T-other"
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T16:41",
-          "p": 0.0015,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T18:13",
-          "p": 0.0015,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
         },
         {
           "t": "2026-06-27T19:54",
-          "p": 0.0015,
-          "bucket": "T-other"
+          "p": 0.0005,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-27T21:15",
+          "p": 0.0005,
+          "bucket": "T-expired"
         }
       ]
     }
   ],
   "glm_signals": [],
   "calibration": {
-    "n_resolved": 52,
-    "brier": 0.1194,
-    "brier_skill": 0.5382,
-    "log_loss": 0.3496,
-    "ece": 0.0763,
+    "n_resolved": 56,
+    "brier": 0.1109,
+    "brier_skill": 0.5734,
+    "log_loss": 0.3246,
+    "ece": 0.0708,
     "base_rate": 0.6667,
-    "actual_rate": 0.5577,
+    "actual_rate": 0.5536,
     "curve": [
       {
         "bin_lo": 0.0,
         "bin_hi": 0.2,
-        "n": 16,
-        "mean_pred": 0.0623,
-        "actual_rate": 0.125
+        "n": 18,
+        "mean_pred": 0.0555,
+        "actual_rate": 0.1111
       },
       {
         "bin_lo": 0.2,
@@ -2917,19 +2977,19 @@
       {
         "bin_lo": 0.8,
         "bin_hi": 1.0,
-        "n": 18,
-        "mean_pred": 0.9639,
+        "n": 20,
+        "mean_pred": 0.9675,
         "actual_rate": 1.0
       }
     ],
     "bootstrap": {
-      "bss_point": 0.5382,
-      "ci_low": 0.267,
-      "ci_high": 0.7498,
-      "n": 52,
+      "bss_point": 0.5734,
+      "ci_low": 0.3242,
+      "ci_high": 0.7682,
+      "n": 56,
       "n_resamples": 10000,
       "verdict": "SKILL DETECTED — market beats base rate (CI > 0)"
     },
-    "note": "n=52: sufficient for large-bias detection only (marginal 2-5% edge needs n≈384+)."
+    "note": "n=56: sufficient for large-bias detection only (marginal 2-5% edge needs n≈384+)."
   }
 }

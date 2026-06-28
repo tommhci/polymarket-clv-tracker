@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-28T21:42:41.109560+00:00",
-  "last_scan": "2026-06-28T21:42:21.494088+00:00",
-  "total_scans": 3360,
+  "generated_at": "2026-06-28T23:14:43.555852+00:00",
+  "last_scan": "2026-06-28T23:14:22.545212+00:00",
+  "total_scans": 3420,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -28,8 +28,8 @@
     },
     {
       "bucket": "T-1h",
-      "markets": 43,
-      "rows": 43
+      "markets": 44,
+      "rows": 44
     },
     {
       "bucket": "T-24h",
@@ -39,12 +39,12 @@
     {
       "bucket": "T-expired",
       "markets": 47,
-      "rows": 1281
+      "rows": 1328
     },
     {
       "bucket": "T-other",
       "markets": 69,
-      "rows": 1756
+      "rows": 1768
     }
   ],
   "histogram": [
@@ -521,7 +521,7 @@
       "ask": 1.0,
       "volume": 180384.0,
       "spread_pct": 0.001,
-      "bucket": "T-other",
+      "bucket": "T-1h",
       "distance": 0.4995
     },
     {
@@ -543,7 +543,13 @@
       "distance": 0.4995
     }
   ],
-  "open_positions": [],
+  "open_positions": [
+    {
+      "question": "Will DR Congo advance to the knockout stages at the 2026 FIFA World Cup?",
+      "entry_price": 1.0,
+      "entry_timestamp": "2026-06-28T23:14:43.307762+00:00"
+    }
+  ],
   "resolved": [
     {
       "question": "Will Algeria advance to the knockout stages at the 2026 FIFA World Cup?",
@@ -1549,6 +1555,11 @@
           "t": "2026-06-28T21:42",
           "p": 0.0005,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
+          "p": 0.0005,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -1832,6 +1843,11 @@
         },
         {
           "t": "2026-06-28T21:42",
+          "p": 0.0005,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
           "p": 0.0005,
           "bucket": "T-expired"
         }
@@ -2119,6 +2135,11 @@
           "t": "2026-06-28T21:42",
           "p": 0.0005,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
+          "p": 0.0005,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -2402,6 +2423,11 @@
         },
         {
           "t": "2026-06-28T21:42",
+          "p": 0.0005,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
           "p": 0.0005,
           "bucket": "T-expired"
         }
@@ -2689,6 +2715,11 @@
           "t": "2026-06-28T21:42",
           "p": 0.0005,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
+          "p": 0.0005,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -2972,6 +3003,11 @@
         },
         {
           "t": "2026-06-28T21:42",
+          "p": 0.0005,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
           "p": 0.0005,
           "bucket": "T-expired"
         }
@@ -3259,6 +3295,11 @@
           "t": "2026-06-28T21:42",
           "p": 0.0005,
           "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
+          "p": 0.0005,
+          "bucket": "T-expired"
         }
       ]
     },
@@ -3532,6 +3573,11 @@
         },
         {
           "t": "2026-06-28T21:42",
+          "p": 0.0005,
+          "bucket": "T-expired"
+        },
+        {
+          "t": "2026-06-28T23:14",
           "p": 0.0005,
           "bucket": "T-expired"
         }

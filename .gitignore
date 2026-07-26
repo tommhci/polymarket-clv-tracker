@@ -6,6 +6,8 @@
 # Source: StackOverflow/openillumi.com — binary DB in git = unreadable diffs + bloat
 # The docs/scans.csv + docs/paper_trades.csv are the portable truth source instead
 *.db
+*.sqlite
+*.sqlite3
 
 # Python
 __pycache__/

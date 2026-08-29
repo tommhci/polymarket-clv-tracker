@@ -292,7 +292,11 @@ def execute_scan(send_summary: bool = False, force: bool = False) -> list:
         decision.use_football_data = False
     elif decision.mode == "skip":
         import sqlite3 as _sq
-        n = _sq.connect(DB_PATH).execute("SELECT COUNT(*) FROM scans").fetchone()[0]
+        _conn = _sq.connect(DB_PATH)
+        try:
+            n = _conn.execute("SELECT COUNT(*) FROM scans").fetchone()[0]
+        finally:
+            _conn.close()
         if n == 0:
             log.info("Bootstrap: empty DB — running initial full scan to populate")
             decision.mode          = "light"   # minimal: just get market data

@@ -76,13 +76,21 @@ def main_test():
 
         # ── force=False (what the regular 30-min cron uses) — must NOT scan ──
         result_no_force = main.execute_scan(send_summary=False, force=False)
-        n_scans_after_no_force = sqlite3.connect(TMP_DB).execute(
-            "SELECT COUNT(*) FROM scans").fetchone()[0]
+        _c1 = sqlite3.connect(TMP_DB)
+        try:
+            n_scans_after_no_force = _c1.execute(
+                "SELECT COUNT(*) FROM scans").fetchone()[0]
+        finally:
+            _c1.close()
 
         # ── force=True (what workflow_dispatch now passes) — MUST scan ──
         result_force = main.execute_scan(send_summary=False, force=True)
-        n_scans_after_force = sqlite3.connect(TMP_DB).execute(
-            "SELECT COUNT(*) FROM scans").fetchone()[0]
+        _c2 = sqlite3.connect(TMP_DB)
+        try:
+            n_scans_after_force = _c2.execute(
+                "SELECT COUNT(*) FROM scans").fetchone()[0]
+        finally:
+            _c2.close()
 
     print(f"force=False: execute_scan returned {len(result_no_force)} snapshots; "
           f"scans table rows: {n_scans_after_no_force}")

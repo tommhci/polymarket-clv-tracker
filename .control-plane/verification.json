@@ -1,5 +1,5 @@
 {
-  "verificationCommand": "python tests/test_force_flag.py && python tests/test_p0_1_time_bucket.py && python tests/test_p0_main_integration.py && python tests/p2_dry_run.py",
+  "verificationCommand": "python tests/test_force_flag.py && python tests/test_p0_1_time_bucket.py && python tests/test_p0_main_integration.py && python tests/test_p3_market_type.py && python tests/p2_dry_run.py",
   "buildCommand": null,
-  "notes": "Declared verification for polymarket-clv-tracker (Python). Corrected 2026-08-29: previous value (python -m pytest tests/ -q) collected 0 items — the tests are __main__-style scripts, not pytest functions, so the declared command silently ran nothing. Each script exits nonzero on failure."
+  "notes": "Declared verification for polymarket-clv-tracker (Python). Tests are __main__-style scripts (pytest collects 0 items); each exits nonzero on failure. 2026-08-29: added test_p3_market_type.py (market_type gate split, capture-rate metric, orphan reconciliation \u2014 FIXLOG Addendum 4)."
 }

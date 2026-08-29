@@ -16,12 +16,14 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import sqlite3
 import statistics
 import os
 from datetime import datetime, timezone
 
 from config import DB_PATH, RISK_FREE_RATE, MIN_NET_EDGE
+from tracker import capture_rate_stats
 
 DOCS_DIR = "docs"
 
@@ -55,6 +57,13 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     buckets = _rows_to_dicts(bucket_rows)
 
     # ── 3. CLV summary (resolved trades) ─────────────────────────────────────
+    # Gate runs on market_type='match' ONLY (FIXLOG Addendum 4): match
+    # moneylines settle weekly and carry a real closing line; season futures
+    # don't settle until May 2027; the closed WC sample is reported separately
+    # as context so its recorded verdict can't leak into the EPL gate.
+    # The gate threshold (CLV_adj ≤ 0 → stop) is provisional: originally
+    # calibrated on the two-week WC sample, to be re-calibrated once the EPL
+    # dataset reaches n≥100 settled matches (process to be logged in FIXLOG).
     clv = conn.execute("""
         SELECT COUNT(*) AS n,
                SUM(CASE WHEN outcome='BEAT_LINE' THEN 1 ELSE 0 END) AS beat,
@@ -63,15 +72,27 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
                AVG(COALESCE(time_value_baseline, 0)) AS avg_lockup,
                MIN(COALESCE(clv_adjusted, clv)) AS worst,
                MAX(COALESCE(clv_adjusted, clv)) AS best
-        FROM paper_trades WHERE outcome != 'PENDING'
+        FROM paper_trades WHERE outcome != 'PENDING' AND market_type = 'match'
     """).fetchone()
 
     clv_adj_values = [
         r[0] for r in conn.execute(
             """SELECT COALESCE(clv_adjusted, clv) FROM paper_trades
-               WHERE outcome!='PENDING' AND COALESCE(clv_adjusted, clv) IS NOT NULL"""
+               WHERE outcome!='PENDING' AND market_type='match'
+                 AND COALESCE(clv_adjusted, clv) IS NOT NULL"""
         ).fetchall()
     ]
+
+    # Closed WC experiment, context only — its STOP verdict (CLV_adj=-0.018,
+    # n=73) was recorded 2026-06-29 against a two-week tournament sample.
+    wc_legacy = conn.execute("""
+        SELECT COUNT(*) AS n,
+               AVG(COALESCE(clv_adjusted, clv)) AS avg_adj
+        FROM paper_trades
+        WHERE outcome != 'PENDING' AND (market_type = 'wc_legacy'
+            OR (market_type IS NULL AND (lower(question) LIKE '%world cup%'
+                OR lower(question) LIKE '%fifa%')))
+    """).fetchone()
 
     n_resolved = clv["n"] or 0
     avg_adj    = clv["avg_adj"]
@@ -91,6 +112,10 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     else:
         gate, gate_class = f"EDGE SUPPORTED (t={t_stat:.2f})", "good"
 
+    # Closing-line capture rate (FIXLOG Addendum 4, clause 3) — quantify the
+    # misses instead of assuming the cron grid is reliable.
+    capture = capture_rate_stats(path)
+
     # ── 4. CLV histogram bins (for distribution chart) ───────────────────────
     hist_bins = {}
     if clv_adj_values:
@@ -100,7 +125,7 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     histogram = sorted([{"bin": k, "count": v} for k, v in hist_bins.items()],
                        key=lambda x: x["bin"])
 
-    # ── 5. Latest snapshot per advancement market ────────────────────────────
+    # ── 5. Latest snapshot per match market ──────────────────────────────────
     market_rows = conn.execute("""
         SELECT s.question, s.poly_mid, s.poly_ask_vwap,
                s.volume_usd, s.spread_pct, s.time_bucket, s.timestamp
@@ -109,19 +134,19 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
             SELECT market_id, MAX(timestamp) AS latest
             FROM scans GROUP BY market_id
         ) L ON s.market_id = L.market_id AND s.timestamp = L.latest
-        WHERE lower(s.question) LIKE '%advance%'
-           OR lower(s.question) LIKE '%qualify%'
-           OR lower(s.question) LIKE '%knockout%'
+        WHERE s.market_type = 'match'
         ORDER BY ABS(s.poly_mid - 0.5) ASC
     """)
     markets = []
     for r in _rows_to_dicts(market_rows):
         team = (r["question"]
                 .replace("Will ", "")
-                .replace(" advance to the knockout stages at the 2026 FIFA World Cup?", "")
-                .replace(" advance to the knockout stages at the 2026 FIFA World Cup", ""))
+                .replace(" end in a draw?", " (draw)")
+                .strip())
+        # "Will Liverpool FC win on 2026-08-29?" → "Liverpool FC (2026-08-29)"
+        team = re.sub(r"\s+win on (\d{4}-\d{2}-\d{2})\?", r" (\1)", team)
         markets.append({
-            "team":       team,
+            "team":       team[:60],
             "mid":        round(r["poly_mid"], 4),
             "ask":        round(r["poly_ask_vwap"], 4),
             "volume":     round(r["volume_usd"], 0),
@@ -241,6 +266,13 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
             "best":          round(clv["best"], 4) if clv["best"] is not None else None,
             "gate":          gate,
             "gate_class":    gate_class,
+            "sample_scope":  "market_type='match' only (EPL moneylines); "
+                             "futures excluded until settlement, WC sample "
+                             "reported separately (wc_legacy)",
+            "wc_legacy_n":   wc_legacy["n"] or 0,
+            "wc_legacy_avg_clv_adj": round(wc_legacy["avg_adj"], 4)
+                                     if wc_legacy["avg_adj"] is not None else None,
+            "capture_rate":  capture,
         },
         "buckets":        buckets,
         "histogram":      histogram,

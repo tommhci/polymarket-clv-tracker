@@ -32,14 +32,15 @@ GAMMA_API_BASE = "https://gamma-api.polymarket.com"
 CLOB_BASE      = "https://clob.polymarket.com"
 
 # ── Odds API sport keys (EPL, since 2026-08 pivot) ─────────────────────────────
-# Free tier: 500 requests/month. One call returns ALL events for the sport.
-# soccer_epl            → h2h (home/draw/away) for per-match baselines
-# soccer_epl_winner     → outrights for season-futures baselines (unverified
-#                         key name — if the API 404s, futures fall back to
-#                         no_baseline and are still price-logged for CLV)
+# CONSTRAINT (FIXLOG Addendum 4): the Odds API is an OPTIONAL reference layer —
+# CLV is computed purely from Polymarket's own entry vs final prices. Budget:
+# free tier 500 credits/month, 1 credit per call per region per market type;
+# single region + h2h only + ≤2 calls/day ≈ 60 credits/month. Stay inside that
+# envelope; /sports list calls are free. Missing key ⇒ no_baseline (logged,
+# prices still recorded) — degradation is expected behavior, not an error.
 ODDS_SPORT_KEY         = os.environ.get("ODDS_SPORT_KEY", "soccer_epl")
 ODDS_SPORT_OUTRIGHT_KEY = os.environ.get("ODDS_SPORT_OUTRIGHT_KEY", "soccer_epl_winner")
-ODDS_REGIONS   = "eu"          # eu books (Pinnacle, Bet365, Betfair)
+ODDS_REGIONS   = "uk"          # single region (uk books) — one credit per call
 ODDS_MARKETS   = "h2h"         # match winner; use "outrights" for futures
 
 # ── Fee model (Polymarket sports taker, post-2026 fee rollout) ─────────────────

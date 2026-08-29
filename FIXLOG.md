@@ -457,3 +457,70 @@ summary/gate mixes the closed WC sample (n=73) with incoming EPL rows.
 The pre-registered WC verdict (stop) must not be read as a verdict on the
 EPL dataset. Partitioning by experiment (e.g. a `dataset` column) is the
 top candidate for the next session.
+
+---
+
+## Addendum 4 (2026-08-29) — EPL hardening: gate split, capture-rate metric, orphan reconciliation
+
+Implements the external review's supplementary clauses. Conflict rule: this
+addendum supersedes Addendum 3 where they overlap.
+
+**1. Odds API demoted to optional reference layer (clause 1–2).** CLV is and
+remains purely Polymarket-internal: entry price vs the market's own final
+price (`close_paper_trade`). The sportsbook baseline feeds only net_edge /
+paper-trade *selection*, never the CLV arithmetic — a missing key or exhausted
+quota degrades to `no_baseline` with prices still recorded. Budget constraint
+encoded in config comments: single region (`eu` → `uk`), h2h only, ≤2 calls/day
+≈ 60 credits/month against the free tier's 500.
+
+**2. Closing-line capture is best-effort and QUANTIFIED (clause 3).** New
+`tracker.capture_rate_stats()`: for every past match-type market, reconstruct
+the kickoff (scan_ts + hours_to_end — constant per market since match rows
+anchor to gameStartTime) and count markets with ≥1 price point in the final
+pre-kickoff hour. Rate + numerator/denominator are written to STATUS.md and
+data.json summary. Supporting changes:
+- scheduler `T-kickoff` window widened (−0.5,0.5) → (−1.0,0.5): at the 30-min
+  cron grid (already off-peak at :07/:37) this guarantees a scan inside the
+  final hour **when runs fire on time** — delays/drops are handled below.
+- new `tracker.close_orphaned_trades()`: a market that resolves between scans
+  drops out of the active universe, so `auto_close_expired` could never see it
+  and the trade stayed PENDING forever — the sample was lost. Orphans are now
+  reconciled against Gamma `/markets/{id}` final outcomePrices (≤20 lookups/run)
+  and closed. A missed cron window now costs a price point, not the sample.
+- STATUS.md gains a "🎯 Closing-Line Capture Rate" section (always rendered).
+
+**3. Schema separates match vs futures (clause 4).** New `market_type` column
+on `scans` + `paper_trades` (`match` | `futures` | `wc_legacy`), derived from
+the question text via `tracker.derive_market_type()` and stamped by the scanner
+(`_match_home` present ⇒ match). Backfill runs both paths: `rebuild_from_csv`
+(fresh DBs) and `init_db` ALTER+UPDATE (existing DBs — the local DB would
+otherwise have kept NULLs forever). The CLV gate and histogram now run on
+`market_type='match'` ONLY; the closed WC sample (n=73, CLV_adj=−0.0178,
+verdict RECORDED) is reported as context, never mixed into the EPL gate.
+data.json summary carries `sample_scope`, `wc_legacy_n`, `wc_legacy_avg_clv_adj`.
+
+**4. Discovery hardening (clause 5–6).** `get_epl_match_events()` resolves the
+EPL tag id via Gamma `/tags/slug/epl` (verified live: id 306) and queries
+`tag_id=…`, falling back to `tag_slug=epl` if the lookup fails; event
+pagination bounded at 1000. Dedup keys are unchanged and correct per clause 6:
+Gamma numeric market id / trade market_id — no slug-based identity anywhere.
+
+**5. Pre-registered branch B (clause 7) — RESOLVED before this addendum.**
+Branch B stated: if scans.csv still didn't grow after the universe switch,
+stop touching the universe and debug append/dedup/export. Discharged by
+Actions run 33243648895 (workflow_dispatch after the pivot commit): scans.csv
+grew 3481 → 3584 rows in CI, i.e. the append/dedup/export path works for the
+new universe. Branch B never triggered.
+https://github.com/tommhci/polymarket-clv-tracker/actions/runs/33243648895
+
+**6. Threshold provenance (clause 8).** Repo secrets verified via API:
+`ODDS_API_KEY` (plus GLM/TAVILY/FOOTBALL_DATA) IS present — CI does not run in
+permanent degraded mode. The stop-gate threshold (CLV_adj ≤ 0 → stop) is
+explicitly PROVISIONAL: the −0.018 anchor comes from the two-week WC sample.
+Recalibration is deferred until the EPL dataset reaches n ≥ 100 settled
+matches; the recalibration (method + new threshold) must be logged here as
+Addendum 5+ BEFORE any stop/continue decision is taken on EPL data.
+
+**Verification:** `test_p3_market_type.py` added (routing, in-place backfill,
+capture-rate hit/miss/exclusion, mocked-Gamma orphan close) and appended to
+the declared verification command; all existing self-tests re-run and pass.

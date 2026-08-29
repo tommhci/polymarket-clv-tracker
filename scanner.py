@@ -73,6 +73,10 @@ class MarketSnapshot:
     # vs T-1h measures whether that drift is exploitable or just lockup discount.
     hours_to_end:    float = -1.0
     time_bucket:     str   = "T-other"
+    # "match" (weekly-settling moneylines = the CLV sample) vs "futures"
+    # (season outrights, collected but excluded from the CLV gate) vs
+    # "wc_legacy" (closed WC experiment). See tracker.derive_market_type().
+    market_type:     str   = "futures"
 
 
 # ── Module 1: Market Discovery (Gamma API) ─────────────────────────────────────
@@ -81,6 +85,23 @@ class MarketSnapshot:
 # (halftime, exact score, corners, spreads...) carry suffixes, so the
 # anchored full-match regex excludes them by construction.
 MATCH_EVENT_RE = re.compile(r"^epl-[a-z]{2,4}-[a-z]{2,4}-\d{4}-\d{2}-\d{2}$")
+
+
+def _get_epl_tag_id() -> Optional[str]:
+    """
+    Resolve the EPL tag id via Gamma /tags/slug/{slug} (official lookup form,
+    verified live 2026-08-29 → id "306"). Returns None on any failure; callers
+    fall back to the tag_slug parameter, which works but is not the
+    documented key.
+    """
+    try:
+        resp = requests.get(f"{GAMMA_API_BASE}/tags/slug/epl", timeout=8)
+        resp.raise_for_status()
+        tag_id = resp.json().get("id")
+        return str(tag_id) if tag_id else None
+    except (requests.RequestException, ValueError) as e:
+        log.warning("Gamma /tags/slug/epl failed (%s) — falling back to tag_slug", e)
+        return None
 
 
 def get_epl_match_events(days_ahead: int = 7) -> list[dict]:
@@ -92,21 +113,35 @@ def get_epl_match_events(days_ahead: int = 7) -> list[dict]:
     which map 1:1 onto the Odds API soccer_epl h2h 3-way market — the
     de-vigged baseline for the whole per-match dataset.
 
-    Events are keyed by slug-date, so we filter to [yesterday, +days_ahead]
-    instead of trusting any sort order from the API.
+    Events are keyed by slug-date, so we filter to [today, +days_ahead]
+    instead of trusting any sort order from the API. Gamma limits are wide
+    (/events 500 req/10s per official docs), so no self-throttling is needed;
+    offset pagination is bounded well below the 422 ceiling.
     """
-    try:
-        resp = requests.get(
-            f"{GAMMA_API_BASE}/events",
-            params={"tag_slug": "epl", "active": "true", "closed": "false",
-                    "limit": 200},
-            timeout=12,
-        )
-        resp.raise_for_status()
-        events = resp.json()
-    except requests.RequestException as e:
-        log.error("Gamma tag_slug=epl error: %s", e)
-        return []
+    tag_id = _get_epl_tag_id()
+    tag_params = {"tag_id": tag_id} if tag_id else {"tag_slug": "epl"}
+
+    events: list[dict] = []
+    offset = 0
+    while offset < 1000:   # EPL tag holds a few hundred events; hard cap anyway
+        try:
+            resp = requests.get(
+                f"{GAMMA_API_BASE}/events",
+                params={**tag_params, "active": "true", "closed": "false",
+                        "limit": 200, "offset": offset},
+                timeout=12,
+            )
+            resp.raise_for_status()
+            batch = resp.json()
+        except requests.RequestException as e:
+            log.error("Gamma events error (offset %d): %s", offset, e)
+            break
+        if not batch:
+            break
+        events.extend(batch)
+        if len(batch) < 200:
+            break
+        offset += 200
 
     today = datetime.now(timezone.utc).date()
     out = []
@@ -714,6 +749,7 @@ def run_scan() -> list[MarketSnapshot]:
             skip_reason=skip_reason,
             hours_to_end=hours_to_end,
             time_bucket=time_bucket,
+            market_type="match" if match_home else "futures",
         )
         snapshots.append(snap)
         time.sleep(0.12)   # gentle rate-limit pause

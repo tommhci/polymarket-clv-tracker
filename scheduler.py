@@ -66,7 +66,12 @@ WINDOWS = {
     "T-1h":     (  0.5,    2.5),   # 1h ± 1h
 
     # Live-play windows (evidence-based — arXiv 2505.21275, SSRN 1540313)
-    "T-kickoff": ( -0.5,   0.5),   # exact kickoff ±30min
+    # T-kickoff extends to -1.0h pre-kickoff: at the 30-min cron grid this
+    # guarantees a scan inside the final pre-kickoff hour (the CLV closing-
+    # line entry window) even though Actions schedule events themselves are
+    # officially best-effort. Capture misses are quantified, not assumed away:
+    # see tracker.capture_rate_stats().
+    "T-kickoff": ( -1.0,   0.5),   # final pre-kickoff hour + kickoff ±30min
     "T-half":   ( -1.5,  -0.5),    # ~halftime (40–65min after kickoff)
     "T-ft":     ( -3.0,  -1.5),    # ~full time (75–90+min)
     "T-post":   ( -5.0,  -3.0),    # settling / auto-close verification

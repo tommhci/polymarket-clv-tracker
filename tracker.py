@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import sqlite3
 import uuid
+import json
 import logging
 from datetime import datetime, timezone
 from dataclasses import dataclass
@@ -83,6 +84,23 @@ class PaperTrade:
     close_timestamp:    Optional[str]  = None
 
 
+# ── Market typing (EPL pivot, FIXLOG Addendum 4) ───────────────────────────────
+# CLV semantics differ by market class: match moneylines settle weekly and are
+# the CLV sample; season futures (champion etc.) settle in May 2027 and have no
+# "closing line" until then. Mixing them into one gate would stall the gate on
+# futures for nine months. The stop gate therefore runs on market_type='match'
+# only. Derived from the question so historical CSV rows backfill cleanly.
+
+def derive_market_type(question: str) -> str:
+    q = (question or "").lower()
+    if "win on " in q or "end in a draw" in q:
+        return "match"          # EPL match moneyline ("Will X win on DATE?")
+    if ("world cup" in q or "fifa" in q or "advance" in q
+            or "knockout" in q or "group stage" in q):
+        return "wc_legacy"      # closed WC experiment — verdict recorded
+    return "futures"            # season outrights (champion, etc.)
+
+
 # ── DB init ────────────────────────────────────────────────────────────────────
 
 def init_db(path: str = DB_PATH):
@@ -132,7 +150,8 @@ def init_db(path: str = DB_PATH):
 
     # ── Schema migrations: add columns to existing tables if absent ──────────
     # SQLite has no "ADD COLUMN IF NOT EXISTS"; use try/except per column.
-    new_scan_cols    = ["hours_to_end REAL", "time_bucket TEXT"]
+    new_scan_cols    = ["hours_to_end REAL", "time_bucket TEXT",
+                        "market_type TEXT"]
     new_trade_cols   = [
         "days_held REAL", "time_value_baseline REAL", "clv_adjusted REAL",
         # FIXLOG P0-2: pre-registered strategy label (A_all/B_discount/
@@ -140,6 +159,7 @@ def init_db(path: str = DB_PATH):
         "strategy_label TEXT",
         "entry_is_approx INTEGER DEFAULT 0",
         "entry_note TEXT",
+        "market_type TEXT",
     ]
     for col in new_scan_cols:
         try:
@@ -151,6 +171,25 @@ def init_db(path: str = DB_PATH):
             conn.execute(f"ALTER TABLE paper_trades ADD COLUMN {col}")
         except sqlite3.OperationalError:
             pass
+
+    # Backfill market_type in-place (SQL mirror of derive_market_type) —
+    # rebuild_from_csv only fires on an empty DB, so a pre-existing local/CI
+    # DB would otherwise keep NULLs and silently fall out of the gate filter.
+    # rebuild_from_csv handles the fresh-DB CSV path with the same logic.
+    _backfill_sql = """
+        UPDATE {table} SET market_type = CASE
+            WHEN lower(question) LIKE '%win on %'
+              OR lower(question) LIKE '%end in a draw%'      THEN 'match'
+            WHEN lower(question) LIKE '%world cup%'
+              OR lower(question) LIKE '%fifa%'
+              OR lower(question) LIKE '%advance%'
+              OR lower(question) LIKE '%knockout%'
+              OR lower(question) LIKE '%group stage%'        THEN 'wc_legacy'
+            ELSE 'futures' END
+        WHERE market_type IS NULL
+    """
+    conn.execute(_backfill_sql.format(table="scans"))
+    conn.execute(_backfill_sql.format(table="paper_trades"))
 
     c.execute("""
         CREATE TABLE IF NOT EXISTS clv_log (
@@ -175,14 +214,14 @@ def log_scan(snap: MarketSnapshot, path: str = DB_PATH):
         INSERT INTO scans
         (timestamp, market_id, question, volume_usd, poly_mid, poly_ask_vwap,
          spread_pct, book_true_prob, baseline_source, net_edge, alertable,
-         skip_reason, hours_to_end, time_bucket)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+         skip_reason, hours_to_end, time_bucket, market_type)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         snap.timestamp, snap.market_id, snap.question, snap.volume_usd,
         snap.poly_mid, snap.poly_ask_vwap, snap.spread_pct,
         snap.book_true_prob, snap.baseline_source, snap.net_edge,
         int(snap.alertable), snap.skip_reason,
-        snap.hours_to_end, snap.time_bucket,
+        snap.hours_to_end, snap.time_bucket, snap.market_type,
     ))
     conn.commit()
     conn.close()
@@ -229,12 +268,12 @@ def open_paper_trade(
         INSERT OR IGNORE INTO paper_trades
         (trade_id, market_id, question, direction, entry_price,
          true_prob_entry, net_edge_entry, entry_timestamp, end_date,
-         strategy_label, entry_is_approx, entry_note)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+         strategy_label, entry_is_approx, entry_note, market_type)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         trade_id, snap.market_id, snap.question, direction,
         entry_price, snap.book_true_prob, snap.net_edge, ts, snap.end_date,
-        strategy_label, int(is_approx), approx_note,
+        strategy_label, int(is_approx), approx_note, snap.market_type,
     ))
     conn.commit()
     conn.close()
@@ -576,6 +615,133 @@ def auto_close_expired(scanner_snapshots: list[MarketSnapshot], path: str = DB_P
             log.info("Auto-closed %s at %.3f (near resolution)", trade["trade_id"], mid)
 
 
+def close_orphaned_trades(current_market_ids: set, path: str = DB_PATH,
+                          max_lookups: int = 20):
+    """
+    Close PENDING trades whose market has vanished from the active scan
+    universe — i.e. it resolved (and closed) between two scans, which is
+    exactly when the cron grid is most likely to have missed it (Actions
+    schedule events are officially best-effort and can be delayed/dropped).
+
+    Without this, a missed window orphans the trade forever: auto_close_expired
+    only sees markets still in the universe, and closed markets stop appearing
+    in Gamma's active feeds. Each orphan costs one Gamma /markets/{id} lookup;
+    capped per run. Closing price = Polymarket's final Yes outcomePrice —
+    the market's own closing line, no sportsbook involved.
+    """
+    import requests as _requests
+
+    open_trades = get_open_trades(path)
+    orphans = [t for t in open_trades if t["market_id"] not in current_market_ids]
+    if not orphans:
+        return
+    log.info("Orphan check: %d open trade(s) not in current universe", len(orphans))
+
+    closed_any = False
+    for trade in orphans[:max_lookups]:
+        try:
+            resp = _requests.get(
+                f"https://gamma-api.polymarket.com/markets/{trade['market_id']}",
+                timeout=8,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        except _requests.RequestException as e:
+            log.warning("Gamma lookup failed for market %s: %s",
+                        trade["market_id"], e)
+            continue
+
+        if not data.get("closed"):
+            continue   # still alive, just not in today's filtered universe
+
+        try:
+            prices = json.loads(data.get("outcomePrices", "[]"))
+            final_yes = float(prices[0])
+        except (json.JSONDecodeError, IndexError, TypeError, ValueError):
+            continue
+        if not (0.0 <= final_yes <= 1.0):
+            continue
+
+        log_clv_checkpoint(trade["trade_id"], final_yes, path)
+        close_paper_trade(trade["trade_id"], final_yes, path)
+        closed_any = True
+        log.info("Closed orphaned trade %s at final price %.3f (market resolved "
+                 "between scans — capture was missed live)", 
+                 trade["trade_id"], final_yes)
+    if closed_any:
+        log.info("Orphan reconciliation done — capture gaps backfilled from "
+                 "Gamma final prices")
+
+
+def capture_rate_stats(path: str = DB_PATH) -> dict:
+    """
+    Quantify closing-line capture (FIXLOG Addendum 4, clause 3).
+
+    For every match-type market whose kickoff has passed, reconstruct the
+    kickoff instant (scan_ts + hours_to_end is constant per market because
+    match rows are anchored to Polymarket's gameStartTime) and check whether
+    at least one price point exists in the final hour before kickoff — the
+    entry window CLV is defined on. Rate = captured / past.
+
+    This makes missed captures a visible metric instead of silent selection
+    bias (misses correlate with kickoff time, since late-night UK slots hit
+    GitHub's high-load cron windows more often).
+    """
+    conn = sqlite3.connect(path)
+    rows = conn.execute("""
+        SELECT market_id, timestamp, hours_to_end
+        FROM scans
+        WHERE market_type = 'match'
+          AND hours_to_end IS NOT NULL
+          AND time_bucket != 'T-expired'
+    """).fetchall()
+    conn.close()
+
+    kickoffs: dict[str, float] = {}   # market_id → reconstructed kickoff (epoch s)
+    for market_id, ts, h2e in rows:
+        try:
+            scan_dt = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+            if scan_dt.tzinfo is None:
+                scan_dt = scan_dt.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            continue
+        kick = scan_dt.timestamp() + float(h2e) * 3600
+        # rows within ±1h of each other reconstruct the same kickoff; keep max
+        kickoffs[market_id] = max(kickoffs.get(market_id, 0.0), kick)
+
+    conn = sqlite3.connect(path)
+    all_ts: dict[str, list[float]] = {}
+    for market_id, ts in conn.execute(
+            "SELECT market_id, timestamp FROM scans WHERE market_type='match'"):
+        try:
+            dt = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            all_ts.setdefault(market_id, []).append(dt.timestamp())
+        except (ValueError, TypeError):
+            continue
+    conn.close()
+
+    now = datetime.now(timezone.utc).timestamp()
+    past = captured = 0
+    for market_id, kick in kickoffs.items():
+        if kick >= now:
+            continue
+        past += 1
+        stamps = all_ts.get(market_id, [])
+        if any(kick - 3600 <= t <= kick for t in stamps):
+            captured += 1
+
+    rate = (captured / past) if past else None
+    return {
+        "match_markets_past": past,
+        "captured_final_hour": captured,
+        "capture_rate": round(rate, 3) if rate is not None else None,
+        "definition": "share of past match markets with ≥1 price point in "
+                      "the last hour before kickoff (the CLV entry window)",
+    }
+
+
 
 # ── CSV truth-source rebuild ────────────────────────────────────────────────
 
@@ -614,9 +780,15 @@ def rebuild_from_csv(docs_dir: str = "docs", path: str = DB_PATH):
         if not rows:
             continue
         cols = list(rows[0].keys())
+        # Pre-pivot CSVs have no market_type column — backfill it from the
+        # question text so the match/futures gate works on historical data.
+        if "market_type" not in cols:
+            cols.append("market_type")
         conn = sqlite3.connect(path)
         for row in rows:
-            vals = [row.get(c) for c in cols]
+            vals = [row.get(c) for c in cols if c != "market_type"]
+            vals.append(row.get("market_type")
+                        or derive_market_type(row.get("question", "")))
             placeholders = ",".join(["?"] * len(cols))
             col_str = ",".join(cols)
             conn.execute(

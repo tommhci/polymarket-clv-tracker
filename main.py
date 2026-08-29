@@ -25,6 +25,7 @@ from scanner import run_scan
 from tracker import (
     init_db, log_scan, open_paper_trade, rebuild_from_csv,
     auto_close_expired, close_paper_trade, print_dashboard,
+    close_orphaned_trades, capture_rate_stats,
     classify_strategies, has_paper_trade, get_latest_historical_price,
 )
 from alerts import alert_edge_found, alert_daily_digest, alert_scan_summary
@@ -80,7 +81,7 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
         ORDER BY entry_timestamp
     """).fetchall()
 
-    # ── CLV summary ─────────────────────────────────────────────────────────
+    # ── CLV summary (match-type only — see FIXLOG Addendum 4) ───────────────
     clv_row = conn.execute("""
         SELECT COUNT(*),
                SUM(CASE WHEN outcome='BEAT_LINE' THEN 1 ELSE 0 END),
@@ -89,10 +90,18 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
                ROUND(MIN(COALESCE(clv_adjusted, clv)), 4),
                ROUND(MAX(COALESCE(clv_adjusted, clv)), 4),
                ROUND(AVG(COALESCE(time_value_baseline, 0)), 6)
-        FROM paper_trades WHERE outcome != 'PENDING'
+        FROM paper_trades WHERE outcome != 'PENDING' AND market_type = 'match'
     """).fetchone()
 
-    # ── Top advancement markets by price (most interesting = near 0.5) ─────
+    wc_row = conn.execute("""
+        SELECT COUNT(*), ROUND(AVG(COALESCE(clv_adjusted, clv)), 4)
+        FROM paper_trades
+        WHERE outcome != 'PENDING' AND (market_type = 'wc_legacy'
+            OR (market_type IS NULL AND (lower(question) LIKE '%world cup%'
+                OR lower(question) LIKE '%fifa%')))
+    """).fetchone()
+
+    # ── Top match markets by price (most interesting = near 0.5) ────────────
     market_rows = conn.execute("""
         SELECT s.question, s.poly_mid, s.volume_usd, s.spread_pct, s.timestamp
         FROM scans s
@@ -100,9 +109,7 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
             SELECT market_id, MAX(timestamp) AS latest
             FROM scans GROUP BY market_id
         ) latest ON s.market_id = latest.market_id AND s.timestamp = latest.latest
-        WHERE lower(s.question) LIKE '%advance%'
-           OR lower(s.question) LIKE '%qualify%'
-           OR lower(s.question) LIKE '%knockout%'
+        WHERE s.market_type = 'match'
         ORDER BY ABS(s.poly_mid - 0.5) ASC
         LIMIT 15
     """).fetchall()
@@ -148,10 +155,18 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
 
     n_resolved = clv_row[0] if clv_row else 0
 
+    # Closing-line capture rate (quantified per FIXLOG Addendum 4, clause 3)
+    capture = capture_rate_stats(path)
+    wc_n, wc_avg = (wc_row[0] or 0, wc_row[1]) if wc_row else (0, None)
+
     if n_resolved == 0:
-        lines.append(f"**No resolved trades yet.** Waiting for matches to complete.")
+        lines.append(f"**No resolved match trades yet.** Waiting for EPL matches to complete.")
         lines.append(f"")
         lines.append(f"> 🕒 CLV data accumulates automatically as matches resolve.")
+        if wc_n:
+            lines.append(f"> 📌 Closed WC experiment (context, excluded from gate): "
+                         f"n={wc_n}, CLV_adj=`{(wc_avg or 0):+.4f}` — verdict RECORDED.")
+        lines.append(f"")
     else:
         beat = clv_row[1] or 0
         avg_adj = clv_row[2]
@@ -194,6 +209,25 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
             verdict = f"✅ **EDGE SUPPORTED** — t={t_stat:.2f}, n={n_resolved}"
 
         lines += [f"### Verdict", f"", f"{verdict}", f""]
+
+    # ── Closing-line capture rate (always shown — FIXLOG Addendum 4) ─────────
+    cr = capture["capture_rate"]
+    cr_str = f"{cr:.0%}" if cr is not None else "n/a (no past matches yet)"
+    lines += [
+        f"### 🎯 Closing-Line Capture Rate",
+        f"",
+        f"| Metric | Value |",
+        f"|---|---|",
+        f"| Past match markets | {capture['match_markets_past']} |",
+        f"| Captured in final pre-kickoff hour | {capture['captured_final_hour']} |",
+        f"| **Capture rate** | **{cr_str}** |",
+        f"",
+        f"*{capture['definition']}.* Actions schedule events are best-effort "
+        f"(GitHub docs: can be delayed or dropped under load) — misses are "
+        f"quantified here and backfilled from Gamma final prices via orphan "
+        f"reconciliation.",
+        f"",
+    ]
 
     lines += [
         f"---",
@@ -353,6 +387,12 @@ def execute_scan(send_summary: bool = False, force: bool = False) -> list:
 
     # Auto-close trades that have reached resolution
     auto_close_expired(snapshots)
+
+    # ── Orphan reconciliation (FIXLOG Addendum 4, clause 3) ──────────────────
+    # A market that resolved between scans drops out of the active universe,
+    # so auto_close_expired can never see it. Reconcile against Gamma's final
+    # prices so a missed cron window loses a price point, not the whole sample.
+    close_orphaned_trades({s.market_id for s in snapshots})
 
     # ── Open paper trades ──────────────────────────────────────────────────
     #

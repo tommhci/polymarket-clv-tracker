@@ -682,3 +682,17 @@ two independent anchors/day + the 15-min cron lottery + maintenance sampling.
 No further mechanism added — the expected cost is occasional capture-rate
 dents, visible in the metric, not sample loss (rows are lost only if a whole
 shift fails AND cron fires nothing for 48h, at which point the issue opens).
+
+## Addendum 6 verification (2026-08-29 15:35 UTC) — last unverified step CLOSED
+
+The sweep commit-landing path — the only part of Addendum 6 that had not run
+end-to-end in CI — is now verified via a smoke shift: sweep.yml loop
+parameterized through workflow_dispatch inputs (defaults unchanged: 13 ×
+25 min), dispatched with iterations=2 / sleep=60. Run 33260592350: both
+iterations scanned 38 markets, "Commit sweep data" produced commit
+6eae5ae "data: sweep 2026-08-29 15:35 UTC" on main, dead-man step ran clean.
+The real 13 × 25-min shift (run 33258427393) was still mid-loop at the time
+and doubles as the production-cadence confirmation. Calendar items are now
+automated: an 8/30 20:00 local one-shot runs the full acceptance checklist
+(sweep commits, first real capture-rate %, issue list); the 9/21 starvation
+review is recorded above and to be scheduled by the user if desired.

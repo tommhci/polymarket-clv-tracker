@@ -27,6 +27,13 @@ on:
     - cron: '7 10 * * *'
     - cron: '7 17 * * *'
   workflow_dispatch:  # manual trigger for testing/repair
+    inputs:
+      iterations:
+        description: 'Scan iterations in this shift (default 13)'
+        default: '13'
+      sleep_seconds:
+        description: 'Seconds between iterations (default 1500 = 25 min)'
+        default: '1500'
 
 jobs:
   sweep:
@@ -57,10 +64,13 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           POLYMARKET_SWEEP: '1'
         run: |
-          for i in $(seq 1 13); do
-            echo "── sweep scan $i/13 ($(date -u +'%H:%M UTC')) ──"
+          ITERS="${{ github.event.inputs.iterations || '13' }}"
+          SLEEP_S="${{ github.event.inputs.sleep_seconds || '1500' }}"
+          echo "sweep: $ITERS iterations, ${SLEEP_S}s apart"
+          for i in $(seq 1 "$ITERS"); do
+            echo "── sweep scan $i/$ITERS ($(date -u +'%H:%M UTC')) ──"
             python main.py || true   # one failed iteration must not kill the shift
-            if [ "$i" -lt 13 ]; then sleep 1500; fi
+            if [ "$i" -lt "$ITERS" ]; then sleep "$SLEEP_S"; fi
           done
 
       - name: Export dashboard + status

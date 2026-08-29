@@ -6,12 +6,12 @@ name: Polymarket Scan
 
 on:
   schedule:
-    # Every 30 min — the SmartScheduler inside main.py decides whether to
-    # actually do anything. Runs at :07 and :37 to avoid GitHub high-load at :00.
-    # Most runs will exit in <2s with "skip" (no active match window).
-    # Full scans (with news + GLM) only fire at T-24h, T-1h, halftime, T-ft.
-    # Estimated Actions usage: ~80% reduction vs naive 30-min full scan.
-    - cron: '7,37 * * * *'
+    # Every 15 min. MEASURED (Addendum 6, 2026-08-29): GitHub dropped ~90% of
+    # the previous 30-min schedule events (run history: 2-4 actual fires/day
+    # against 48 scheduled), which is exactly why the first EPL capture-rate
+    # reading was 0% — no run ever landed inside a final-hour window. More
+    # off-peak slots = more surviving lottery tickets; skip-runs cost <2s.
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:  # Manual trigger (always runs full scan regardless of scheduler)
 
 jobs:
@@ -75,7 +75,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data.json docs/data.csv docs/scans.csv docs/paper_trades.csv STATUS.md || true
+          git add docs/data.json docs/data.csv docs/scans.csv docs/paper_trades.csv docs/odds_state.json STATUS.md || true
           git diff --cached --quiet || git commit -m "data: scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push || true
 
@@ -91,4 +91,16 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python alerts.py --stale --threshold-h 48
+        run: |
+          python alerts.py --stale --threshold-h 48
+          # The stale banner must be COMMITTED, not just written: it only
+          # exists in the runner workspace otherwise (Addendum 6 fix), and
+          # the commit itself defers GitHub's 60-day schedule disable.
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet STATUS.md || (
+            git add STATUS.md &&
+            git commit -m "alert: pipeline stale banner (auto)" &&
+            git pull --rebase -q origin main || true &&
+            git push || true
+          )

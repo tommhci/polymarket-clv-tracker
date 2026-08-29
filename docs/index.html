@@ -125,7 +125,7 @@
     <h1><span class="dot">●</span> Polymarket CLV Tracker</h1>
     <div class="meta" id="meta">loading…</div>
   </header>
-  <div class="sub">Paper-trading research · measuring Closing Line Value on World Cup advancement markets</div>
+  <div class="sub">Paper-trading research · Closing Line Value on Premier League match markets (EPL 2026-27)</div>
 
   <div class="gate neutral" id="gate">
     <span class="label">Decision Gate</span>
@@ -219,6 +219,13 @@ async function load() {
   const gate = document.getElementById("gate");
   gate.className = "gate " + (s.gate_class || "neutral");
   document.getElementById("gate-text").textContent = s.gate;
+  if (s.wc_legacy_n) {
+    const note = document.createElement("div");
+    note.className = "meta";
+    note.style.cssText = "text-align:center;margin:-6px 0 12px;font-size:12px;opacity:.75";
+    note.textContent = `context: closed WC experiment n=${s.wc_legacy_n}, CLV_adj ${s.wc_legacy_avg_clv_adj} — verdict recorded, excluded from this gate`;
+    gate.insertAdjacentElement("afterend", note);
+  }
 
   // Cards
   const adjClass = s.avg_clv_adj === null ? "" : (s.avg_clv_adj > 0 ? "pos" : "neg");
@@ -228,7 +235,11 @@ async function load() {
     {k:"t-statistic", v: fmt(s.t_stat,2), s:`need ≥2.0 for significance`},
     {k:"Win Rate", v: s.win_rate===null?"—":fmtPct(s.win_rate), s:`${s.beat_line}/${s.n_resolved} beat line`},
     {k:"Open Positions", v: d.open_positions.length, s:`awaiting resolution`},
-    {k:"Markets Tracked", v: d.markets.length, s:`advancement contracts`},
+    {k:"Markets Tracked", v: d.markets.length, s:`EPL match moneylines`},
+    {k:"Capture Rate", v: s.capture_rate && s.capture_rate.capture_rate !== null
+        ? (s.capture_rate.capture_rate*100).toFixed(0)+"%"
+        : "—",
+      s:`final-hour capture · ${s.capture_rate ? s.capture_rate.captured_final_hour+"/"+s.capture_rate.match_markets_past : "no past matches yet"}`},
   ];
   document.getElementById("cards").innerHTML = cards.map(c =>
     `<div class="card"><div class="k">${c.k}</div><div class="v ${c.cls||''}">${c.v}</div><div class="s">${c.s||''}</div></div>`

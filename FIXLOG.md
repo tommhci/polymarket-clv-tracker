@@ -567,3 +567,80 @@ explicitly exploratory.
 stale state and restored; fresh-path check exits OK (5.3h-old rows, no issue
 spammed). Full declared suite re-run: PASS. CI verified via the follow-up
 workflow_dispatch run (see "Addendum 5 verification" below once run).
+
+---
+
+## Addendum 6 (2026-08-29) — the cron was a lottery: measured ~90% drop rate; deterministic sweep + quota throttle
+
+**Discovery (empirical, this repo).** The first capture-rate reading came back
+**0% (0/9 past match markets)** with zero paper trades opened — and run history
+shows why: the 30-min cron (`7,37 * * * *`) produced only 2–4 *actual fires per
+day* against 48 scheduled (today: 03:19 and 10:22 UTC; nothing between 10:22
+and 14:26 despite 4 matches kicking off). No rows exist between 10:23 and 14:26,
+so every EPL kickoff today missed its final-hour window. This has plausibly been
+true since June — the WC pipeline "worked" at 2–4 scans/day because nobody was
+checking window capture. The drops are GitHub-side (runs never start — not even
+as "skipped"), not scanner-side.
+
+**External verification (all retrieved 2026-08-29):**
+
+- GitHub schedule reliability — official docs: *"The `schedule` event can be
+  delayed during periods of high loads"*; *"If the load is sufficiently high
+  enough, some queued jobs may be dropped"*. Source:
+  https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+- 60-day auto-disable — official docs: in a public repository, scheduled
+  workflows are auto-disabled after 60 days without repository activity; commits
+  count as activity, workflow runs do not. Source:
+  https://docs.github.com/actions/managing-workflow-runs/disabling-and-enabling-a-workflow
+- Odds API billing — official v4 docs: *"The usage quota cost is 1 per region
+  per market"* for /odds; /sports and /events *"do not count against the usage
+  quota"*. Verified live with the real key: /sports returns 81 sports,
+  `soccer_epl` present with **`has_outrights: false`** and **no
+  `soccer_epl_winner` key** — EPL outright baselines do not exist on the Odds
+  API; champion futures run no_baseline *by design* (they are excluded from the
+  CLV gate anyway). Source: https://the-odds-api.com/liveapi/guides/v4/
+- Insufficient evidence: the free tier's exact monthly credit number (the
+  pricing page requires a login; the 500/month figure remains reviewer-sourced,
+  unverified here). It does not affect the design — the throttle below caps
+  usage far below any plausible free tier.
+
+**Quota math correction.** The Addendum 4 estimate ("≤2 calls/day ≈ 60
+credits/month") silently depended on GitHub dropping ~90% of runs. A pipeline
+that actually fires 48×/day would spend 48–96 credits/day. Two mechanisms now
+close the budget jointly:
+
+1. **Baseline throttle** — `scanner._odds_throttled()`: one successful fetch
+   per sport key per `ODDS_MIN_INTERVAL_H` (6h), enforced via a git-tracked
+   `docs/odds_state.json` (a per-process cache is useless across ephemeral
+   runners). Worst case ≈ 8 fetches/day/sport ≈ 240 credits/month ceiling,
+   typical far less. Light scans never fetch at all.
+2. **Light scans skip the baseline** — `run_scan(use_baseline=...)`; the
+   baseline feeds only net_edge / trade *selection*, never CLV arithmetic, so
+   a light price scan loses nothing that CLV needs (Addendum 4's "optional
+   reference layer", now actually enforced).
+
+**Deterministic coverage — `sweep.yml`.** Two daily schedule triggers (10:07,
+17:07 UTC) start jobs that self-loop ~5.5h at 25-min cadence (13 scans/shift):
+GitHub drops schedule *events*, it does not interrupt a running job. Shift
+times bracket the EPL kickoff distribution (UK 11:30–20:00 ≈ 10:30–20:00 UTC;
+midweek 19:45). Inside a sweep, scheduler "skip" degrades to a light scan
+(`POLYMARKET_SWEEP=1` in `main.execute_scan`) so the price path is dense
+(~26 rows/day/shift coverage + cron lottery on top). Expected capture-rate
+effect: from 0% to near-100% for kickoffs inside sweep windows; overnight
+kickoffs (none in the EPL fixture pattern) remain on the cron lottery.
+Also: `scan.yml` cron widened to a 15-min off-peak grid (more surviving
+tickets; skip-runs cost <2s), and the dead-man's-switch banner is now
+**committed** (previously written to the runner workspace and lost — a real
+bug in Addendum 5; the commit also defers the 60-day disable).
+
+**Dashboard** (`docs/index.html`): Capture Rate card + WC-context note under
+the gate.
+
+**Tests:** `test_p4_quota.py` — throttle denies without HTTP; state-file
+roundtrip; `use_baseline=False` never touches the network; sweep-mode
+degradation. Appended to the declared verification command (governance
+verification.json updated). Full suite: PASS.
+
+**Pre-registration note:** entry-window semantics (T-1h) are unchanged; the
+sweeps only make it more likely a scan actually lands there. No threshold,
+label, or metric definition was altered in this addendum.

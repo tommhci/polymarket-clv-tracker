@@ -15,6 +15,7 @@ markets ($50–70M volume each).  Compared against Odds API outright winner line
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 import logging
@@ -27,6 +28,7 @@ import requests
 from config import (
     GAMMA_API_BASE, CLOB_BASE,
     ODDS_API_KEY, ODDS_SPORT_KEY, ODDS_SPORT_OUTRIGHT_KEY, ODDS_REGIONS,
+    ODDS_MIN_INTERVAL_H,
     SPORTS_TAKER_FEE_RATE,
     MIN_NET_EDGE, MAX_SPREAD_PCT, MIN_VOLUME_USD,
     PAPER_TRADE_SIZE_USD, MAX_MARKETS_PER_SCAN,
@@ -405,6 +407,47 @@ def get_clob_vwap(token_id: str, size_usd: float = PAPER_TRADE_SIZE_USD) -> tupl
 
 _odds_cache: dict = {}   # { sport_key: [event, ...] }
 
+ODDS_STATE_PATH = os.path.join("docs", "odds_state.json")
+
+
+def _odds_last_fetch(sport: str) -> float:
+    """Last successful Odds API fetch for this sport (epoch s), 0 if never."""
+    try:
+        with open(ODDS_STATE_PATH, encoding="utf-8") as f:
+            return float(json.load(f).get(sport, 0))
+    except (OSError, ValueError):
+        return 0.0
+
+
+def _odds_record_fetch(sport: str):
+    """Stamp a successful fetch; committed with the scan so the throttle
+    survives the ephemeral Actions runner."""
+    try:
+        state = {}
+        if os.path.exists(ODDS_STATE_PATH):
+            with open(ODDS_STATE_PATH, encoding="utf-8") as f:
+                state = json.load(f)
+        state[sport] = datetime.now(timezone.utc).timestamp()
+        with open(ODDS_STATE_PATH, "w", encoding="utf-8") as f:
+            json.dump(state, f)
+    except OSError as e:
+        log.warning("Could not write odds state file: %s", e)
+
+
+def _odds_throttled(sport: str) -> bool:
+    """True when this sport was fetched within ODDS_MIN_INTERVAL_H. The state
+    file is git-committed with each scan, so the throttle works across the
+    ephemeral runner boundaries that make per-process caches useless."""
+    last = _odds_last_fetch(sport)
+    if last <= 0:
+        return False
+    age_h = (datetime.now(timezone.utc).timestamp() - last) / 3600
+    if age_h < ODDS_MIN_INTERVAL_H:
+        log.info("Odds API [%s] throttled — last fetch %.1fh ago (< %sh)",
+                 sport, age_h, ODDS_MIN_INTERVAL_H)
+        return True
+    return False
+
 
 def clear_odds_cache():
     global _odds_cache
@@ -426,6 +469,9 @@ def _fetch_odds(sport: str, markets: str) -> list[dict]:
         log.warning("ODDS_API_KEY not set — sportsbook baseline unavailable")
         return []
 
+    if _odds_throttled(sport):
+        return []
+
     url    = f"https://api.the-odds-api.com/v4/sports/{sport}/odds/"
     params = {
         "apiKey":     ODDS_API_KEY,
@@ -438,6 +484,7 @@ def _fetch_odds(sport: str, markets: str) -> list[dict]:
         resp.raise_for_status()
         events = resp.json()
         _odds_cache[cache_key] = events
+        _odds_record_fetch(sport)
         remaining = resp.headers.get("x-requests-remaining", "?")
         log.info("Odds API [%s/%s]: %d events (quota: %s)", sport, markets, len(events), remaining)
         return events
@@ -646,10 +693,15 @@ def _classify_time_bucket(end_date: Optional[str]) -> tuple[float, str]:
 
 # ── Module 6: Full Scan Pipeline ──────────────────────────────────────────────
 
-def run_scan() -> list[MarketSnapshot]:
+def run_scan(use_baseline: bool = True) -> list[MarketSnapshot]:
     """
     One full scan. Returns all MarketSnapshot objects (alertable and skipped).
     Callers (main.py) write to DB and send alerts.
+
+    use_baseline=False (light/maintenance scans) skips the Odds API entirely:
+    the baseline feeds only net_edge / paper-trade selection, never the CLV
+    arithmetic, so a light price scan loses nothing that CLV needs — and the
+    free-tier quota stays reserved for the windows that open trades.
     """
     clear_odds_cache()
     ts = datetime.now(timezone.utc).isoformat()
@@ -686,7 +738,10 @@ def run_scan() -> list[MarketSnapshot]:
         match_away = mkt.get("_match_away")
 
         if match_home and match_away:
-            probs, source = get_devigged_h2h_probs(match_home, match_away)
+            if not use_baseline:
+                probs, source = None, "baseline_skipped_light_mode"
+            else:
+                probs, source = get_devigged_h2h_probs(match_home, match_away)
             if probs is None:
                 p_true = 0.0
             elif "end in a draw" in q_lower:
@@ -704,8 +759,10 @@ def run_scan() -> list[MarketSnapshot]:
             is_advance = any(k in q_lower for k in
                              ("advance", "qualify", "knockout", "reach the", "group stage"))
             team = extract_team(question)
-            if is_advance or not team:
-                p_true, source = 0.0, "no_baseline"
+            if is_advance or not team or not use_baseline:
+                p_true, source = 0.0, ("baseline_skipped_light_mode"
+                                       if not use_baseline and not is_advance
+                                       else "no_baseline")
             else:
                 p_true, source = get_devigged_win_prob(team)
 

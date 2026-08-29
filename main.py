@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import time
 from datetime import datetime, timezone
 
@@ -371,11 +372,20 @@ def execute_scan(send_summary: bool = False, force: bool = False) -> list:
                 decision.use_news      = False
                 decision.use_glm       = False
                 decision.use_football_data = False
+            elif os.environ.get("POLYMARKET_SWEEP"):
+                # Sustained-sweep mode (sweep.yml): the 25-min in-job cadence
+                # is the deterministic replacement for GitHub's dropped cron
+                # events (Addendum 6), so "skip" never stands — degrade to a
+                # light scan to keep the price path dense through the sweep.
+                decision.mode          = "light"
+                decision.use_news      = False
+                decision.use_glm       = False
+                decision.use_football_data = False
             else:
                 log.info("── Skipped (no active match window) — %s", decision.reason)
                 return []
 
-    snapshots = run_scan()
+    snapshots = run_scan(use_baseline=(decision.mode != "light"))
 
     if not snapshots:
         log.warning("Scan returned 0 snapshots — check API keys and network")

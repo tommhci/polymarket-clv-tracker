@@ -32,16 +32,29 @@ GAMMA_API_BASE = "https://gamma-api.polymarket.com"
 CLOB_BASE      = "https://clob.polymarket.com"
 
 # ── Odds API sport keys (EPL, since 2026-08 pivot) ─────────────────────────────
-# CONSTRAINT (FIXLOG Addendum 4): the Odds API is an OPTIONAL reference layer —
-# CLV is computed purely from Polymarket's own entry vs final prices. Budget:
-# free tier 500 credits/month, 1 credit per call per region per market type;
-# single region + h2h only + ≤2 calls/day ≈ 60 credits/month. Stay inside that
-# envelope; /sports list calls are free. Missing key ⇒ no_baseline (logged,
-# prices still recorded) — degradation is expected behavior, not an error.
+# CONSTRAINT (FIXLOG Addendum 4/6): the Odds API is an OPTIONAL reference layer —
+# CLV is computed purely from Polymarket's own entry vs final prices. Verified
+# against the official v4 docs (2026-08-29): /odds costs "1 per region per
+# market"; /sports and /events "do not count against the usage quota".
+# https://the-odds-api.com/liveapi/guides/v4/
+# Baseline fetches are time-throttled (ODDS_MIN_INTERVAL_H) via a git-tracked
+# state file — at real (non-dropped) scan cadences this is what keeps the
+# free tier inside budget; the earlier "~60 credits/month" estimate silently
+# assumed the ~90% schedule-drop rate GitHub was exhibiting (Addendum 6).
 ODDS_SPORT_KEY         = os.environ.get("ODDS_SPORT_KEY", "soccer_epl")
-ODDS_SPORT_OUTRIGHT_KEY = os.environ.get("ODDS_SPORT_OUTRIGHT_KEY", "soccer_epl_winner")
 ODDS_REGIONS   = "uk"          # single region (uk books) — one credit per call
 ODDS_MARKETS   = "h2h"         # match winner; use "outrights" for futures
+
+# VERIFIED ABSENT (2026-08-29, free /sports endpoint, zero quota cost):
+# soccer_epl lists has_outrights=false and no soccer_epl_winner key exists
+# (81 sports listed; no EPL outright entry). EPL futures therefore run
+# no_baseline by design — they are price-only rows excluded from the CLV gate.
+ODDS_SPORT_OUTRIGHT_KEY = os.environ.get("ODDS_SPORT_OUTRIGHT_KEY", "soccer_epl_winner")
+
+# Minimum hours between successful Odds API fetches per sport key, enforced by
+# scanner via docs/odds_state.json (git-tracked so the throttle survives the
+# ephemeral Actions runner). Light/maintenance scans skip the baseline entirely.
+ODDS_MIN_INTERVAL_H = 6
 
 # ── Fee model (Polymarket sports taker, post-2026 fee rollout) ─────────────────
 # Formula: fee_per_contract = FEE_RATE * p * (1 - p)

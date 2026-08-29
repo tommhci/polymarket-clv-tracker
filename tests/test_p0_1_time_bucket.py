@@ -1,10 +1,14 @@
 """
 tests/test_p0_1_time_bucket.py — Offline self-test for FIXLOG.md "P0-1".
 
-Confirms that scanner.run_scan() now derives each advancement market's
-time_bucket from THAT TEAM's own last group-stage match (via
-news_fetcher.get_team_last_group_kickoff), instead of Polymarket's shared
-endDateIso — without making any real network calls.
+Originally written for the World Cup advancement markets, where each team's
+kickoff had to be looked up from football-data.org. Since the EPL pivot
+(2026-08) scanner anchors each match market's time_bucket to Polymarket's
+own gameStartTime field (per-market kickoff, no external lookup), falling
+back to endDateIso when it is missing. This test now protects THAT mechanism:
+markets sharing one endDateIso must still get distinct hours_to_end when
+gameStartTime differs, and the no-gameStartTime fallback must degrade
+gracefully — without making any real network calls.
 
 Run: python3 tests/test_p0_1_time_bucket.py
 """
@@ -23,9 +27,10 @@ import scanner
 import news_fetcher
 
 
-def _fake_market(question: str, end_date_shared: str) -> dict:
+def _fake_market(question: str, end_date_shared: str,
+                 game_start: str | None = None) -> dict:
     """Build a raw Gamma-API-shaped market dict (matches parse_market_meta)."""
-    return {
+    m = {
         "id": f"id_{abs(hash(question)) % 10**8}",
         "question": question,
         "endDateIso": end_date_shared,
@@ -34,44 +39,32 @@ def _fake_market(question: str, end_date_shared: str) -> dict:
         "bestBid": 0.55,
         "bestAsk": 0.57,
     }
+    if game_start is not None:
+        m["gameStartTime"] = game_start
+    return m
 
 
 def main() -> None:
     now = datetime.now(timezone.utc)
 
-    # Every advancement market shares the SAME Polymarket endDateIso — this
-    # is the actual bug, reproduced exactly as observed in docs/scans.csv
-    # (all 46 teams showed hours_to_end=168.09 at the same timestamp).
+    # Every market shares the SAME endDateIso — the original P0-1 bug shape.
     shared_end_date = (now + timedelta(hours=168.09)).isoformat()
 
     markets = [
-        _fake_market("Will Spain advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date),
-        _fake_market("Will USA advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date),
-        _fake_market("Will Brazil advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date),
-        # Team with NO fixture match available — must fall back gracefully,
-        # not raise, and keep using the shared (old, wrong) end_date.
+        _fake_market("Will Spain advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date,
+                     game_start=(now + timedelta(hours=1.0)).isoformat()),    # → T-1h
+        _fake_market("Will USA advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date,
+                     game_start=(now + timedelta(hours=25.0)).isoformat()),   # → T-24h
+        _fake_market("Will Brazil advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date,
+                     game_start=(now + timedelta(hours=400.0)).isoformat()),  # → T-other
+        # Market with NO gameStartTime — must fall back gracefully to the
+        # shared endDateIso, not raise.
         _fake_market("Will Wales advance to the knockout stages at the 2026 FIFA World Cup?", shared_end_date),
     ]
 
-    # Each team's OWN last group match is at a different time — this is what
-    # should now drive each market's hours_to_end / time_bucket. These are
-    # raw kickoff times: scanner.py feeds kickoff directly into
-    # _classify_time_bucket() (no resolution-lag offset — see FIXLOG.md
-    # "P0-1", this was caught and reverted by this very test).
-    real_kickoffs = {
-        "Spain":  now + timedelta(hours=1.0),    # → should land in T-1h
-        "USA":    now + timedelta(hours=25.0),   # → should land in T-24h
-        "Brazil": now + timedelta(hours=400.0),  # → should land in T-other
-        # "Wales" deliberately omitted — simulates no football-data.org match
-    }
-
-    def fake_get_team_last_group_kickoff(team: str):
-        return real_kickoffs.get(team)
-
-    with mock.patch.object(scanner, "get_world_cup_markets", return_value=markets), \
+    with mock.patch.object(scanner, "get_scan_universe", return_value=markets), \
          mock.patch.object(scanner, "get_clob_vwap", return_value=(0.57, 1.0)), \
-         mock.patch.object(scanner, "get_devigged_win_prob", return_value=(0.0, "no_advance_baseline")), \
-         mock.patch.object(news_fetcher, "get_team_last_group_kickoff", side_effect=fake_get_team_last_group_kickoff):
+         mock.patch.object(scanner, "get_devigged_win_prob", return_value=(0.0, "no_baseline")):
 
         snapshots = scanner.run_scan()
 

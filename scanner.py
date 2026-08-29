@@ -19,18 +19,18 @@ import re
 import time
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 import requests
 
 from config import (
     GAMMA_API_BASE, CLOB_BASE,
-    ODDS_API_KEY, ODDS_SPORT_KEY, ODDS_REGIONS,
+    ODDS_API_KEY, ODDS_SPORT_KEY, ODDS_SPORT_OUTRIGHT_KEY, ODDS_REGIONS,
     SPORTS_TAKER_FEE_RATE,
     MIN_NET_EDGE, MAX_SPREAD_PCT, MIN_VOLUME_USD,
     PAPER_TRADE_SIZE_USD, MAX_MARKETS_PER_SCAN,
-    WC_KEYWORDS, TEAM_NAMES, PRIORITY_EVENT_SLUGS,
+    EPL_KEYWORDS, TEAM_NAMES, PRIORITY_EVENT_SLUGS,
     RISK_FREE_RATE,
 )
 
@@ -77,12 +77,74 @@ class MarketSnapshot:
 
 # ── Module 1: Market Discovery (Gamma API) ─────────────────────────────────────
 
-def get_world_cup_markets() -> list[dict]:
+# Main match events look like "epl-liv-not-2026-08-29". Derivative events
+# (halftime, exact score, corners, spreads...) carry suffixes, so the
+# anchored full-match regex excludes them by construction.
+MATCH_EVENT_RE = re.compile(r"^epl-[a-z]{2,4}-[a-z]{2,4}-\d{4}-\d{2}-\d{2}$")
+
+
+def get_epl_match_events(days_ahead: int = 7) -> list[dict]:
     """
-    Fetch active WC markets from Gamma API.
-    Primary universe: "Will X win the 2026 FIFA World Cup?" outright markets.
-    Returns raw dicts with corrected field names.
+    Discover upcoming EPL match events via the Gamma tag endpoint.
+
+    Each match event carries exactly 3 moneyline sub-markets
+    ("Will X win on DATE?" / "end in a draw?" / "Will Y win on DATE?")
+    which map 1:1 onto the Odds API soccer_epl h2h 3-way market — the
+    de-vigged baseline for the whole per-match dataset.
+
+    Events are keyed by slug-date, so we filter to [yesterday, +days_ahead]
+    instead of trusting any sort order from the API.
     """
+    try:
+        resp = requests.get(
+            f"{GAMMA_API_BASE}/events",
+            params={"tag_slug": "epl", "active": "true", "closed": "false",
+                    "limit": 200},
+            timeout=12,
+        )
+        resp.raise_for_status()
+        events = resp.json()
+    except requests.RequestException as e:
+        log.error("Gamma tag_slug=epl error: %s", e)
+        return []
+
+    today = datetime.now(timezone.utc).date()
+    out = []
+    for ev in events:
+        slug = ev.get("slug", "") or ""
+        if not MATCH_EVENT_RE.match(slug):
+            continue
+        # slug tail IS the date: "epl-liv-not-2026-08-29" → 2026-08-29
+        date_part = slug.rsplit("-", 3)  # ['epl-liv-not', '2026', '08', '29']
+        try:
+            match_date = datetime.strptime("-".join(date_part[1:]),
+                                           "%Y-%m-%d").date()
+        except ValueError:
+            continue
+
+        if not (today <= match_date <= today + timedelta(days=days_ahead)):
+            continue
+        # Event-level liquidity gate: keep the whole 3-way set together
+        # even when the draw leg alone is under the $20K market floor —
+        # dropping the draw would break the 1:1 h2h baseline mapping.
+        if float(ev.get("volume", 0) or 0) < MIN_VOLUME_USD:
+            continue
+
+        title = ev.get("title", "")
+        parts = [p.strip() for p in title.split(" vs. ")]
+        if len(parts) != 2:
+            continue
+        for m in ev.get("markets", []):
+            if not m.get("clobTokenIds") or m.get("clobTokenIds") == "[]":
+                continue
+            m["_match_home"], m["_match_away"] = parts[0], parts[1]
+            out.append(m)
+
+    log.info("EPL match discovery: %d moneyline markets across upcoming events",
+             len(out))
+    return out
+
+
 def get_event_markets(slug: str) -> list[dict]:
     """
     Fetch all sub-markets under a Polymarket EVENT by slug.
@@ -121,20 +183,30 @@ def get_event_markets(slug: str) -> list[dict]:
     return out
 
 
-def get_world_cup_markets() -> list[dict]:
+def get_scan_universe() -> list[dict]:
     """
-    Build the scan universe, PRIORITISING advancement markets over outright winners.
+    Build the scan universe (EPL since the 2026-08 pivot).
 
     Order:
-      1. Priority event sub-markets (advancement to knockout) — the real target
-      2. Flat /markets WC entries (fills remaining slots; mostly outright winners)
+      1. Per-match moneyline markets via tag discovery — the weekly CLV core
+      2. Priority event sub-markets (season futures, e.g. 2027 champion)
+      3. Flat /markets EPL entries (fills remaining slots; mostly futures)
 
     Deduplicated by market id. Capped at MAX_MARKETS_PER_SCAN.
     """
     found: list[dict] = []
     seen_ids: set = set()
 
-    # ── 1. Priority: advancement markets via event endpoint ──
+    # ── 1. Priority: upcoming match moneylines via tag discovery ──
+    for m in get_epl_match_events():
+        mid = str(m.get("id", ""))
+        if mid and mid not in seen_ids:
+            seen_ids.add(mid)
+            found.append(m)
+
+    n_matches = len(found)
+
+    # ── 2. Priority event sub-markets (season futures) ──
     for slug in PRIORITY_EVENT_SLUGS:
         for m in get_event_markets(slug):
             mid = str(m.get("id", ""))
@@ -142,7 +214,7 @@ def get_world_cup_markets() -> list[dict]:
                 seen_ids.add(mid)
                 found.append(m)
 
-    n_priority = len(found)
+    n_priority = len(found) - n_matches
 
     # ── 2. Fill remaining slots from flat /markets feed ──
     url    = f"{GAMMA_API_BASE}/markets"
@@ -170,9 +242,13 @@ def get_world_cup_markets() -> list[dict]:
             tok = m.get("clobTokenIds", "[]")
             mid = str(m.get("id", ""))
 
+            # Word-boundary match: a bare substring test matched "epl" inside
+            # "replace" and pulled a Bitcoin market into the scan universe.
+            kw_hit = any(re.search(r"\b" + re.escape(kw) + r"\b", q)
+                         for kw in EPL_KEYWORDS)
             if (mid not in seen_ids
                     and vol >= MIN_VOLUME_USD
-                    and any(kw in q for kw in WC_KEYWORDS)
+                    and kw_hit
                     and tok and tok != "[]"):
                 seen_ids.add(mid)
                 flat.append(m)
@@ -180,6 +256,8 @@ def get_world_cup_markets() -> list[dict]:
         if len(batch) < 100:
             break
         offset += 100
+        if offset >= 500:   # filler is best-effort; /markets 422s past ~2k
+            break
         time.sleep(0.1)
 
     # Sort flat fillers by volume desc, append after priority markets
@@ -188,16 +266,16 @@ def get_world_cup_markets() -> list[dict]:
     result = found[:MAX_MARKETS_PER_SCAN]
 
     log.info(
-        "Universe: %d markets (%d priority advancement + %d flat fillers)",
-        len(result), n_priority, len(result) - n_priority,
+        "Universe: %d markets (%d match moneylines + %d priority futures + %d flat fillers)",
+        len(result), n_matches, n_priority, len(result) - n_matches - n_priority,
     )
     return result
 
 
-def parse_market_meta(m: dict) -> tuple[str, str, float, str, float, float]:
+def parse_market_meta(m: dict) -> tuple[str, str, float, str, float, float, str]:
     """
-    Extract (yes_token_id, end_date, volume, question, best_bid, best_ask)
-    from a raw Gamma API market dict.
+    Extract (yes_token_id, end_date, volume, question, best_bid, best_ask,
+    game_start) from a raw Gamma API market dict.
     """
     # clobTokenIds is a JSON string: '["tokenA", "tokenB"]'
     # outcomes[0] = "Yes", so clobTokenIds[0] = Yes token
@@ -212,8 +290,12 @@ def parse_market_meta(m: dict) -> tuple[str, str, float, str, float, float]:
     question = m.get("question", "")
     best_bid = float(m.get("bestBid", 0) or 0)
     best_ask = float(m.get("bestAsk", 1) or 1)
+    # EPL match markets carry the actual kickoff here (verified live
+    # 2026-08-29: gameStartTime = "2026-08-29 11:30:00+00" while endDateIso
+    # is a bare date). Use it as the time-bucket anchor.
+    game_start = str(m.get("gameStartTime") or "")
 
-    return yes_token, end_date, volume, question, best_bid, best_ask
+    return yes_token, end_date, volume, question, best_bid, best_ask, game_start
 
 
 # ── Module 2: CLOB Order-Book Depth ───────────────────────────────────────────
@@ -330,8 +412,8 @@ def _fetch_odds(sport: str, markets: str) -> list[dict]:
 
 
 def _fetch_odds_outright() -> list[dict]:
-    """Fetch tournament winner outrights (uses soccer_fifa_world_cup_winner key)."""
-    return _fetch_odds("soccer_fifa_world_cup_winner", "outrights")
+    """Fetch season-winner outrights (uses the EPL outright sport key)."""
+    return _fetch_odds(ODDS_SPORT_OUTRIGHT_KEY, "outrights")
 
 
 def _fetch_odds_h2h() -> list[dict]:
@@ -383,6 +465,62 @@ def get_devigged_win_prob(team_name: str) -> tuple[float, str]:
             return round(avg, 5), source
 
     return 0.0, "NO_MATCH"
+
+
+def get_devigged_h2h_probs(home: str, away: str) -> tuple[Optional[dict], str]:
+    """
+    De-vig the Odds API 3-way h2h market for a match and return
+    ({home: p, draw: p, away: p}, source_label), or (None, "NO_MATCH").
+
+    Odds API event fields (v4 docs): home_team / away_team / bookmakers[].markets[]
+    with outcomes [{name, price}] where name ∈ {home_team, "Draw", away_team}.
+    Averaged across up to 3 bookmakers, multiplicative de-vig.
+    """
+    events = _fetch_odds(ODDS_SPORT_KEY, "h2h")
+    home_l, away_l = home.lower(), away.lower()
+
+    for event in events:
+        ev_home = (event.get("home_team") or "").lower()
+        ev_away = (event.get("away_team") or "").lower()
+        # Odds API and Polymarket use the same "X FC" full-club naming, but
+        # allow containment either way to survive minor suffix differences.
+        if not ((home_l in ev_home or ev_home in home_l)
+                and (away_l in ev_away or ev_away in away_l)):
+            continue
+
+        outcome_probs: dict[str, list[float]] = {"home": [], "draw": [], "away": []}
+        for bk in event.get("bookmakers", [])[:3]:
+            for mkt in bk.get("markets", []):
+                if mkt.get("key") != "h2h":
+                    continue
+                outcomes = mkt.get("outcomes", [])
+                if len(outcomes) != 3:
+                    continue
+                raw = {}
+                for o in outcomes:
+                    name = (o.get("name") or "").lower()
+                    if name == "draw":
+                        key = "draw"
+                    elif name and (name in ev_home or ev_home in name):
+                        key = "home"
+                    elif name and (name in ev_away or ev_away in name):
+                        key = "away"
+                    else:
+                        key = None
+                    if key and o.get("price"):
+                        raw[key] = 1.0 / float(o["price"])
+                if len(raw) == 3:
+                    total = sum(raw.values())
+                    for key in ("home", "draw", "away"):
+                        outcome_probs[key].append(raw[key] / total)
+
+        if all(outcome_probs[k] for k in ("home", "draw", "away")):
+            avg = {k: round(sum(v) / len(v), 5)
+                   for k, v in outcome_probs.items()}
+            source = (f"h2h {home} vs {away} ({len(outcome_probs['home'])} books)")
+            return avg, source
+
+    return None, "NO_MATCH"
 
 
 # ── Module 4: Fee & Edge ───────────────────────────────────────────────────────
@@ -442,10 +580,13 @@ def _classify_time_bucket(end_date: Optional[str]) -> tuple[float, str]:
     now_utc = datetime.now(timezone.utc)
     try:
         ed = str(end_date)
-        if "T" in ed:
+        # Try a full timestamp first. gameStartTime comes back as
+        # "2026-08-29 11:30:00+00" (space separator, no "T"), so a bare
+        # "T in ed" check would misroute it into the date-only branch.
+        try:
             end_dt = datetime.fromisoformat(ed.replace("Z", "+00:00"))
-        else:
-            # Date-only string like "2026-06-20" → treat as end of day UTC
+        except ValueError:
+            # Date-only string like "2026-08-20" → treat as end of day UTC
             end_dt = datetime.fromisoformat(f"{ed}T23:59:00+00:00")
 
         if end_dt.tzinfo is None:
@@ -478,11 +619,12 @@ def run_scan() -> list[MarketSnapshot]:
     clear_odds_cache()
     ts = datetime.now(timezone.utc).isoformat()
 
-    markets   = get_world_cup_markets()
+    markets   = get_scan_universe()
     snapshots = []
 
     for mkt in markets:
-        yes_token, end_date, volume, question, best_bid, best_ask = parse_market_meta(mkt)
+        yes_token, end_date, volume, question, best_bid, best_ask, game_start = \
+            parse_market_meta(mkt)
 
         if not yes_token:
             log.debug("No yes_token for: %s", question[:50])
@@ -499,26 +641,38 @@ def run_scan() -> list[MarketSnapshot]:
             vwap_ask = best_ask
 
         # ── External baseline ──
-        # IMPORTANT: advancement markets ("Will X advance to knockout?") need
-        # "to qualify" odds. The free Odds API only provides tournament-WINNER
-        # outrights + match h2h — NOT advancement odds. Comparing an advance
-        # market (e.g. 0.49) to winner odds (e.g. 0.005) is meaningless, so we
-        # do NOT fabricate an edge signal for these. They are still logged every
-        # scan, which is all CLV needs (CLV = entry price vs closing price, both
-        # from Polymarket — no sportsbook baseline required).
+        # Route by market type:
+        #   Match moneyline (tag-discovered events carry _match_home/_match_away)
+        #     → de-vigged 3-way h2h from Odds API soccer_epl. The draw question
+        #       mentions BOTH clubs, so check it before the team-name branch.
+        #   Season futures → de-vigged outright winner odds (existing path).
         q_lower = question.lower()
-        is_advance = any(k in q_lower for k in
-                         ("advance", "qualify", "knockout", "reach the", "group stage"))
+        match_home = mkt.get("_match_home")
+        match_away = mkt.get("_match_away")
 
-        team = extract_team(question)
-
-        if is_advance:
-            p_true, source = 0.0, "no_advance_baseline (qualification odds unavailable)"
-        else:
-            if team:
-                p_true, source = get_devigged_win_prob(team)
+        if match_home and match_away:
+            probs, source = get_devigged_h2h_probs(match_home, match_away)
+            if probs is None:
+                p_true = 0.0
+            elif "end in a draw" in q_lower:
+                p_true = probs["draw"]
             else:
-                p_true, source = 0.0, "no_team_match"
+                team = extract_team(question)
+                if team and team.lower() == match_home.lower():
+                    p_true = probs["home"]
+                elif team and team.lower() == match_away.lower():
+                    p_true = probs["away"]
+                else:
+                    p_true = 0.0
+                    source = "team_name_mismatch"
+        else:
+            is_advance = any(k in q_lower for k in
+                             ("advance", "qualify", "knockout", "reach the", "group stage"))
+            team = extract_team(question)
+            if is_advance or not team:
+                p_true, source = 0.0, "no_baseline"
+            else:
+                p_true, source = get_devigged_win_prob(team)
 
         # ── Fee (always computed, regardless of baseline) ──
         fee_always = taker_fee_fraction(vwap_ask)
@@ -528,55 +682,16 @@ def run_scan() -> list[MarketSnapshot]:
 
         # ── Multi-timepoint: classify this scan into a time bucket ──
         #
-        # FIXLOG P0-1: Polymarket sets ONE shared endDateIso for every
-        # advancement market (the group-stage-wide deadline, ~6/28), not
-        # each team's own last group match. Feeding that shared date into
-        # _classify_time_bucket() collapses every team into the same bucket
-        # regardless of when they actually play — verified directly against
-        # docs/scans.csv (all 46 advancement markets showed identical
-        # hours_to_end=168.09 at the same scan timestamp). That breaks the
-        # T-1h CLV/calibration entry trigger below: by the time the shared
-        # deadline's T-1h window arrives, every match has long since been
-        # played and prices have already converged to the known outcome.
-        #
-        # Fix: for advancement markets, look up this specific team's own
-        # last group-stage match kickoff (football-data.org — one fetch for
-        # the whole tournament, see news_fetcher.get_team_last_group_kickoff)
-        # and classify against an end_date derived from THAT instead. The
-        # bucket thresholds in _classify_time_bucket() itself are unchanged —
-        # only the input end_date changes for advancement markets.
-        effective_end_date = end_date
-        if is_advance and team:
-            try:
-                from news_fetcher import get_team_last_group_kickoff
-                real_kickoff = get_team_last_group_kickoff(team)
-            except Exception as e:
-                real_kickoff = None
-                log.warning("football-data.org lookup failed for %s: %s", team, e)
-            if real_kickoff is not None:
-                # Feed the team's own kickoff time directly — NOT kickoff
-                # plus a resolution lag. _classify_time_bucket()'s "T-1h"
-                # bucket (hours_to_end ∈ [0,2]) is meant to mean "0-2h
-                # BEFORE the moment that matters" (final lineups, highest
-                # narrative bias, entry before the outcome is known — see
-                # the bucket_desc comments in main.py). For advancement
-                # markets that moment IS kickoff: once the match starts,
-                # the live price already reflects in-game events, so the
-                # clean pre-match entry window is [kickoff-2h, kickoff],
-                # not [kickoff, kickoff+2h]. An earlier draft of this fix
-                # added scheduler.py's RESOLUTION_LAG_H here, which shifted
-                # "T-1h" to fire AFTER kickoff instead of before it — caught
-                # by tests/test_p0_1_time_bucket.py, reverted.
-                effective_end_date = real_kickoff.isoformat()
-            else:
-                log.warning(
-                    "No football-data.org fixture match for advancement-market "
-                    "team=%r (%s) — falling back to Polymarket's shared "
-                    "endDateIso for this team only. time_bucket will be "
-                    "inaccurate until football-data.org coverage improves "
-                    "(see FIXLOG.md known limitations).",
-                    team, question[:60],
-                )
+        # For EPL match markets, Polymarket's gameStartTime IS the kickoff
+        # (verified live 2026-08-29: endDate 2026-08-29T11:30:00Z ==
+        # gameStartTime for liv-not). Anchoring buckets to it means the
+        # "T-1h" bucket fires 0–2h before kickoff as intended, and the
+        # scheduler's end_dt reconstruction below resolves exactly to
+        # kickoff (hence scheduler.RESOLUTION_LAG_H = 0 after the pivot).
+        # endDateIso is a bare date ("2026-08-29") and would collapse every
+        # match that day to 23:59 UTC — the same shared-date defect that
+        # FIXLOG P0-1 documented for World Cup advancement markets.
+        effective_end_date = game_start or end_date
 
         hours_to_end, time_bucket = _classify_time_bucket(effective_end_date)
 

@@ -31,11 +31,16 @@ TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 GAMMA_API_BASE = "https://gamma-api.polymarket.com"
 CLOB_BASE      = "https://clob.polymarket.com"
 
-# ── Odds API sport key for World Cup ──────────────────────────────────────────
+# ── Odds API sport keys (EPL, since 2026-08 pivot) ─────────────────────────────
 # Free tier: 500 requests/month. One call returns ALL events for the sport.
-ODDS_SPORT_KEY = os.environ.get("ODDS_SPORT_KEY", "soccer_fifa_world_cup")
+# soccer_epl            → h2h (home/draw/away) for per-match baselines
+# soccer_epl_winner     → outrights for season-futures baselines (unverified
+#                         key name — if the API 404s, futures fall back to
+#                         no_baseline and are still price-logged for CLV)
+ODDS_SPORT_KEY         = os.environ.get("ODDS_SPORT_KEY", "soccer_epl")
+ODDS_SPORT_OUTRIGHT_KEY = os.environ.get("ODDS_SPORT_OUTRIGHT_KEY", "soccer_epl_winner")
 ODDS_REGIONS   = "eu"          # eu books (Pinnacle, Bet365, Betfair)
-ODDS_MARKETS   = "h2h"         # match winner; use "outrights" for qualification
+ODDS_MARKETS   = "h2h"         # match winner; use "outrights" for futures
 
 # ── Fee model (Polymarket sports taker, post-2026 fee rollout) ─────────────────
 # Formula: fee_per_contract = FEE_RATE * p * (1 - p)
@@ -64,6 +69,10 @@ KELLY_FRACTION       = 0.25  # Quarter-Kelly when sizing real trades later
 # ── Scan behaviour ────────────────────────────────────────────────────────────
 SCAN_INTERVAL_MINUTES = 30   # cron cadence (override with --interval flag)
 MAX_MARKETS_PER_SCAN  = 60   # raised to fit advancement markets + a few winners
+# EPL pivot: when no match window is active, run one light price-only scan
+# per this many hours so the CLV time series keeps accumulating between
+# matches (main.execute_scan "maintenance sample").
+MAINTENANCE_INTERVAL_H = 6
 
 # ── Risk-free rate for CLV time-value adjustment ───────────────────────────────
 # US 3-month T-bill rate, June 2026 ≈ 5.3%
@@ -71,34 +80,38 @@ MAX_MARKETS_PER_SCAN  = 60   # raised to fit advancement markets + a few winners
 # This strips out the capital-lockup premium from the raw CLV signal.
 RISK_FREE_RATE = 0.053
 
-# ── Priority event slugs (the markets where retail edge could actually exist) ──
-# Verified live (June 2026): advancement markets are $27K-250K volume, many
-# near coin-flip (Czechia 0.55, Turkiye 0.515) = narrative-sensitive, the
-# mid-liquidity tier institutions/bots under-cover. These are the TARGET.
-# The "Win World Cup" outright markets ($50-70M) are efficient — negative edge.
+# ── Priority event slugs (season futures; per-match events are discovered
+#    dynamically by scanner.get_epl_match_events via the Gamma tag endpoint) ──
+# Verified live (2026-08-29): slug is suffixed with a creation timestamp —
+# the bare "epl-2027-champion" resolves to nothing via the events endpoint.
+# "EPL: 2027 Champion" is $11M volume across 24 sub-markets — the season-long
+# outright series where CLV drift is measurable over months, complementing
+# the weekly match-level dataset.
 PRIORITY_EVENT_SLUGS = [
-    "world-cup-team-to-advance-to-knockout-stages",
+    "epl-2027-champion-20260701200428749",
 ]
 
 # ── Database ──────────────────────────────────────────────────────────────────
 DB_PATH = os.environ.get("DB_PATH", "polymarket_tracker.db")
 
-# ── World Cup keyword filter (lower-case) ─────────────────────────────────────
-WC_KEYWORDS = [
-    "world cup", "qualify", "advance", "knockout", "group stage",
-    "fifa", "2026 wc", "round of 32",
+# ── EPL keyword filter (lower-case) ───────────────────────────────────────────
+# Secondary flat-feed filler only; the primary universe comes from
+# scanner.get_epl_match_events() (Gamma /events?tag_slug=epl), because
+# per-match questions ("Will Liverpool FC win on 2026-08-29?") contain
+# neither "premier league" nor "epl".
+EPL_KEYWORDS = [
+    "premier league", "epl",
 ]
 
 # ── Known team names for Odds API matching ────────────────────────────────────
+# 2026-27 EPL clubs, enumerated from live Gamma API events on 2026-08-29
+# (includes promoted Coventry City FC, Hull City AFC — do not "correct"
+# against last season's table).
 TEAM_NAMES = [
-    "Argentina", "Australia", "Belgium", "Brazil", "Cameroon", "Canada",
-    "Colombia", "Croatia", "Denmark", "Ecuador", "England", "France",
-    "Germany", "Ghana", "Iran", "Italy", "Japan", "Mexico", "Morocco",
-    "Netherlands", "Nigeria", "Poland", "Portugal", "Saudi Arabia",
-    "Scotland", "Senegal", "Serbia", "South Korea", "Spain", "Sweden",
-    "Switzerland", "Tunisia", "Turkey", "Turkiye", "Ukraine", "Uruguay", "USA",
-    "Wales", "Ivory Coast", "Curacao", "Haiti", "Paraguay", "Bosnia",
-    "Bosnia and Herzegovina", "Qatar", "Czechia", "Czech Republic",
-    "Norway", "New Zealand", "Egypt", "Uzbekistan", "Algeria", "Austria",
-    "Congo DR", "Cape Verde", "Jordan", "Panama", "South Africa", "Iraq",
+    "AFC Bournemouth", "Arsenal FC", "Aston Villa FC", "Brentford FC",
+    "Brighton & Hove Albion FC", "Chelsea FC", "Coventry City FC",
+    "Crystal Palace FC", "Everton FC", "Fulham FC", "Hull City AFC",
+    "Ipswich Town FC", "Leeds United FC", "Liverpool FC",
+    "Manchester City FC", "Manchester United FC", "Newcastle United FC",
+    "Nottingham Forest FC", "Sunderland AFC", "Tottenham Hotspur FC",
 ]

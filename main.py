@@ -20,7 +20,7 @@ import logging
 import time
 from datetime import datetime, timezone
 
-from config import SCAN_INTERVAL_MINUTES, DB_PATH
+from config import SCAN_INTERVAL_MINUTES, DB_PATH, MAINTENANCE_INTERVAL_H
 from scanner import run_scan
 from tracker import (
     init_db, log_scan, open_paper_trade, rebuild_from_csv,
@@ -304,8 +304,42 @@ def execute_scan(send_summary: bool = False, force: bool = False) -> list:
             decision.use_glm       = False
             decision.use_football_data = False
         else:
-            log.info("── Skipped (no active match window) — %s", decision.reason)
-            return []
+            # ── Maintenance sample (EPL pivot, 2026-08) ──
+            # The scheduler only fires around match windows, but a CLV time
+            # series needs a price path BETWEEN windows too. If the last scan
+            # row is older than MAINTENANCE_INTERVAL_H, degrade "skip" to one
+            # light price-only scan instead of exiting. At the default 30-min
+            # cron this yields ~4 rows/day on matchless days at zero extra
+            # API cost (Odds API quota is untouched by light scans).
+            import sqlite3 as _sq
+            from datetime import datetime as _dt, timezone as _tz
+            _now = _dt.now(_tz.utc)
+            _conn = _sq.connect(DB_PATH)
+            try:
+                last_ts = _conn.execute(
+                    "SELECT MAX(timestamp) FROM scans").fetchone()[0]
+            finally:
+                _conn.close()
+            _age_h = None
+            if last_ts:
+                try:
+                    _last = _dt.fromisoformat(str(last_ts).replace("Z", "+00:00"))
+                    if _last.tzinfo is None:
+                        _last = _last.replace(tzinfo=_tz.utc)
+                    _age_h = (_now - _last).total_seconds() / 3600
+                except (ValueError, TypeError):
+                    _age_h = None
+            if _age_h is not None and _age_h >= MAINTENANCE_INTERVAL_H:
+                log.info("No active window, but last scan is %.1fh old "
+                         "(>= %dh) — running maintenance light scan",
+                         _age_h, MAINTENANCE_INTERVAL_H)
+                decision.mode          = "light"
+                decision.use_news      = False
+                decision.use_glm       = False
+                decision.use_football_data = False
+            else:
+                log.info("── Skipped (no active match window) — %s", decision.reason)
+                return []
 
     snapshots = run_scan()
 

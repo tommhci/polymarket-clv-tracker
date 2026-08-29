@@ -392,3 +392,68 @@ to the *correct* fixture (a same-prefix false-positive collision is a
 theoretical residual risk the fuzzy fallback doesn't fully rule out).
 
 
+
+---
+
+## Addendum 3 (2026-08-29) — World Cup → Premier League pivot
+
+**Why:** the World Cup resolved in early July 2026. The Actions cron kept
+committing "data: scan ..." twice a day, but every run found zero open
+markets matching the WC filters, so `last_scan` in the exported snapshot
+stayed frozen at `2026-06-29T01:38` for two months while `generated_at`
+advanced — a running pipeline with a dead scan universe. The WC experiment
+itself closed at its pre-registered gate: CLV_adj = −0.018 at n=73
+(PROJECT STOP SIGNAL, still displayed in the dashboard — that verdict
+belongs to the WC sample).
+
+**What changed:**
+
+- **`config.py`** — `ODDS_SPORT_KEY` → `soccer_epl`, new
+  `ODDS_SPORT_OUTRIGHT_KEY` (default `soccer_epl_winner`, unverified key
+  name; futures degrade to no-baseline if it 404s). `WC_KEYWORDS` →
+  `EPL_KEYWORDS`. `TEAM_NAMES` → the 20 verified 2026-27 EPL clubs
+  (enumerated from live Gamma events, includes promoted Coventry/Hull).
+  `PRIORITY_EVENT_SLUGS` → `epl-2027-champion-20260701200428749` (slug is
+  timestamp-suffixed; the bare name resolves to nothing). New
+  `MAINTENANCE_INTERVAL_H = 6`.
+- **`scanner.py`** — new `get_epl_match_events()`: discovers upcoming match
+  moneylines via Gamma `/events?tag_slug=epl`, slug-regex
+  `^epl-[a-z]{2,4}-[a-z]{2,4}-\d{4}-\d{2}-\d{2}$` (excludes corners /
+  spreads / halftime derivatives by construction), event-level $20K
+  liquidity gate so the 3-way set stays together. New
+  `get_devigged_h2h_probs()` — 3-way multiplicative de-vig of the Odds API
+  h2h market, matched by home/away team, averaged over 3 books. Baseline
+  routing in `run_scan()`: match moneylines → h2h probs (draw question
+  checked before team-name branch); futures → outrights (old path).
+  Time anchor: `gameStartTime` (verified = kickoff) replaces the
+  football-data.org advancement-market lookup; `_classify_time_bucket()`
+  now tries a full timestamp parse before the date-only fallback
+  (gameStartTime comes back space-separated: `2026-08-29 11:30:00+00`).
+  Flat-feed filler uses word-boundary keyword matching (substring "epl"
+  was matching "replace" and pulled a Bitcoin market into the universe)
+  and caps pagination at offset 500 (the feed 422s past ~2k and the
+  retries cost 2 min per scan).
+- **`scheduler.py`** — window SQL now also matches `%win on %` /
+  `%end in a draw%` (the old `%advance%/%qualify%/%knockout%` filter would
+  never fire on EPL questions — second silent cold-start blocker).
+  `RESOLUTION_LAG_H` 2.0 → 0.0: gameStartTime IS the kickoff, nothing to
+  subtract.
+- **`main.py`** — "skip" no longer exits unconditionally: if the newest
+  scan row is older than `MAINTENANCE_INTERVAL_H` (6h), degrade to one
+  light price-only scan so the CLV time series keeps accumulating between
+  match windows (~4 rows/day on matchless days, no Odds API cost).
+- **tests** — all three self-tests updated to the gameStartTime anchor
+  (the football-data.org mock path no longer exists); `test_force_flag`
+  additionally covers the maintenance-sample contract (fresh → skip,
+  force → scan, stale >6h → maintenance scan).
+
+**Verified end-to-end locally (2026-08-29):** 21 match moneylines (7
+matches × 3) + 20 champion futures scanned against live APIs; baselines
+track the market (e.g. Liverpool 0.651 book vs 0.675 poly mid); scans.csv
+3481 → 3543 rows after two months frozen.
+
+**⚠️ Known methodological caveat (NOT yet fixed, deliberate):** the CLV
+summary/gate mixes the closed WC sample (n=73) with incoming EPL rows.
+The pre-registered WC verdict (stop) must not be read as a verdict on the
+EPL dataset. Partitioning by experiment (e.g. a `dataset` column) is the
+top candidate for the next session.

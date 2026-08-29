@@ -53,7 +53,10 @@ from config import DB_PATH
 # ── Window definitions ─────────────────────────────────────────────────────────
 # (low_h, high_h) relative to estimated KICKOFF (endDateIso - RESOLUTION_LAG_H)
 
-RESOLUTION_LAG_H = 2.0      # endDateIso is typically ~2h after kickoff
+# Since the EPL pivot (2026-08), scanner anchors hours_to_end to
+# gameStartTime, which IS the kickoff — no resolution lag to subtract.
+# The old WC endDateIso (~2h after kickoff) no longer applies to match markets.
+RESOLUTION_LAG_H = 0.0
 
 WINDOWS = {
     # Critical measurement points for CLV
@@ -127,7 +130,12 @@ def compute_scan_decision(path: str = DB_PATH) -> ScanDecision:
         ) L ON s.market_id = L.market_id AND s.timestamp = L.latest
         WHERE (lower(s.question) LIKE '%advance%'
             OR lower(s.question) LIKE '%qualify%'
-            OR lower(s.question) LIKE '%knockout%')
+            OR lower(s.question) LIKE '%knockout%'
+            -- EPL match moneylines: "Will Liverpool FC win on 2026-08-29?"
+            -- and "Will X vs. Y end in a draw?" (draws share the kickoff
+            -- window, so including them densifies the same windows)
+            OR lower(s.question) LIKE '%win on %'
+            OR lower(s.question) LIKE '%end in a draw%')
           AND s.hours_to_end IS NOT NULL
           AND s.hours_to_end > -48
     """).fetchall()

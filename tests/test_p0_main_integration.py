@@ -3,11 +3,10 @@ tests/test_p0_main_integration.py — Offline integration self-test for
 FIXLOG.md "P0-1" (catch-up backfill + dedup guard) and "P0-2" (strategy
 labels actually landing on real paper_trades rows).
 
-No network calls: mocks scanner's Polymarket/CLOB calls, news_fetcher's
-football-data.org lookup, and replaces scheduler.compute_scan_decision with
-a fixed decision so this test exercises exactly the trade-opening logic in
-main.py, not the scheduler's own window math (covered separately and noted
-as a known limitation in FIXLOG.md).
+No network calls: mocks scanner's Polymarket/CLOB calls and replaces
+scheduler.compute_scan_decision with a fixed decision so this test exercises
+exactly the trade-opening logic in main.py, not the scheduler's own window
+math (covered separately and noted as a known limitation in FIXLOG.md).
 
 Run: DB_PATH=/tmp/test_p0_main.db python3 tests/test_p0_main_integration.py
 (this script sets DB_PATH itself before importing anything — see below)
@@ -31,14 +30,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import main          # noqa: E402  (import after DB_PATH env var is set)
 import scanner        # noqa: E402
-import news_fetcher   # noqa: E402
 import tracker        # noqa: E402
 from scheduler import ScanDecision  # noqa: E402
 
 
-def _fake_market(question: str, mid: float, alertable: bool = False) -> dict:
+def _fake_market(question: str, mid: float, alertable: bool = False,
+                 game_start: str | None = None) -> dict:
     bid, ask = mid - 0.01, mid + 0.01
-    return {
+    m = {
         "id": f"id_{abs(hash(question)) % 10**8}",
         "question": question,
         "endDateIso": "2026-06-28T00:00:00+00:00",  # the shared (buggy) deadline
@@ -48,6 +47,9 @@ def _fake_market(question: str, mid: float, alertable: bool = False) -> dict:
         "bestAsk": ask,
         "_alertable_test_flag": alertable,  # read by the fake edge fn below
     }
+    if game_start is not None:
+        m["gameStartTime"] = game_start
+    return m
 
 
 def _row_count(path: str) -> int:
@@ -60,18 +62,21 @@ def _row_count(path: str) -> int:
 def run_one_scan(real_kickoffs: dict, historical_prices: dict[str, float]):
     """
     Run main.execute_scan() once, fully offline:
-      - scanner.get_world_cup_markets() -> our fixed market list
+      - scanner.get_scan_universe() -> our fixed market list (kickoffs via
+        Polymarket's gameStartTime field, the post-EPL-pivot anchor)
       - scanner.get_clob_vwap()         -> trivial passthrough
       - scanner.get_devigged_win_prob() -> no baseline (matches real advance-market behavior)
-      - news_fetcher.get_team_last_group_kickoff -> our synthetic per-team kickoffs
       - scheduler.compute_scan_decision -> fixed, no DB-dependent reconstruction
       - calculate_edge() is the REAL function -- alertable is decided for us
         by net_edge/spread the same way production does, so we don't fake it.
     """
     markets = [
-        _fake_market("Will Spain advance to the knockout stages at the 2026 FIFA World Cup?", 0.50),
-        _fake_market("Will Norway advance to the knockout stages at the 2026 FIFA World Cup?", 0.50),
-        _fake_market("Will Panama advance to the knockout stages at the 2026 FIFA World Cup?", 0.50),
+        _fake_market("Will Spain advance to the knockout stages at the 2026 FIFA World Cup?", 0.50,
+                     game_start=real_kickoffs["Spain"].isoformat()),
+        _fake_market("Will Norway advance to the knockout stages at the 2026 FIFA World Cup?", 0.50,
+                     game_start=real_kickoffs["Norway"].isoformat()),
+        _fake_market("Will Panama advance to the knockout stages at the 2026 FIFA World Cup?", 0.50,
+                     game_start=real_kickoffs["Panama"].isoformat()),
     ]
 
     fixed_decision = ScanDecision(
@@ -79,9 +84,6 @@ def run_one_scan(real_kickoffs: dict, historical_prices: dict[str, float]):
         next_window_h=None, reason="test: scheduler bypassed",
         use_news=False, use_glm=False, use_football_data=True,
     )
-
-    def fake_kickoff(team: str):
-        return real_kickoffs.get(team)
 
     def fake_hist_price(market_id: str, before_ts=None, path=tracker.DB_PATH):
         # Look up by question keyword rather than market_id (market_id is a
@@ -93,10 +95,9 @@ def run_one_scan(real_kickoffs: dict, historical_prices: dict[str, float]):
 
     market_id_to_question = {m["id"]: m["question"] for m in markets}
 
-    with mock.patch.object(scanner, "get_world_cup_markets", return_value=markets), \
+    with mock.patch.object(scanner, "get_scan_universe", return_value=markets), \
          mock.patch.object(scanner, "get_clob_vwap", return_value=(0.50, 1.0)), \
          mock.patch.object(scanner, "get_devigged_win_prob", return_value=(0.0, "no_advance_baseline")), \
-         mock.patch.object(news_fetcher, "get_team_last_group_kickoff", side_effect=fake_kickoff), \
          mock.patch.object(main, "compute_scan_decision", return_value=fixed_decision), \
          mock.patch.object(main, "get_latest_historical_price", side_effect=fake_hist_price):
         return main.execute_scan(send_summary=False)

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-29T08:56:01.187152+00:00",
-  "last_scan": "2026-08-29T08:39:11.056408+00:00",
-  "total_scans": 3583,
+  "generated_at": "2026-08-29T09:00:53.370509+00:00",
+  "last_scan": "2026-08-29T09:00:37.501418+00:00",
+  "total_scans": 3624,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 110,
-      "rows": 1883
+      "rows": 1924
     }
   ],
   "histogram": [],
@@ -62,7 +62,7 @@
       "team": "Chelsea FC (2026-08-30)",
       "mid": 0.525,
       "ask": 0.53,
-      "volume": 37727.0,
+      "volume": 37765.0,
       "spread_pct": 0.0189,
       "bucket": "T-other",
       "distance": 0.025
@@ -71,7 +71,7 @@
       "team": "AFC Bournemouth (2026-08-29)",
       "mid": 0.465,
       "ask": 0.47,
-      "volume": 108631.0,
+      "volume": 108649.0,
       "spread_pct": 0.0213,
       "bucket": "T-other",
       "distance": 0.035
@@ -80,7 +80,7 @@
       "team": "Coventry City FC (2026-08-29)",
       "mid": 0.545,
       "ask": 0.55,
-      "volume": 205066.0,
+      "volume": 205082.0,
       "spread_pct": 0.0182,
       "bucket": "T-other",
       "distance": 0.045
@@ -89,7 +89,7 @@
       "team": "Tottenham Hotspur FC (2026-08-29)",
       "mid": 0.435,
       "ask": 0.44,
-      "volume": 280121.0,
+      "volume": 280473.0,
       "spread_pct": 0.0227,
       "bucket": "T-other",
       "distance": 0.065
@@ -98,7 +98,7 @@
       "team": "Arsenal FC (2026-08-31)",
       "mid": 0.625,
       "ask": 0.63,
-      "volume": 80168.0,
+      "volume": 80664.0,
       "spread_pct": 0.0159,
       "bucket": "T-other",
       "distance": 0.125
@@ -107,7 +107,7 @@
       "team": "Leeds United FC (2026-08-30)",
       "mid": 0.365,
       "ask": 0.37,
-      "volume": 10626.0,
+      "volume": 10629.0,
       "spread_pct": 0.027,
       "bucket": "T-other",
       "distance": 0.135
@@ -116,7 +116,7 @@
       "team": "Brentford FC (2026-08-30)",
       "mid": 0.355,
       "ask": 0.36,
-      "volume": 194888.0,
+      "volume": 194894.0,
       "spread_pct": 0.0278,
       "bucket": "T-other",
       "distance": 0.145
@@ -125,7 +125,7 @@
       "team": "Liverpool FC (2026-08-29)",
       "mid": 0.675,
       "ask": 0.68,
-      "volume": 407365.0,
+      "volume": 407986.0,
       "spread_pct": 0.0147,
       "bucket": "T-other",
       "distance": 0.175
@@ -134,7 +134,7 @@
       "team": "Newcastle United FC (2026-08-29)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 262001.0,
+      "volume": 264868.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -152,7 +152,7 @@
       "team": "AFC Bournemouth vs. Everton FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 5160.0,
+      "volume": 5181.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225
@@ -161,7 +161,7 @@
       "team": "Everton FC (2026-08-29)",
       "mid": 0.265,
       "ask": 0.27,
-      "volume": 7074.0,
+      "volume": 7130.0,
       "spread_pct": 0.037,
       "bucket": "T-other",
       "distance": 0.235
@@ -170,7 +170,7 @@
       "team": "Coventry City FC vs. Hull City AFC (draw)",
       "mid": 0.265,
       "ask": 0.27,
-      "volume": 2750.0,
+      "volume": 2772.0,
       "spread_pct": 0.037,
       "bucket": "T-other",
       "distance": 0.235
@@ -215,7 +215,7 @@
       "team": "Liverpool FC vs. Nottingham Forest FC (draw)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 48492.0,
+      "volume": 48786.0,
       "spread_pct": 0.05,
       "bucket": "T-other",
       "distance": 0.305
@@ -224,7 +224,7 @@
       "team": "Hull City AFC (2026-08-29)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 24649.0,
+      "volume": 25095.0,
       "spread_pct": 0.05,
       "bucket": "T-other",
       "distance": 0.305
@@ -242,7 +242,7 @@
       "team": "Nottingham Forest FC (2026-08-29)",
       "mid": 0.135,
       "ask": 0.14,
-      "volume": 105869.0,
+      "volume": 107029.0,
       "spread_pct": 0.0714,
       "bucket": "T-other",
       "distance": 0.365

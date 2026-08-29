@@ -38,3 +38,7 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Runtime session logs (control-plane attach surface)
+.agents/session_log.jsonl
+.agents/effectiveness_log.jsonl

@@ -32,15 +32,16 @@ GAMMA_API_BASE = "https://gamma-api.polymarket.com"
 CLOB_BASE      = "https://clob.polymarket.com"
 
 # ── Odds API sport keys (EPL, since 2026-08 pivot) ─────────────────────────────
-# CONSTRAINT (FIXLOG Addendum 4/6): the Odds API is an OPTIONAL reference layer —
-# CLV is computed purely from Polymarket's own entry vs final prices. Verified
-# against the official v4 docs (2026-08-29): /odds costs "1 per region per
-# market"; /sports and /events "do not count against the usage quota".
+# CONSTRAINT (FIXLOG Addendum 4/7): the Odds API is an OPTIONAL reference layer —
+# CLV is computed purely from Polymarket's own entry vs final prices. VERIFIED
+# (2026-08-29): free tier = 500 credits/month (the-odds-api.com homepage,
+# corroborated by oddspapi.io and community sources); /odds costs "1 per region
+# per market"; /sports and /events "do not count against the usage quota".
 # https://the-odds-api.com/liveapi/guides/v4/
 # Baseline fetches are time-throttled (ODDS_MIN_INTERVAL_H) via a git-tracked
-# state file — at real (non-dropped) scan cadences this is what keeps the
-# free tier inside budget; the earlier "~60 credits/month" estimate silently
-# assumed the ~90% schedule-drop rate GitHub was exhibiting (Addendum 6).
+# state file. Precision note (Addendum 7): the throttle's ~240/month worst
+# case is HALF the 500 budget, not "far below" it — the real safety margin is
+# that light scans skip the baseline entirely and only scheduler windows pay.
 ODDS_SPORT_KEY         = os.environ.get("ODDS_SPORT_KEY", "soccer_epl")
 ODDS_REGIONS   = "uk"          # single region (uk books) — one credit per call
 ODDS_MARKETS   = "h2h"         # match winner; use "outrights" for futures

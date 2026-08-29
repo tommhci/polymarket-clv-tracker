@@ -19,7 +19,7 @@ import argparse
 import logging
 import os
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from config import SCAN_INTERVAL_MINUTES, DB_PATH, MAINTENANCE_INTERVAL_H
 from scanner import run_scan
@@ -114,6 +114,14 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
         ORDER BY ABS(s.poly_mid - 0.5) ASC
         LIMIT 15
     """).fetchall()
+
+    # ── Entry activity / trade-starvation probe (FIXLOG Addendum 7) ──────────
+    last_entry = conn.execute(
+        "SELECT MAX(entry_timestamp) FROM paper_trades").fetchone()[0]
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    n_entries_7d = conn.execute(
+        "SELECT COUNT(*) FROM paper_trades WHERE entry_timestamp >= ?",
+        (cutoff,)).fetchone()[0]
 
     conn.close()
 
@@ -227,6 +235,23 @@ def generate_status_report(path: str = DB_PATH, out: str = "STATUS.md"):
         f"(GitHub docs: can be delayed or dropped under load) — misses are "
         f"quantified here and backfilled from Gamma final prices via orphan "
         f"reconciliation.",
+        f"",
+    ]
+
+    # ── Entry activity (rendered from values queried above, pre-close) ───────
+    lines += [
+        f"### 🎣 Entry Activity (trade-starvation probe)",
+        f"",
+        f"| Metric | Value |",
+        f"|---|---|",
+        f"| Entries opened (last 7 days) | {n_entries_7d} |",
+        f"| Last entry ever | `{(last_entry or 'never')[:19]}` |",
+        f"",
+        f"*Starvation is a strategy-parameter question, not a bug: efficient "
+        f"EPL pricing + throttled baselines may keep net_edge ≥ 4% from ever "
+        f"firing. 0 entries past a full match weekend is a FINDING to log — "
+        f"any entry-threshold change requires a pre-registered FIXLOG "
+        f"amendment, never a quiet edit.*",
         f"",
     ]
 

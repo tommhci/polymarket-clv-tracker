@@ -644,3 +644,41 @@ verification.json updated). Full suite: PASS.
 **Pre-registration note:** entry-window semantics (T-1h) are unchanged; the
 sweeps only make it more likely a scan actually lands there. No threshold,
 label, or metric definition was altered in this addendum.
+
+---
+
+## Addendum 7 (2026-08-29) — close the last evidence gap; instrument trade starvation
+
+**1. Free-tier credit figure: INSUFFICIENT-EVIDENCE tag retired.** The 500
+credits/month figure is now verified from the primary source —
+[the-odds-api.com](https://the-odds-api.com/) homepage ("500 credits per
+month. All sports. Most bookmakers. All betting markets.", retrieved
+2026-08-29) — with third-party corroboration (oddspapi.io pricing comparison;
+community reports on r/algobetting). Precision correction accepted from
+review: the throttle's ~240 credits/month worst case is HALF the budget, not
+"far below" it. The real safety margin is architectural: light scans never
+call the Odds API at all, and only scheduler-window full scans pay (and those
+are further throttled to one fetch per sport per 6h).
+
+**2. Trade starvation instrumented (new failure mode from review).** Current
+state, verified: 0 EPL entries, last entry ever 2026-06-28 (WC era). The
+pipeline can run perfectly, accumulate rows, and STILL produce zero evidence
+if `net_edge ≥ 4%` never fires against efficient EPL pricing with 6h-stale
+baselines. Starvation is now a standing metric:
+- `dashboard.export_all()` → `entry_activity` block in data.json
+  (n_entries_7d, last_entry, note).
+- STATUS.md → "🎣 Entry Activity (trade-starvation probe)" table.
+**Pre-registered protocol:** if 0 entries persists past a full match weekend,
+that is a FINDING, not a bug to hotfix. Any change to MIN_NET_EDGE, strategy
+thresholds, or the entry window requires a pre-registered FIXLOG amendment
+(new Addendum, before the change, with rationale) — quiet edits permanently
+devalue the dataset. First scheduled review of this metric: 2026-09-21.
+
+**3. Sweep-anchor residual (documented, accepted).** The sweep's 10:07/17:07
+schedule anchors are themselves schedule events and can be dropped; a single
+missed shift is invisible to the 48h dead-man switch. The capture-rate metric
+is the designated probe for that failure layer. Mitigations already in place:
+two independent anchors/day + the 15-min cron lottery + maintenance sampling.
+No further mechanism added — the expected cost is occasional capture-rate
+dents, visible in the metric, not sample loss (rows are lost only if a whole
+shift fails AND cron fires nothing for 48h, at which point the issue opens).

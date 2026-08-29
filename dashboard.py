@@ -20,7 +20,7 @@ import re
 import sqlite3
 import statistics
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from config import DB_PATH, RISK_FREE_RATE, MIN_NET_EDGE
 from tracker import capture_rate_stats
@@ -115,6 +115,21 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
     # Closing-line capture rate (FIXLOG Addendum 4, clause 3) — quantify the
     # misses instead of assuming the cron grid is reliable.
     capture = capture_rate_stats(path)
+
+    # Trade-starvation probe (FIXLOG Addendum 7): the pipeline can be healthy,
+    # collecting rows, and STILL never open a trade if net_edge ≥ 4% never
+    # fires (efficient EPL pricing + 6h-stale baselines). Starvation must be a
+    # visible number, not a silent zero — any future threshold change to fix
+    # it requires a pre-registered FIXLOG amendment, never a quiet edit.
+    last_entry = conn.execute(
+        "SELECT MAX(entry_timestamp) FROM paper_trades").fetchone()[0]
+    # ISO-T strings compare lexicographically; compute the cutoff in Python so
+    # the format matches what open_paper_trade stores (SQLite datetime('now')
+    # uses a space separator and would corrupt the comparison).
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    n_entries_7d = conn.execute(
+        "SELECT COUNT(*) FROM paper_trades WHERE entry_timestamp >= ?",
+        (cutoff,)).fetchone()[0]
 
     # ── 4. CLV histogram bins (for distribution chart) ───────────────────────
     hist_bins = {}
@@ -279,6 +294,13 @@ def export_all(path: str = DB_PATH, docs_dir: str = DOCS_DIR):
         "markets":        markets,
         "open_positions": open_positions,
         "resolved":       resolved,
+        "entry_activity": {
+            "n_entries_7d": n_entries_7d,
+            "last_entry":   last_entry,
+            "note": "0 entries over a match weekend = trade starvation "
+                    "(net_edge threshold never fires); any threshold change "
+                    "requires a pre-registered FIXLOG amendment",
+        },
         "price_history":  price_history,
         "glm_signals":    glm_signals,
         "calibration":    calibration,

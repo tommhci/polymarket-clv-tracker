@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write   # dead-man's switch opens/closes the stale-pipeline issue
     steps:
       - name: Checkout repo
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -77,3 +78,17 @@ jobs:
           git add docs/data.json docs/data.csv docs/scans.csv docs/paper_trades.csv STATUS.md || true
           git diff --cached --quiet || git commit -m "data: scan $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push || true
+
+      # ── Dead-man's switch (FIXLOG Addendum 5) ──────────────────────────────
+      # This pipeline died silently once (Jul-Aug 2026: cron ran, zero markets,
+      # two months of no rows). `if: always()` makes the check fire even when
+      # the scan step failed; a stale STATUS banner is committed, which also
+      # counts as repo activity and defers GitHub's 60-day schedule disable.
+      # Advisory only — never fails the workflow. The second-order blind spot
+      # (workflow stops running ENTIRELY) is covered by GitHub's own
+      # "scheduled workflow disabled" email after 60 days + weekly review.
+      - name: Dead-man's switch — alert on silent pipeline death
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python alerts.py --stale --threshold-h 48

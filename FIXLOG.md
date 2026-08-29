@@ -524,3 +524,46 @@ Addendum 5+ BEFORE any stop/continue decision is taken on EPL data.
 **Verification:** `test_p3_market_type.py` added (routing, in-place backfill,
 capture-rate hit/miss/exclusion, mocked-Gamma orphan close) and appended to
 the declared verification command; all existing self-tests re-run and pass.
+
+---
+
+## Addendum 5 (2026-08-29) — Dead-man's switch + WC experiment report; project enters observation mode
+
+**Rationale:** the pipeline is verified live (runs 08:39 / 09:00 / 10:23 UTC
+all produced rows after the pivot). Remaining work is calendar-bound, not
+engineering-bound. This addendum closes the two loose ends that justify code
+changes, then the project goes to observation mode: weekly three-question
+review (rows growing? capture rate healthy? stuck PENDINGs?), gate evaluation
+at EPL n=30, threshold recalibration at n≥100 (Addendum 6), futures settlement
+May 2027.
+
+**1. Dead-man's switch (the failure mode that already bit once).** Jul–Aug 2026
+the pipeline ran for two months with zero new rows and nobody noticed. Added:
+
+- `alerts.py --stale --threshold-h 48`: reads the newest row from the committed
+  `docs/scans.csv` (the truth source — on a failed scan it *is* the last good
+  state), and when older than the threshold: (a) prepends a red banner to
+  STATUS.md (idempotent; regenerated STATUS on the next good run drops it
+  naturally), (b) opens a deduped GitHub issue, (c) on recovery auto-closes it.
+- Wired as the LAST workflow step with `if: always()` — fires even when the
+  scan step failed. The banner commit also counts as repo activity, deferring
+  GitHub's 60-day-scheduled-workflow auto-disable. `issues: write` permission
+  added to the workflow.
+- Known blind spot (stated, not hidden): this covers "workflow runs but scanner
+  fails". If the workflow stops running ENTIRELY, no in-repo mechanism can fire;
+  that residual risk is covered by GitHub's own "scheduled workflow disabled"
+  notification at day 60 and the weekly manual review.
+
+**2. `docs/world_cup_experiment.md`** — self-contained one-page report of the
+closed WC experiment: research question, pre-registration (with commit-history
+provenance), sample, gate verdict (CLV_adj −0.0178, n=73, beat rate 28.8%,
+t=−0.44), the underpowered-CI caveat (±0.08 at 95%), the exploratory strategy
+split (A_all +0.009 vs B_discount −0.032 — directionally consistent with
+long-shot bias being on the buy side), known defects, and what survives. The
+aggregate gate fired on the pooled sample; the report keeps the split
+explicitly exploratory.
+
+**Verification:** banner write/idempotency tested locally against a synthetic
+stale state and restored; fresh-path check exits OK (5.3h-old rows, no issue
+spammed). Full declared suite re-run: PASS. CI verified via the follow-up
+workflow_dispatch run (see "Addendum 5 verification" below once run).

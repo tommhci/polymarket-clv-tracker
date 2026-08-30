@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-30T00:48:23.953435+00:00",
-  "last_scan": "2026-08-30T00:48:11.207776+00:00",
-  "total_scans": 3983,
+  "generated_at": "2026-08-30T05:55:46.935066+00:00",
+  "last_scan": "2026-08-30T05:55:36.719080+00:00",
+  "total_scans": 4015,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,19 +53,19 @@
     {
       "bucket": "T-other",
       "markets": 113,
-      "rows": 2196
+      "rows": 2228
     }
   ],
   "histogram": [],
   "markets": [
     {
       "team": "Chelsea FC (2026-08-30)",
-      "mid": 0.515,
-      "ask": 0.52,
-      "volume": 371631.0,
-      "spread_pct": 0.0192,
+      "mid": 0.495,
+      "ask": 0.5,
+      "volume": 440003.0,
+      "spread_pct": 0.02,
       "bucket": "T-other",
-      "distance": 0.015
+      "distance": 0.005
     },
     {
       "team": "Newcastle United FC (2026-08-29)",
@@ -80,7 +80,7 @@
       "team": "Leeds United FC (2026-08-30)",
       "mid": 0.365,
       "ask": 0.37,
-      "volume": 13452.0,
+      "volume": 15513.0,
       "spread_pct": 0.027,
       "bucket": "T-other",
       "distance": 0.135
@@ -89,7 +89,7 @@
       "team": "Arsenal FC (2026-08-31)",
       "mid": 0.635,
       "ask": 0.64,
-      "volume": 94667.0,
+      "volume": 120361.0,
       "spread_pct": 0.0156,
       "bucket": "T-other",
       "distance": 0.135
@@ -98,7 +98,7 @@
       "team": "Brentford FC (2026-08-30)",
       "mid": 0.355,
       "ask": 0.36,
-      "volume": 276899.0,
+      "volume": 291682.0,
       "spread_pct": 0.0278,
       "bucket": "T-other",
       "distance": 0.145
@@ -116,7 +116,7 @@
       "team": "Manchester United FC (2026-08-30)",
       "mid": 0.695,
       "ask": 0.7,
-      "volume": 11350.0,
+      "volume": 33875.0,
       "spread_pct": 0.0143,
       "bucket": "T-other",
       "distance": 0.195
@@ -125,7 +125,7 @@
       "team": "Leeds United FC vs. Brentford FC (draw)",
       "mid": 0.285,
       "ask": 0.29,
-      "volume": 38670.0,
+      "volume": 39353.0,
       "spread_pct": 0.0345,
       "bucket": "T-other",
       "distance": 0.215
@@ -140,6 +140,15 @@
       "distance": 0.225
     },
     {
+      "team": "Brighton & Hove Albion FC (2026-08-30)",
+      "mid": 0.255,
+      "ask": 0.26,
+      "volume": 19858.0,
+      "spread_pct": 0.0385,
+      "bucket": "T-other",
+      "distance": 0.245
+    },
+    {
       "team": "AFC Bournemouth (2026-08-29)",
       "mid": 0.755,
       "ask": 0.77,
@@ -152,25 +161,16 @@
       "team": "Chelsea FC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.245,
       "ask": 0.25,
-      "volume": 2201.0,
+      "volume": 2883.0,
       "spread_pct": 0.04,
       "bucket": "T-other",
       "distance": 0.255
     },
     {
-      "team": "Brighton & Hove Albion FC (2026-08-30)",
-      "mid": 0.235,
-      "ask": 0.24,
-      "volume": 9754.0,
-      "spread_pct": 0.0417,
-      "bucket": "T-other",
-      "distance": 0.265
-    },
-    {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",
       "mid": 0.225,
       "ask": 0.23,
-      "volume": 2165.0,
+      "volume": 2175.0,
       "spread_pct": 0.0435,
       "bucket": "T-other",
       "distance": 0.275
@@ -197,19 +197,10 @@
       "team": "Manchester United FC vs. Ipswich Town FC (draw)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 617.0,
+      "volume": 708.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315
-    },
-    {
-      "team": "Aston Villa FC (2026-08-31)",
-      "mid": 0.145,
-      "ask": 0.15,
-      "volume": 7443.0,
-      "spread_pct": 0.0667,
-      "bucket": "T-other",
-      "distance": 0.355
     },
     {
       "team": "Nottingham Forest FC (2026-08-29)",
@@ -221,10 +212,19 @@
       "distance": 0.365
     },
     {
+      "team": "Aston Villa FC (2026-08-31)",
+      "mid": 0.135,
+      "ask": 0.14,
+      "volume": 7695.0,
+      "spread_pct": 0.0714,
+      "bucket": "T-other",
+      "distance": 0.365
+    },
+    {
       "team": "Ipswich Town FC (2026-08-30)",
       "mid": 0.115,
       "ask": 0.12,
-      "volume": 10393.0,
+      "volume": 12180.0,
       "spread_pct": 0.0833,
       "bucket": "T-other",
       "distance": 0.385

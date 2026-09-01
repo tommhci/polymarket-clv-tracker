@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-01T01:46:54.691804+00:00",
-  "last_scan": "2026-08-31T22:55:02.121081+00:00",
-  "total_scans": 4273,
+  "generated_at": "2026-09-01T06:48:41.592206+00:00",
+  "last_scan": "2026-09-01T06:48:31.096330+00:00",
+  "total_scans": 4299,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 116,
-      "rows": 2444
+      "markets": 119,
+      "rows": 2470
     }
   ],
   "histogram": [],
@@ -62,7 +62,7 @@
       "team": "Arsenal FC (2026-09-06)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 9107.0,
+      "volume": 9932.0,
       "spread_pct": 0.0175,
       "bucket": "T-other",
       "distance": 0.065
@@ -107,7 +107,7 @@
       "team": "Arsenal FC vs. Chelsea FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 1553.0,
+      "volume": 1729.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -152,10 +152,19 @@
       "team": "Chelsea FC (2026-09-06)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 21220.0,
+      "volume": 22617.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315
+    },
+    {
+      "team": "Manchester City FC (2026-09-05)",
+      "mid": 0.835,
+      "ask": 0.84,
+      "volume": 32275.0,
+      "spread_pct": 0.0119,
+      "bucket": "T-other",
+      "distance": 0.335
     },
     {
       "team": "Aston Villa FC (2026-08-31)",
@@ -176,6 +185,15 @@
       "distance": 0.365
     },
     {
+      "team": "Manchester City FC vs. Coventry City FC (draw)",
+      "mid": 0.115,
+      "ask": 0.12,
+      "volume": 210.0,
+      "spread_pct": 0.0833,
+      "bucket": "T-other",
+      "distance": 0.385
+    },
+    {
       "team": "Tottenham Hotspur FC (2026-08-29)",
       "mid": 0.095,
       "ask": 0.1006,
@@ -183,6 +201,15 @@
       "spread_pct": 0.1,
       "bucket": "T-expired",
       "distance": 0.405
+    },
+    {
+      "team": "Coventry City FC (2026-09-05)",
+      "mid": 0.065,
+      "ask": 0.07,
+      "volume": 2537.0,
+      "spread_pct": 0.1429,
+      "bucket": "T-other",
+      "distance": 0.435
     },
     {
       "team": "Everton FC (2026-08-29)",

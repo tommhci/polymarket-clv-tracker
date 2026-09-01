@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-01T12:06:39.834156+00:00",
-  "last_scan": "2026-09-01T06:48:31.096330+00:00",
-  "total_scans": 4299,
+  "generated_at": "2026-09-01T16:34:46.687858+00:00",
+  "last_scan": "2026-09-01T16:34:33.736215+00:00",
+  "total_scans": 4331,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,17 +52,26 @@
     },
     {
       "bucket": "T-other",
-      "markets": 119,
-      "rows": 2470
+      "markets": 125,
+      "rows": 2502
     }
   ],
   "histogram": [],
   "markets": [
     {
+      "team": "Newcastle United FC (2026-09-05)",
+      "mid": 0.445,
+      "ask": 0.45,
+      "volume": 41551.0,
+      "spread_pct": 0.0222,
+      "bucket": "T-other",
+      "distance": 0.055
+    },
+    {
       "team": "Arsenal FC (2026-09-06)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 9932.0,
+      "volume": 10547.0,
       "spread_pct": 0.0175,
       "bucket": "T-other",
       "distance": 0.065
@@ -75,6 +84,15 @@
       "spread_pct": 0.0161,
       "bucket": "T-expired",
       "distance": 0.115
+    },
+    {
+      "team": "Liverpool FC (2026-09-04)",
+      "mid": 0.635,
+      "ask": 0.64,
+      "volume": 19971.0,
+      "spread_pct": 0.0156,
+      "bucket": "T-other",
+      "distance": 0.135
     },
     {
       "team": "Arsenal FC (2026-08-31)",
@@ -95,6 +113,15 @@
       "distance": 0.175
     },
     {
+      "team": "AFC Bournemouth (2026-09-05)",
+      "mid": 0.305,
+      "ask": 0.31,
+      "volume": 1543.0,
+      "spread_pct": 0.0323,
+      "bucket": "T-other",
+      "distance": 0.195
+    },
+    {
       "team": "Tottenham Hotspur FC vs. Newcastle United FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
@@ -104,10 +131,19 @@
       "distance": 0.225
     },
     {
+      "team": "Newcastle United FC vs. AFC Bournemouth (draw)",
+      "mid": 0.255,
+      "ask": 0.26,
+      "volume": 58.0,
+      "spread_pct": 0.0385,
+      "bucket": "T-other",
+      "distance": 0.245
+    },
+    {
       "team": "Arsenal FC vs. Chelsea FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 1729.0,
+      "volume": 1839.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -131,6 +167,15 @@
       "distance": 0.285
     },
     {
+      "team": "Ipswich Town FC vs. Liverpool FC (draw)",
+      "mid": 0.205,
+      "ask": 0.21,
+      "volume": 1035.0,
+      "spread_pct": 0.0476,
+      "bucket": "T-other",
+      "distance": 0.295
+    },
+    {
       "team": "Liverpool FC vs. Nottingham Forest FC (draw)",
       "mid": 0.195,
       "ask": 0.2,
@@ -152,16 +197,25 @@
       "team": "Chelsea FC (2026-09-06)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 22617.0,
+      "volume": 23607.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315
     },
     {
+      "team": "Ipswich Town FC (2026-09-04)",
+      "mid": 0.165,
+      "ask": 0.17,
+      "volume": 2065.0,
+      "spread_pct": 0.0588,
+      "bucket": "T-other",
+      "distance": 0.335
+    },
+    {
       "team": "Manchester City FC (2026-09-05)",
       "mid": 0.835,
       "ask": 0.84,
-      "volume": 32275.0,
+      "volume": 88276.0,
       "spread_pct": 0.0119,
       "bucket": "T-other",
       "distance": 0.335
@@ -186,12 +240,12 @@
     },
     {
       "team": "Manchester City FC vs. Coventry City FC (draw)",
-      "mid": 0.115,
-      "ask": 0.12,
-      "volume": 210.0,
-      "spread_pct": 0.0833,
+      "mid": 0.105,
+      "ask": 0.11,
+      "volume": 1410.0,
+      "spread_pct": 0.0909,
       "bucket": "T-other",
-      "distance": 0.385
+      "distance": 0.395
     },
     {
       "team": "Tottenham Hotspur FC (2026-08-29)",
@@ -204,12 +258,12 @@
     },
     {
       "team": "Coventry City FC (2026-09-05)",
-      "mid": 0.065,
-      "ask": 0.07,
-      "volume": 2537.0,
-      "spread_pct": 0.1429,
+      "mid": 0.055,
+      "ask": 0.06,
+      "volume": 2832.0,
+      "spread_pct": 0.1667,
       "bucket": "T-other",
-      "distance": 0.435
+      "distance": 0.445
     },
     {
       "team": "Everton FC (2026-08-29)",

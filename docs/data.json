@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-03T22:29:48.220212+00:00",
-  "last_scan": "2026-09-03T22:29:37.196973+00:00",
-  "total_scans": 4602,
+  "generated_at": "2026-09-04T00:19:21.967884+00:00",
+  "last_scan": "2026-09-04T00:19:10.987441+00:00",
+  "total_scans": 4637,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 128,
-      "rows": 2767
+      "rows": 2802
     }
   ],
   "histogram": [],
@@ -62,7 +62,7 @@
       "team": "Newcastle United FC (2026-09-05)",
       "mid": 0.455,
       "ask": 0.46,
-      "volume": 47182.0,
+      "volume": 47199.0,
       "spread_pct": 0.0217,
       "bucket": "T-other",
       "distance": 0.045
@@ -71,7 +71,7 @@
       "team": "Arsenal FC (2026-09-06)",
       "mid": 0.575,
       "ask": 0.58,
-      "volume": 24419.0,
+      "volume": 24513.0,
       "spread_pct": 0.0172,
       "bucket": "T-other",
       "distance": 0.075
@@ -107,7 +107,7 @@
       "team": "Liverpool FC (2026-09-04)",
       "mid": 0.645,
       "ask": 0.65,
-      "volume": 62843.0,
+      "volume": 65042.0,
       "spread_pct": 0.0154,
       "bucket": "T-other",
       "distance": 0.145
@@ -116,7 +116,7 @@
       "team": "Tottenham Hotspur FC (2026-09-05)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 27187.0,
+      "volume": 27276.0,
       "spread_pct": 0.0303,
       "bucket": "T-other",
       "distance": 0.175
@@ -134,7 +134,7 @@
       "team": "AFC Bournemouth (2026-09-05)",
       "mid": 0.285,
       "ask": 0.29,
-      "volume": 1945.0,
+      "volume": 1955.0,
       "spread_pct": 0.0345,
       "bucket": "T-other",
       "distance": 0.215
@@ -215,7 +215,7 @@
       "team": "Ipswich Town FC vs. Liverpool FC (draw)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 2799.0,
+      "volume": 3417.0,
       "spread_pct": 0.05,
       "bucket": "T-other",
       "distance": 0.305
@@ -224,28 +224,28 @@
       "team": "Chelsea FC (2026-09-06)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 27918.0,
+      "volume": 27998.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315
     },
     {
-      "team": "Ipswich Town FC (2026-09-04)",
-      "mid": 0.165,
-      "ask": 0.17,
-      "volume": 6350.0,
-      "spread_pct": 0.0588,
+      "team": "Manchester City FC (2026-09-05)",
+      "mid": 0.835,
+      "ask": 0.84,
+      "volume": 107971.0,
+      "spread_pct": 0.0119,
       "bucket": "T-other",
       "distance": 0.335
     },
     {
-      "team": "Manchester City FC (2026-09-05)",
-      "mid": 0.835,
-      "ask": 0.84,
-      "volume": 102955.0,
-      "spread_pct": 0.0119,
+      "team": "Ipswich Town FC (2026-09-04)",
+      "mid": 0.155,
+      "ask": 0.16,
+      "volume": 7347.0,
+      "spread_pct": 0.0625,
       "bucket": "T-other",
-      "distance": 0.335
+      "distance": 0.345
     },
     {
       "team": "Aston Villa FC (2026-08-31)",

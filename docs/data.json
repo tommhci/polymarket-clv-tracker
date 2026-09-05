@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-05T18:23:39.795090+00:00",
-  "last_scan": "2026-09-05T18:23:31.023910+00:00",
-  "total_scans": 5182,
+  "generated_at": "2026-09-05T20:40:25.728884+00:00",
+  "last_scan": "2026-09-05T20:40:17.223819+00:00",
+  "total_scans": 5208,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 143,
-      "rows": 3266
+      "rows": 3292
     }
   ],
   "histogram": [],
@@ -62,7 +62,7 @@
       "team": "Manchester United FC (2026-09-06)",
       "mid": 0.455,
       "ask": 0.46,
-      "volume": 213175.0,
+      "volume": 216731.0,
       "spread_pct": 0.0217,
       "bucket": "T-other",
       "distance": 0.045
@@ -71,9 +71,9 @@
       "team": "Arsenal FC (2026-09-06)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 71749.0,
+      "volume": 72177.0,
       "spread_pct": 0.0175,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.065
     },
     {
@@ -104,6 +104,15 @@
       "distance": 0.175
     },
     {
+      "team": "Everton FC (2026-09-06)",
+      "mid": 0.285,
+      "ask": 0.29,
+      "volume": 2171.0,
+      "spread_pct": 0.0345,
+      "bucket": "T-other",
+      "distance": 0.215
+    },
+    {
       "team": "Tottenham Hotspur FC vs. Newcastle United FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
@@ -113,19 +122,10 @@
       "distance": 0.225
     },
     {
-      "team": "Everton FC (2026-09-06)",
-      "mid": 0.275,
-      "ask": 0.28,
-      "volume": 1852.0,
-      "spread_pct": 0.0357,
-      "bucket": "T-other",
-      "distance": 0.225
-    },
-    {
       "team": "Everton FC vs. Manchester United FC (draw)",
       "mid": 0.265,
       "ask": 0.27,
-      "volume": 900.0,
+      "volume": 1498.0,
       "spread_pct": 0.037,
       "bucket": "T-other",
       "distance": 0.235
@@ -142,10 +142,10 @@
     {
       "team": "Arsenal FC vs. Chelsea FC (draw)",
       "mid": 0.235,
-      "ask": 0.2421,
-      "volume": 15423.0,
+      "ask": 0.2492,
+      "volume": 15826.0,
       "spread_pct": 0.0417,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.265
     },
     {
@@ -179,9 +179,9 @@
       "team": "Chelsea FC (2026-09-06)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 164960.0,
+      "volume": 183364.0,
       "spread_pct": 0.05,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.305
     },
     {

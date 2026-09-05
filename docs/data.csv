@@ -5108,3 +5108,47 @@ id,timestamp,market_id,question,volume_usd,poly_mid,poly_ask_vwap,spread_pct,boo
 5108,2026-09-05T13:31:13.486830+00:00,2771341,Will Coventry City win the 2026-27 English Premier League (EPL) Championship?,588556.183749,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6394.48,T-other,futures
 5109,2026-09-05T13:31:13.486830+00:00,2771342,Will Ipswich Town win the 2026-27 English Premier League (EPL) Championship?,489598.5517609999,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6394.48,T-other,futures
 5110,2026-09-05T13:31:13.486830+00:00,2771343,Will Hull City win the 2026-27 English Premier League (EPL) Championship?,874904.8975039999,0.0035,0.0048,0.25,0.0,no_baseline,0.0,0,no_baseline,6394.48,T-other,futures
+5111,2026-09-05T16:13:11.677213+00:00,3791943,Will Fulham FC win on 2026-09-05?,496589.51739000046,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5112,2026-09-05T16:13:11.677213+00:00,3791948,Will Fulham FC vs. Crystal Palace FC end in a draw?,97456.30999299996,0.0005,0.0014,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5113,2026-09-05T16:13:11.677213+00:00,3791951,Will Crystal Palace FC win on 2026-09-05?,531800.4159390006,0.9995,1.0,0.001,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5114,2026-09-05T16:13:11.677213+00:00,3791962,Will Nottingham Forest FC win on 2026-09-05?,445898.4859720003,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5115,2026-09-05T16:13:11.677213+00:00,3791965,Will Nottingham Forest FC vs. Tottenham Hotspur FC end in a draw?,49720.33881299998,0.9995,1.0,0.001,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5116,2026-09-05T16:13:11.677213+00:00,3791968,Will Tottenham Hotspur FC win on 2026-09-05?,481711.94818700047,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5117,2026-09-05T16:13:11.677213+00:00,3791978,Will Brentford FC win on 2026-09-05?,497742.0134770002,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5118,2026-09-05T16:13:11.677213+00:00,3791981,Will Brentford FC vs. Sunderland AFC end in a draw?,76721.33997500001,0.9995,1.0,0.001,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5119,2026-09-05T16:13:11.677213+00:00,3791983,Will Sunderland AFC win on 2026-09-05?,170616.6592399999,0.0005,0.0014,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5120,2026-09-05T16:13:11.677213+00:00,3791994,Will Brighton & Hove Albion FC win on 2026-09-05?,761904.1431540009,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5121,2026-09-05T16:13:11.677213+00:00,3791997,Will Brighton & Hove Albion FC vs. Leeds United FC end in a draw?,39437.12911599998,0.9995,1.0,0.001,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5122,2026-09-05T16:13:11.677213+00:00,3792001,Will Leeds United FC win on 2026-09-05?,132208.554009,0.0005,0.0029,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5123,2026-09-05T16:13:11.677213+00:00,3792010,Will Manchester City FC win on 2026-09-05?,2062544.1815949983,0.9995,1.0,0.001,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5124,2026-09-05T16:13:11.677213+00:00,3792012,Will Manchester City FC vs. Coventry City FC end in a draw?,136503.17616899995,0.0005,0.0012,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5125,2026-09-05T16:13:11.677213+00:00,3792014,Will Coventry City FC win on 2026-09-05?,756221.0358410003,0.0005,0.001,1.0,0.0,NO_MATCH,0.0,0,no_baseline,-2.22,T-expired,match
+5126,2026-09-05T16:13:11.677213+00:00,3792016,Will Hull City AFC win on 2026-09-05?,106999.59496,0.225,0.23,0.0435,0.0,NO_MATCH,0.0,0,no_baseline,0.28,T-1h,match
+5127,2026-09-05T16:13:11.677213+00:00,3792018,Will Hull City AFC vs. Aston Villa FC end in a draw?,9276.422659000003,0.255,0.26,0.0385,0.0,NO_MATCH,0.0,0,no_baseline,0.28,T-1h,match
+5128,2026-09-05T16:13:11.677213+00:00,3792023,Will Aston Villa FC win on 2026-09-05?,639150.5876720008,0.515,0.52,0.0192,0.0,NO_MATCH,0.0,0,no_baseline,0.28,T-1h,match
+5129,2026-09-05T16:13:11.677213+00:00,3829888,Will Everton FC win on 2026-09-06?,1639.0360640000001,0.275,0.28,0.0357,0.0,NO_MATCH,0.0,0,no_baseline,20.78,T-other,match
+5130,2026-09-05T16:13:11.677213+00:00,3829894,Will Everton FC vs. Manchester United FC end in a draw?,888.5684500000002,0.265,0.27,0.037,0.0,NO_MATCH,0.0,0,no_baseline,20.78,T-other,match
+5131,2026-09-05T16:13:11.677213+00:00,3829899,Will Manchester United FC win on 2026-09-06?,210882.77168399983,0.455,0.46,0.0217,0.0,NO_MATCH,0.0,0,no_baseline,20.78,T-other,match
+5132,2026-09-05T16:13:11.677213+00:00,3829927,Will Arsenal FC win on 2026-09-06?,68763.56001399999,0.565,0.57,0.0175,0.0,NO_MATCH,0.0,0,no_baseline,23.28,T-24h,match
+5133,2026-09-05T16:13:11.677213+00:00,3829929,Will Arsenal FC vs. Chelsea FC end in a draw?,15339.468205000003,0.235,0.2413,0.0417,0.0,NO_MATCH,0.0,0,no_baseline,23.28,T-24h,match
+5134,2026-09-05T16:13:11.677213+00:00,3829931,Will Chelsea FC win on 2026-09-06?,122298.27126300005,0.205,0.21,0.0476,0.0,NO_MATCH,0.0,0,no_baseline,23.28,T-24h,match
+5135,2026-09-05T16:13:11.677213+00:00,2771324,Will Arsenal win the 2026-27 English Premier League (EPL) Championship?,755323.6172599997,0.485,0.49,0.0204,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5136,2026-09-05T16:13:11.677213+00:00,2771325,Will Aston Villa win the 2026-27 English Premier League (EPL) Championship?,523397.6504660001,0.0045,0.0077,0.2,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5137,2026-09-05T16:13:11.677213+00:00,2771326,Will Bournemouth win the 2026-27 English Premier League (EPL) Championship?,600978.2343329998,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5138,2026-09-05T16:13:11.677213+00:00,2771327,Will Brentford win the 2026-27 English Premier League (EPL) Championship?,815326.1017319998,0.0045,0.0082,0.2,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5139,2026-09-05T16:13:11.677213+00:00,2771328,Will Brighton win the 2026-27 English Premier League (EPL) Championship?,625372.162461,0.0055,0.0064,0.1667,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5140,2026-09-05T16:13:11.677213+00:00,2771329,Will Chelsea win the 2026-27 English Premier League (EPL) Championship?,714823.4125779999,0.11,0.12,0.1667,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5141,2026-09-05T16:13:11.677213+00:00,2771330,Will Crystal Palace win the 2026-27 English Premier League (EPL) Championship?,1014217.452233,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5142,2026-09-05T16:13:11.677213+00:00,2771331,Will Everton win the 2026-27 English Premier League (EPL) Championship?,348220.18700000003,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5143,2026-09-05T16:13:11.677213+00:00,2771332,Will Fulham win the 2026-27 English Premier League (EPL) Championship?,450150.02405999997,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5144,2026-09-05T16:13:11.677213+00:00,2771333,Will Leeds United win the 2026-27 English Premier League (EPL) Championship?,422363.8442720001,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5145,2026-09-05T16:13:11.677213+00:00,2771334,Will Liverpool win the 2026-27 English Premier League (EPL) Championship?,600185.1498209999,0.055,0.06,0.1667,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5146,2026-09-05T16:13:11.677213+00:00,2771335,Will Manchester City win the 2026-27 English Premier League (EPL) Championship?,2099627.082424,0.265,0.27,0.037,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5147,2026-09-05T16:13:11.677213+00:00,2771336,Will Manchester United win the 2026-27 English Premier League (EPL) Championship?,566060.1839719999,0.055,0.06,0.1667,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5148,2026-09-05T16:13:11.677213+00:00,2771337,Will Newcastle United win the 2026-27 English Premier League (EPL) Championship?,653554.9079950001,0.0045,0.007,0.2,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5149,2026-09-05T16:13:11.677213+00:00,2771338,Will Nottingham Forest win the 2026-27 English Premier League (EPL) Championship?,649958.0815939999,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5150,2026-09-05T16:13:11.677213+00:00,2771339,Will Tottenham win the 2026-27 English Premier League (EPL) Championship?,985171.622304,0.0075,0.0129,0.125,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5151,2026-09-05T16:13:11.677213+00:00,2771340,Will Sunderland win the 2026-27 English Premier League (EPL) Championship?,643839.708227,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5152,2026-09-05T16:13:11.677213+00:00,2771341,Will Coventry City win the 2026-27 English Premier League (EPL) Championship?,588956.183749,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5153,2026-09-05T16:13:11.677213+00:00,2771342,Will Ipswich Town win the 2026-27 English Premier League (EPL) Championship?,490998.551761,0.0015,0.002,0.5,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures
+5154,2026-09-05T16:13:11.677213+00:00,2771343,Will Hull City win the 2026-27 English Premier League (EPL) Championship?,884266.7375039997,0.0035,0.0049,0.25,0.0,no_baseline,0.0,0,no_baseline,6391.78,T-other,futures

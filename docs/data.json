@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-06T08:50:47.081323+00:00",
-  "last_scan": "2026-09-06T08:50:37.159191+00:00",
-  "total_scans": 5312,
+  "generated_at": "2026-09-06T12:23:38.969607+00:00",
+  "last_scan": "2026-09-06T12:23:31.159142+00:00",
+  "total_scans": 5338,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -37,8 +37,8 @@
     },
     {
       "bucket": "T-1h",
-      "markets": 89,
-      "rows": 98
+      "markets": 92,
+      "rows": 101
     },
     {
       "bucket": "T-24h",
@@ -53,28 +53,28 @@
     {
       "bucket": "T-other",
       "markets": 143,
-      "rows": 3396
+      "rows": 3419
     }
   ],
   "histogram": [],
   "markets": [
     {
       "team": "Manchester United FC (2026-09-06)",
-      "mid": 0.475,
-      "ask": 0.48,
-      "volume": 391240.0,
-      "spread_pct": 0.0208,
-      "bucket": "T-other",
-      "distance": 0.025
+      "mid": 0.495,
+      "ask": 0.5,
+      "volume": 3370044.0,
+      "spread_pct": 0.02,
+      "bucket": "T-1h",
+      "distance": 0.005
     },
     {
       "team": "Arsenal FC (2026-09-06)",
-      "mid": 0.555,
-      "ask": 0.56,
-      "volume": 223883.0,
-      "spread_pct": 0.0179,
+      "mid": 0.565,
+      "ask": 0.57,
+      "volume": 302842.0,
+      "spread_pct": 0.0175,
       "bucket": "T-other",
-      "distance": 0.055
+      "distance": 0.065
     },
     {
       "team": "Newcastle United FC (2026-08-29)",
@@ -113,24 +113,6 @@
       "distance": 0.225
     },
     {
-      "team": "Everton FC (2026-09-06)",
-      "mid": 0.275,
-      "ask": 0.28,
-      "volume": 8904.0,
-      "spread_pct": 0.0357,
-      "bucket": "T-other",
-      "distance": 0.225
-    },
-    {
-      "team": "Everton FC vs. Manchester United FC (draw)",
-      "mid": 0.265,
-      "ask": 0.27,
-      "volume": 3321.0,
-      "spread_pct": 0.037,
-      "bucket": "T-other",
-      "distance": 0.235
-    },
-    {
       "team": "AFC Bournemouth (2026-08-29)",
       "mid": 0.755,
       "ask": 0.77,
@@ -140,10 +122,28 @@
       "distance": 0.255
     },
     {
+      "team": "Everton FC (2026-09-06)",
+      "mid": 0.245,
+      "ask": 0.25,
+      "volume": 61338.0,
+      "spread_pct": 0.04,
+      "bucket": "T-1h",
+      "distance": 0.255
+    },
+    {
+      "team": "Everton FC vs. Manchester United FC (draw)",
+      "mid": 0.245,
+      "ask": 0.25,
+      "volume": 19471.0,
+      "spread_pct": 0.04,
+      "bucket": "T-1h",
+      "distance": 0.255
+    },
+    {
       "team": "Arsenal FC vs. Chelsea FC (draw)",
       "mid": 0.245,
       "ask": 0.25,
-      "volume": 22328.0,
+      "volume": 27754.0,
       "spread_pct": 0.04,
       "bucket": "T-other",
       "distance": 0.255
@@ -179,7 +179,7 @@
       "team": "Chelsea FC (2026-09-06)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 240700.0,
+      "volume": 313116.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315

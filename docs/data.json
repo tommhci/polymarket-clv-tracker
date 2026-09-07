@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-07T01:05:55.918167+00:00",
-  "last_scan": "2026-09-06T19:35:46.330975+00:00",
-  "total_scans": 5413,
+  "generated_at": "2026-09-07T06:01:09.276518+00:00",
+  "last_scan": "2026-09-07T06:01:01.697505+00:00",
+  "total_scans": 5436,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 143,
-      "rows": 3479
+      "markets": 146,
+      "rows": 3502
     }
   ],
   "histogram": [],
@@ -75,6 +75,15 @@
       "spread_pct": 0.0154,
       "bucket": "T-1h",
       "distance": 0.145
+    },
+    {
+      "team": "Arsenal FC (2026-09-12)",
+      "mid": 0.665,
+      "ask": 0.67,
+      "volume": 30109.0,
+      "spread_pct": 0.0149,
+      "bucket": "T-other",
+      "distance": 0.165
     },
     {
       "team": "Liverpool FC (2026-08-29)",
@@ -102,6 +111,15 @@
       "spread_pct": 0.0132,
       "bucket": "T-expired",
       "distance": 0.255
+    },
+    {
+      "team": "Sunderland AFC vs. Arsenal FC (draw)",
+      "mid": 0.225,
+      "ask": 0.23,
+      "volume": 102.0,
+      "spread_pct": 0.0435,
+      "bucket": "T-other",
+      "distance": 0.275
     },
     {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",
@@ -147,6 +165,15 @@
       "spread_pct": 0.0714,
       "bucket": "T-1h",
       "distance": 0.365
+    },
+    {
+      "team": "Sunderland AFC (2026-09-12)",
+      "mid": 0.125,
+      "ask": 0.13,
+      "volume": 58.0,
+      "spread_pct": 0.0769,
+      "bucket": "T-other",
+      "distance": 0.375
     },
     {
       "team": "Tottenham Hotspur FC (2026-08-29)",

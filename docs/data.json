@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-07T06:01:09.276518+00:00",
-  "last_scan": "2026-09-07T06:01:01.697505+00:00",
-  "total_scans": 5436,
+  "generated_at": "2026-09-07T12:19:22.636525+00:00",
+  "last_scan": "2026-09-07T12:19:13.181455+00:00",
+  "total_scans": 5459,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 146,
-      "rows": 3502
+      "rows": 3525
     }
   ],
   "histogram": [],
@@ -80,7 +80,7 @@
       "team": "Arsenal FC (2026-09-12)",
       "mid": 0.665,
       "ask": 0.67,
-      "volume": 30109.0,
+      "volume": 30497.0,
       "spread_pct": 0.0149,
       "bucket": "T-other",
       "distance": 0.165
@@ -170,7 +170,7 @@
       "team": "Sunderland AFC (2026-09-12)",
       "mid": 0.125,
       "ask": 0.13,
-      "volume": 58.0,
+      "volume": 1073.0,
       "spread_pct": 0.0769,
       "bucket": "T-other",
       "distance": 0.375

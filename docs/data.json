@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-13T14:39:04.162058+00:00",
-  "last_scan": "2026-09-13T14:38:52.479577+00:00",
-  "total_scans": 6416,
+  "generated_at": "2026-09-13T17:44:25.728775+00:00",
+  "last_scan": "2026-09-13T17:44:18.281445+00:00",
+  "total_scans": 6439,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -23,9 +23,9 @@
     "wc_legacy_n": 73,
     "wc_legacy_avg_clv_adj": -0.0178,
     "capture_rate": {
-      "match_markets_past": 81,
-      "captured_final_hour": 36,
-      "capture_rate": 0.444,
+      "match_markets_past": 84,
+      "captured_final_hour": 39,
+      "capture_rate": 0.464,
       "definition": "share of past match markets with ≥1 price point in the last hour before kickoff (the CLV entry window)"
     }
   },
@@ -42,8 +42,8 @@
     },
     {
       "bucket": "T-24h",
-      "markets": 88,
-      "rows": 203
+      "markets": 91,
+      "rows": 206
     },
     {
       "bucket": "T-expired",
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 173,
-      "rows": 4401
+      "rows": 4421
     }
   ],
   "histogram": [],
@@ -71,9 +71,9 @@
       "team": "Leeds United FC (2026-09-14)",
       "mid": 0.415,
       "ask": 0.42,
-      "volume": 5180.0,
+      "volume": 5487.0,
       "spread_pct": 0.0238,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.085
     },
     {
@@ -107,9 +107,9 @@
       "team": "Newcastle United FC (2026-09-14)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 190977.0,
+      "volume": 194955.0,
       "spread_pct": 0.0303,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.175
     },
     {
@@ -143,9 +143,9 @@
       "team": "Leeds United FC vs. Newcastle United FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 1847.0,
+      "volume": 2185.0,
       "spread_pct": 0.0357,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.225
     },
     {

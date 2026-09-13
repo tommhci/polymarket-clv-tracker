@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-13T05:26:33.247079+00:00",
-  "last_scan": "2026-09-13T05:26:22.516848+00:00",
-  "total_scans": 6358,
+  "generated_at": "2026-09-13T10:34:30.684155+00:00",
+  "last_scan": "2026-09-13T10:34:22.050230+00:00",
+  "total_scans": 6387,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,25 +53,25 @@
     {
       "bucket": "T-other",
       "markets": 173,
-      "rows": 4349
+      "rows": 4378
     }
   ],
   "histogram": [],
   "markets": [
     {
       "team": "Brighton & Hove Albion FC (2026-09-13)",
-      "mid": 0.505,
-      "ask": 0.51,
-      "volume": 374706.0,
-      "spread_pct": 0.0196,
+      "mid": 0.515,
+      "ask": 0.52,
+      "volume": 2365558.0,
+      "spread_pct": 0.0192,
       "bucket": "T-other",
-      "distance": 0.005
+      "distance": 0.015
     },
     {
       "team": "Manchester City FC (2026-09-13)",
       "mid": 0.445,
       "ask": 0.45,
-      "volume": 733754.0,
+      "volume": 837704.0,
       "spread_pct": 0.0222,
       "bucket": "T-other",
       "distance": 0.055
@@ -80,7 +80,7 @@
       "team": "Leeds United FC (2026-09-14)",
       "mid": 0.415,
       "ask": 0.42,
-      "volume": 4408.0,
+      "volume": 4575.0,
       "spread_pct": 0.0238,
       "bucket": "T-other",
       "distance": 0.085
@@ -116,7 +116,7 @@
       "team": "Newcastle United FC (2026-09-14)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 189337.0,
+      "volume": 189382.0,
       "spread_pct": 0.0303,
       "bucket": "T-other",
       "distance": 0.175
@@ -132,12 +132,12 @@
     },
     {
       "team": "Manchester United FC (2026-09-13)",
-      "mid": 0.315,
-      "ask": 0.32,
-      "volume": 117536.0,
-      "spread_pct": 0.0313,
+      "mid": 0.305,
+      "ask": 0.31,
+      "volume": 130989.0,
+      "spread_pct": 0.0323,
       "bucket": "T-other",
-      "distance": 0.185
+      "distance": 0.195
     },
     {
       "team": "Tottenham Hotspur FC vs. Newcastle United FC (draw)",
@@ -152,7 +152,7 @@
       "team": "Leeds United FC vs. Newcastle United FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 1555.0,
+      "volume": 1598.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225
@@ -161,7 +161,7 @@
       "team": "Coventry City FC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 5426.0,
+      "volume": 14639.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -176,22 +176,22 @@
       "distance": 0.255
     },
     {
-      "team": "Coventry City FC (2026-09-13)",
+      "team": "Manchester United FC vs. Manchester City FC (draw)",
       "mid": 0.245,
       "ask": 0.25,
-      "volume": 4339.0,
+      "volume": 11917.0,
       "spread_pct": 0.04,
       "bucket": "T-other",
       "distance": 0.255
     },
     {
-      "team": "Manchester United FC vs. Manchester City FC (draw)",
-      "mid": 0.245,
-      "ask": 0.25,
-      "volume": 6712.0,
-      "spread_pct": 0.04,
+      "team": "Coventry City FC (2026-09-13)",
+      "mid": 0.235,
+      "ask": 0.24,
+      "volume": 161136.0,
+      "spread_pct": 0.0417,
       "bucket": "T-other",
-      "distance": 0.255
+      "distance": 0.265
     },
     {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",

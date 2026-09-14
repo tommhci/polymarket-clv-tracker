@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-14T00:17:00.680547+00:00",
-  "last_scan": "2026-09-14T00:16:49.821039+00:00",
-  "total_scans": 6520,
+  "generated_at": "2026-09-14T05:06:06.512918+00:00",
+  "last_scan": "2026-09-14T05:05:55.597108+00:00",
+  "total_scans": 6549,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 179,
-      "rows": 4499
+      "rows": 4528
     }
   ],
   "histogram": [],
@@ -68,28 +68,28 @@
       "distance": 0.055
     },
     {
-      "team": "Arsenal FC (2026-09-19)",
-      "mid": 0.565,
-      "ask": 0.57,
-      "volume": 24133.0,
-      "spread_pct": 0.0175,
-      "bucket": "T-other",
-      "distance": 0.065
-    },
-    {
       "team": "Chelsea FC (2026-09-18)",
       "mid": 0.435,
       "ask": 0.44,
-      "volume": 18977.0,
+      "volume": 22528.0,
       "spread_pct": 0.0227,
       "bucket": "T-other",
       "distance": 0.065
     },
     {
+      "team": "Arsenal FC (2026-09-19)",
+      "mid": 0.575,
+      "ask": 0.58,
+      "volume": 26413.0,
+      "spread_pct": 0.0172,
+      "bucket": "T-other",
+      "distance": 0.075
+    },
+    {
       "team": "Leeds United FC (2026-09-14)",
       "mid": 0.415,
       "ask": 0.42,
-      "volume": 10494.0,
+      "volume": 14049.0,
       "spread_pct": 0.0238,
       "bucket": "T-other",
       "distance": 0.085
@@ -125,7 +125,7 @@
       "team": "Newcastle United FC (2026-09-14)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 196781.0,
+      "volume": 212063.0,
       "spread_pct": 0.0303,
       "bucket": "T-other",
       "distance": 0.175
@@ -134,7 +134,7 @@
       "team": "Brentford FC (2026-09-18)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 1489.0,
+      "volume": 1498.0,
       "spread_pct": 0.0303,
       "bucket": "T-other",
       "distance": 0.175
@@ -170,7 +170,7 @@
       "team": "Leeds United FC vs. Newcastle United FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 2592.0,
+      "volume": 3200.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225
@@ -188,7 +188,7 @@
       "team": "Brentford FC vs. Chelsea FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 595.0,
+      "volume": 689.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245

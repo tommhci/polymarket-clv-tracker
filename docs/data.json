@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-06T02:53:40.373349+00:00",
-  "last_scan": "2026-10-05T22:52:57.522597+00:00",
-  "total_scans": 8537,
+  "generated_at": "2026-10-06T10:06:09.663168+00:00",
+  "last_scan": "2026-10-06T10:06:02.192635+00:00",
+  "total_scans": 8560,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 203,
-      "rows": 6429
+      "markets": 206,
+      "rows": 6452
     }
   ],
   "histogram": [],
@@ -84,6 +84,15 @@
       "spread_pct": 0.0222,
       "bucket": "T-1h",
       "distance": 0.055
+    },
+    {
+      "team": "Manchester United FC (2026-10-10)",
+      "mid": 0.575,
+      "ask": 0.58,
+      "volume": 48236.0,
+      "spread_pct": 0.0172,
+      "bucket": "T-other",
+      "distance": 0.075
     },
     {
       "team": "Newcastle United FC (2026-08-29)",
@@ -221,12 +230,30 @@
       "distance": 0.255
     },
     {
+      "team": "Manchester United FC vs. Tottenham Hotspur FC (draw)",
+      "mid": 0.225,
+      "ask": 0.23,
+      "volume": 533.0,
+      "spread_pct": 0.0435,
+      "bucket": "T-other",
+      "distance": 0.275
+    },
+    {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",
       "mid": 0.215,
       "ask": 0.22,
       "volume": 14273.0,
       "spread_pct": 0.0455,
       "bucket": "T-1h",
+      "distance": 0.285
+    },
+    {
+      "team": "Tottenham Hotspur FC (2026-10-10)",
+      "mid": 0.215,
+      "ask": 0.22,
+      "volume": 4262.0,
+      "spread_pct": 0.0455,
+      "bucket": "T-other",
       "distance": 0.285
     },
     {

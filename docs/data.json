@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-07T19:36:02.505689+00:00",
-  "last_scan": "2026-10-07T13:50:36.360373+00:00",
-  "total_scans": 8650,
+  "generated_at": "2026-10-07T23:47:09.012986+00:00",
+  "last_scan": "2026-10-07T23:46:59.001858+00:00",
+  "total_scans": 8682,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 215,
-      "rows": 6542
+      "rows": 6574
     }
   ],
   "histogram": [],
@@ -89,7 +89,7 @@
       "team": "Manchester United FC (2026-10-10)",
       "mid": 0.575,
       "ask": 0.58,
-      "volume": 76025.0,
+      "volume": 76683.0,
       "spread_pct": 0.0172,
       "bucket": "T-other",
       "distance": 0.075
@@ -98,7 +98,7 @@
       "team": "Brighton & Hove Albion FC (2026-10-10)",
       "mid": 0.415,
       "ask": 0.42,
-      "volume": 210107.0,
+      "volume": 211436.0,
       "spread_pct": 0.0238,
       "bucket": "T-other",
       "distance": 0.085
@@ -125,7 +125,7 @@
       "team": "Liverpool FC (2026-10-11)",
       "mid": 0.375,
       "ask": 0.38,
-      "volume": 6628.0,
+      "volume": 6754.0,
       "spread_pct": 0.0263,
       "bucket": "T-other",
       "distance": 0.125
@@ -134,7 +134,7 @@
       "team": "Manchester City FC (2026-10-11)",
       "mid": 0.375,
       "ask": 0.38,
-      "volume": 14904.0,
+      "volume": 15163.0,
       "spread_pct": 0.0263,
       "bucket": "T-other",
       "distance": 0.125
@@ -179,7 +179,7 @@
       "team": "Sunderland AFC (2026-10-10)",
       "mid": 0.315,
       "ask": 0.32,
-      "volume": 761.0,
+      "volume": 768.0,
       "spread_pct": 0.0313,
       "bucket": "T-other",
       "distance": 0.185
@@ -215,7 +215,7 @@
       "team": "Arsenal FC (2026-10-10)",
       "mid": 0.705,
       "ask": 0.71,
-      "volume": 15528.0,
+      "volume": 19264.0,
       "spread_pct": 0.0141,
       "bucket": "T-other",
       "distance": 0.205
@@ -251,7 +251,7 @@
       "team": "Sunderland AFC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 704.0,
+      "volume": 728.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225
@@ -278,7 +278,7 @@
       "team": "Liverpool FC vs. Manchester City FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
-      "volume": 521.0,
+      "volume": 552.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -296,7 +296,7 @@
       "team": "Manchester United FC vs. Tottenham Hotspur FC (draw)",
       "mid": 0.225,
       "ask": 0.23,
-      "volume": 1491.0,
+      "volume": 1496.0,
       "spread_pct": 0.0435,
       "bucket": "T-other",
       "distance": 0.275
@@ -314,7 +314,7 @@
       "team": "Tottenham Hotspur FC (2026-10-10)",
       "mid": 0.205,
       "ask": 0.21,
-      "volume": 4877.0,
+      "volume": 4883.0,
       "spread_pct": 0.0476,
       "bucket": "T-other",
       "distance": 0.295
@@ -368,7 +368,7 @@
       "team": "Arsenal FC vs. Leeds United FC (draw)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 673.0,
+      "volume": 713.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315
@@ -437,15 +437,6 @@
       "distance": 0.385
     },
     {
-      "team": "Leeds United FC (2026-10-10)",
-      "mid": 0.115,
-      "ask": 0.12,
-      "volume": 9008.0,
-      "spread_pct": 0.0833,
-      "bucket": "T-other",
-      "distance": 0.385
-    },
-    {
       "team": "Manchester City FC vs. Sunderland AFC (draw)",
       "mid": 0.11,
       "ask": 0.1065,
@@ -461,6 +452,15 @@
       "volume": 401318.0,
       "spread_pct": 0.0111,
       "bucket": "T-expired",
+      "distance": 0.395
+    },
+    {
+      "team": "Leeds United FC (2026-10-10)",
+      "mid": 0.105,
+      "ask": 0.11,
+      "volume": 9211.0,
+      "spread_pct": 0.0909,
+      "bucket": "T-other",
       "distance": 0.395
     },
     {

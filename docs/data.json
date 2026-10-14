@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-14T17:33:05.586479+00:00",
-  "last_scan": "2026-10-14T12:28:47.942041+00:00",
-  "total_scans": 9352,
+  "generated_at": "2026-10-14T20:56:05.546148+00:00",
+  "last_scan": "2026-10-14T20:55:57.909580+00:00",
+  "total_scans": 9375,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 233,
-      "rows": 7187
+      "rows": 7210
     }
   ],
   "histogram": [],
@@ -411,12 +411,12 @@
     },
     {
       "team": "Manchester City FC (2026-10-17)",
-      "mid": 0.815,
-      "ask": 0.82,
-      "volume": 8944.0,
-      "spread_pct": 0.0122,
+      "mid": 0.805,
+      "ask": 0.81,
+      "volume": 9149.0,
+      "spread_pct": 0.0123,
       "bucket": "T-other",
-      "distance": 0.315
+      "distance": 0.305
     },
     {
       "team": "Coventry City FC (2026-09-19)",
@@ -503,7 +503,7 @@
       "team": "Manchester City FC vs. Ipswich Town FC (draw)",
       "mid": 0.125,
       "ask": 0.13,
-      "volume": 609.0,
+      "volume": 640.0,
       "spread_pct": 0.0769,
       "bucket": "T-other",
       "distance": 0.375
@@ -574,8 +574,8 @@
     {
       "team": "Ipswich Town FC (2026-10-17)",
       "mid": 0.065,
-      "ask": 0.07,
-      "volume": 11216.0,
+      "ask": 0.0798,
+      "volume": 11239.0,
       "spread_pct": 0.1429,
       "bucket": "T-other",
       "distance": 0.435

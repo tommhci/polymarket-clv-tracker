@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-14T23:52:18.529408+00:00",
-  "last_scan": "2026-10-14T20:55:57.909580+00:00",
-  "total_scans": 9375,
+  "generated_at": "2026-10-15T04:25:15.776670+00:00",
+  "last_scan": "2026-10-15T04:25:06.337735+00:00",
+  "total_scans": 9398,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 233,
-      "rows": 7210
+      "rows": 7233
     }
   ],
   "histogram": [],
@@ -413,7 +413,7 @@
       "team": "Manchester City FC (2026-10-17)",
       "mid": 0.805,
       "ask": 0.81,
-      "volume": 9149.0,
+      "volume": 19307.0,
       "spread_pct": 0.0123,
       "bucket": "T-other",
       "distance": 0.305
@@ -503,7 +503,7 @@
       "team": "Manchester City FC vs. Ipswich Town FC (draw)",
       "mid": 0.125,
       "ask": 0.13,
-      "volume": 640.0,
+      "volume": 656.0,
       "spread_pct": 0.0769,
       "bucket": "T-other",
       "distance": 0.375
@@ -563,21 +563,21 @@
       "distance": 0.425
     },
     {
+      "team": "Ipswich Town FC (2026-10-17)",
+      "mid": 0.07,
+      "ask": 0.08,
+      "volume": 11434.0,
+      "spread_pct": 0.25,
+      "bucket": "T-other",
+      "distance": 0.43
+    },
+    {
       "team": "Ipswich Town FC vs. Liverpool FC (draw)",
       "mid": 0.065,
       "ask": 0.0776,
       "volume": 82392.0,
       "spread_pct": 0.1429,
       "bucket": "T-expired",
-      "distance": 0.435
-    },
-    {
-      "team": "Ipswich Town FC (2026-10-17)",
-      "mid": 0.065,
-      "ask": 0.0798,
-      "volume": 11239.0,
-      "spread_pct": 0.1429,
-      "bucket": "T-other",
       "distance": 0.435
     },
     {

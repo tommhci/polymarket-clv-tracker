@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-19T06:58:55.843901+00:00",
-  "last_scan": "2026-10-19T06:58:48.737705+00:00",
-  "total_scans": 10263,
+  "generated_at": "2026-10-19T14:35:51.268165+00:00",
+  "last_scan": "2026-10-19T14:35:42.493291+00:00",
+  "total_scans": 10286,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 260,
-      "rows": 8017
+      "rows": 8040
     }
   ],
   "histogram": [],
@@ -194,6 +194,15 @@
       "distance": 0.125
     },
     {
+      "team": "Tottenham Hotspur FC (2026-10-19)",
+      "mid": 0.635,
+      "ask": 0.64,
+      "volume": 96688.0,
+      "spread_pct": 0.0156,
+      "bucket": "T-other",
+      "distance": 0.135
+    },
+    {
       "team": "Arsenal FC (2026-08-31)",
       "mid": 0.645,
       "ask": 0.65,
@@ -218,15 +227,6 @@
       "volume": 27226.0,
       "spread_pct": 0.0278,
       "bucket": "T-1h",
-      "distance": 0.145
-    },
-    {
-      "team": "Tottenham Hotspur FC (2026-10-19)",
-      "mid": 0.645,
-      "ask": 0.65,
-      "volume": 31438.0,
-      "spread_pct": 0.0154,
-      "bucket": "T-other",
       "distance": 0.145
     },
     {
@@ -503,7 +503,7 @@
       "team": "Tottenham Hotspur FC vs. Coventry City FC (draw)",
       "mid": 0.205,
       "ask": 0.21,
-      "volume": 2427.0,
+      "volume": 5537.0,
       "spread_pct": 0.0476,
       "bucket": "T-other",
       "distance": 0.295
@@ -573,12 +573,12 @@
     },
     {
       "team": "Coventry City FC (2026-10-19)",
-      "mid": 0.155,
-      "ask": 0.16,
-      "volume": 58104.0,
-      "spread_pct": 0.0625,
+      "mid": 0.165,
+      "ask": 0.17,
+      "volume": 72430.0,
+      "spread_pct": 0.0588,
       "bucket": "T-other",
-      "distance": 0.345
+      "distance": 0.335
     },
     {
       "team": "Aston Villa FC (2026-08-31)",

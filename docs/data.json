@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-20T02:09:32.328339+00:00",
-  "last_scan": "2026-10-19T23:47:15.113414+00:00",
-  "total_scans": 10329,
+  "generated_at": "2026-10-20T07:43:23.339853+00:00",
+  "last_scan": "2026-10-20T07:43:13.474900+00:00",
+  "total_scans": 10352,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 260,
-      "rows": 8080
+      "markets": 263,
+      "rows": 8103
     }
   ],
   "histogram": [],
@@ -137,6 +137,15 @@
       "volume": 1128978.0,
       "spread_pct": 0.0222,
       "bucket": "T-1h",
+      "distance": 0.055
+    },
+    {
+      "team": "Liverpool FC (2026-10-25)",
+      "mid": 0.445,
+      "ask": 0.45,
+      "volume": 5454.0,
+      "spread_pct": 0.0222,
+      "bucket": "T-other",
       "distance": 0.055
     },
     {
@@ -254,6 +263,15 @@
       "volume": 40539.0,
       "spread_pct": 0.0313,
       "bucket": "T-1h",
+      "distance": 0.185
+    },
+    {
+      "team": "Brighton & Hove Albion FC (2026-10-25)",
+      "mid": 0.315,
+      "ask": 0.32,
+      "volume": 17958.0,
+      "spread_pct": 0.0313,
+      "bucket": "T-other",
       "distance": 0.185
     },
     {
@@ -452,6 +470,15 @@
       "volume": 440268.0,
       "spread_pct": 0.04,
       "bucket": "T-expired",
+      "distance": 0.255
+    },
+    {
+      "team": "Liverpool FC vs. Brighton & Hove Albion FC (draw)",
+      "mid": 0.245,
+      "ask": 0.25,
+      "volume": 100.0,
+      "spread_pct": 0.04,
+      "bucket": "T-other",
       "distance": 0.255
     },
     {

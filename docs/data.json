@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-23T11:29:03.924297+00:00",
-  "last_scan": "2026-10-23T11:28:50.117028+00:00",
-  "total_scans": 10601,
+  "generated_at": "2026-10-23T15:53:10.784169+00:00",
+  "last_scan": "2026-10-23T15:52:57.493066+00:00",
+  "total_scans": 10639,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -42,8 +42,8 @@
     },
     {
       "bucket": "T-24h",
-      "markets": 169,
-      "rows": 317
+      "markets": 172,
+      "rows": 323
     },
     {
       "bucket": "T-expired",
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 275,
-      "rows": 8346
+      "rows": 8378
     }
   ],
   "histogram": [],
@@ -134,9 +134,18 @@
       "team": "Liverpool FC (2026-10-25)",
       "mid": 0.455,
       "ask": 0.46,
-      "volume": 215495.0,
+      "volume": 215646.0,
       "spread_pct": 0.0217,
       "bucket": "T-other",
+      "distance": 0.045
+    },
+    {
+      "team": "Chelsea FC (2026-10-24)",
+      "mid": 0.545,
+      "ask": 0.55,
+      "volume": 83236.0,
+      "spread_pct": 0.0182,
+      "bucket": "T-24h",
       "distance": 0.045
     },
     {
@@ -149,19 +158,10 @@
       "distance": 0.055
     },
     {
-      "team": "Chelsea FC (2026-10-24)",
-      "mid": 0.565,
-      "ask": 0.57,
-      "volume": 31256.0,
-      "spread_pct": 0.0175,
-      "bucket": "T-other",
-      "distance": 0.065
-    },
-    {
       "team": "Brentford FC (2026-10-25)",
       "mid": 0.575,
       "ask": 0.58,
-      "volume": 18251.0,
+      "volume": 18501.0,
       "spread_pct": 0.0172,
       "bucket": "T-other",
       "distance": 0.075
@@ -179,7 +179,7 @@
       "team": "Nottingham Forest FC (2026-10-23)",
       "mid": 0.415,
       "ask": 0.42,
-      "volume": 10794.0,
+      "volume": 14324.0,
       "spread_pct": 0.0238,
       "bucket": "T-other",
       "distance": 0.085
@@ -215,9 +215,9 @@
       "team": "Manchester City FC (2026-10-24)",
       "mid": 0.605,
       "ask": 0.61,
-      "volume": 57553.0,
+      "volume": 114934.0,
       "spread_pct": 0.0164,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.105
     },
     {
@@ -293,21 +293,21 @@
       "distance": 0.175
     },
     {
+      "team": "Arsenal FC (2026-10-24)",
+      "mid": 0.675,
+      "ask": 0.68,
+      "volume": 24475.0,
+      "spread_pct": 0.0147,
+      "bucket": "T-24h",
+      "distance": 0.175
+    },
+    {
       "team": "Ipswich Town FC (2026-10-10)",
       "mid": 0.315,
       "ask": 0.32,
       "volume": 40539.0,
       "spread_pct": 0.0313,
       "bucket": "T-1h",
-      "distance": 0.185
-    },
-    {
-      "team": "Arsenal FC (2026-10-24)",
-      "mid": 0.685,
-      "ask": 0.69,
-      "volume": 16294.0,
-      "spread_pct": 0.0145,
-      "bucket": "T-24h",
       "distance": 0.185
     },
     {
@@ -341,7 +341,7 @@
       "team": "Ipswich Town FC (2026-10-23)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 8813.0,
+      "volume": 15282.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -350,7 +350,7 @@
       "team": "Brighton & Hove Albion FC (2026-10-25)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 217733.0,
+      "volume": 218161.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -458,7 +458,7 @@
       "team": "Ipswich Town FC vs. Nottingham Forest FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 1426.0,
+      "volume": 1921.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225
@@ -539,7 +539,7 @@
       "team": "Liverpool FC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.245,
       "ask": 0.25,
-      "volume": 509.0,
+      "volume": 769.0,
       "spread_pct": 0.04,
       "bucket": "T-other",
       "distance": 0.255
@@ -572,22 +572,22 @@
       "distance": 0.265
     },
     {
-      "team": "Hull City AFC vs. Brentford FC (draw)",
+      "team": "Chelsea FC vs. Tottenham Hotspur FC (draw)",
       "mid": 0.235,
       "ask": 0.24,
       "volume": 622.0,
       "spread_pct": 0.0417,
-      "bucket": "T-other",
+      "bucket": "T-24h",
       "distance": 0.265
     },
     {
-      "team": "Chelsea FC vs. Tottenham Hotspur FC (draw)",
-      "mid": 0.225,
-      "ask": 0.23,
-      "volume": 609.0,
-      "spread_pct": 0.0435,
+      "team": "Hull City AFC vs. Brentford FC (draw)",
+      "mid": 0.235,
+      "ask": 0.24,
+      "volume": 890.0,
+      "spread_pct": 0.0417,
       "bucket": "T-other",
-      "distance": 0.275
+      "distance": 0.265
     },
     {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",
@@ -620,28 +620,28 @@
       "team": "Aston Villa FC vs. Manchester City FC (draw)",
       "mid": 0.215,
       "ask": 0.22,
-      "volume": 867.0,
+      "volume": 915.0,
       "spread_pct": 0.0455,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.285
     },
     {
       "team": "Arsenal FC vs. Everton FC (draw)",
       "mid": 0.215,
       "ask": 0.22,
-      "volume": 368.0,
+      "volume": 382.0,
       "spread_pct": 0.0455,
       "bucket": "T-24h",
       "distance": 0.285
     },
     {
       "team": "Tottenham Hotspur FC (2026-10-24)",
-      "mid": 0.205,
-      "ask": 0.21,
-      "volume": 1577.0,
-      "spread_pct": 0.0476,
-      "bucket": "T-other",
-      "distance": 0.295
+      "mid": 0.215,
+      "ask": 0.22,
+      "volume": 3213.0,
+      "spread_pct": 0.0455,
+      "bucket": "T-24h",
+      "distance": 0.285
     },
     {
       "team": "Liverpool FC vs. Nottingham Forest FC (draw)",
@@ -674,7 +674,7 @@
       "team": "Hull City AFC (2026-10-25)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 1778.0,
+      "volume": 1779.0,
       "spread_pct": 0.05,
       "bucket": "T-other",
       "distance": 0.305
@@ -701,9 +701,9 @@
       "team": "Aston Villa FC (2026-10-24)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 5586.0,
+      "volume": 5796.0,
       "spread_pct": 0.0526,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.315
     },
     {
@@ -818,7 +818,7 @@
       "team": "Everton FC (2026-10-24)",
       "mid": 0.105,
       "ask": 0.11,
-      "volume": 5127.0,
+      "volume": 21636.0,
       "spread_pct": 0.0909,
       "bucket": "T-24h",
       "distance": 0.395

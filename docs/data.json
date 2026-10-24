@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-24T19:51:24.563074+00:00",
-  "last_scan": "2026-10-24T19:51:13.656592+00:00",
-  "total_scans": 10919,
+  "generated_at": "2026-10-24T22:00:21.945955+00:00",
+  "last_scan": "2026-10-24T22:00:12.615673+00:00",
+  "total_scans": 10948,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 281,
-      "rows": 8622
+      "rows": 8651
     }
   ],
   "histogram": [],
@@ -134,7 +134,7 @@
       "team": "Liverpool FC (2026-10-25)",
       "mid": 0.455,
       "ask": 0.46,
-      "volume": 238657.0,
+      "volume": 241119.0,
       "spread_pct": 0.0217,
       "bucket": "T-other",
       "distance": 0.045
@@ -149,22 +149,22 @@
       "distance": 0.055
     },
     {
-      "team": "Brentford FC (2026-10-25)",
-      "mid": 0.565,
-      "ask": 0.57,
-      "volume": 50383.0,
-      "spread_pct": 0.0175,
+      "team": "Manchester United FC (2026-10-25)",
+      "mid": 0.435,
+      "ask": 0.44,
+      "volume": 27816.0,
+      "spread_pct": 0.0227,
       "bucket": "T-other",
       "distance": 0.065
     },
     {
-      "team": "Manchester United FC (2026-10-25)",
-      "mid": 0.435,
-      "ask": 0.44,
-      "volume": 27661.0,
-      "spread_pct": 0.0227,
+      "team": "Brentford FC (2026-10-25)",
+      "mid": 0.575,
+      "ask": 0.58,
+      "volume": 51487.0,
+      "spread_pct": 0.0172,
       "bucket": "T-other",
-      "distance": 0.065
+      "distance": 0.075
     },
     {
       "team": "Newcastle United FC (2026-10-17)",
@@ -377,7 +377,7 @@
       "team": "Brighton & Hove Albion FC (2026-10-25)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 234052.0,
+      "volume": 236442.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -386,7 +386,7 @@
       "team": "AFC Bournemouth (2026-10-25)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 10890.0,
+      "volume": 11172.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -530,7 +530,7 @@
       "team": "Manchester United FC vs. AFC Bournemouth (draw)",
       "mid": 0.265,
       "ask": 0.27,
-      "volume": 4848.0,
+      "volume": 4920.0,
       "spread_pct": 0.037,
       "bucket": "T-other",
       "distance": 0.235
@@ -602,7 +602,7 @@
       "team": "Liverpool FC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.245,
       "ask": 0.25,
-      "volume": 1091.0,
+      "volume": 1455.0,
       "spread_pct": 0.04,
       "bucket": "T-other",
       "distance": 0.255
@@ -710,7 +710,7 @@
       "team": "Hull City AFC (2026-10-25)",
       "mid": 0.195,
       "ask": 0.2,
-      "volume": 2335.0,
+      "volume": 2514.0,
       "spread_pct": 0.05,
       "bucket": "T-other",
       "distance": 0.305

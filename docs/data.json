@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-25T04:54:44.314253+00:00",
-  "last_scan": "2026-10-25T04:54:35.358244+00:00",
-  "total_scans": 11009,
+  "generated_at": "2026-10-25T09:44:18.341580+00:00",
+  "last_scan": "2026-10-25T09:44:08.800568+00:00",
+  "total_scans": 11041,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 284,
-      "rows": 8712
+      "rows": 8744
     }
   ],
   "histogram": [],
@@ -134,7 +134,7 @@
       "team": "Liverpool FC (2026-10-25)",
       "mid": 0.455,
       "ask": 0.46,
-      "volume": 276569.0,
+      "volume": 285844.0,
       "spread_pct": 0.0217,
       "bucket": "T-other",
       "distance": 0.045
@@ -158,20 +158,20 @@
       "distance": 0.075
     },
     {
-      "team": "Manchester United FC (2026-10-25)",
-      "mid": 0.425,
-      "ask": 0.43,
-      "volume": 55109.0,
-      "spread_pct": 0.0233,
-      "bucket": "T-other",
-      "distance": 0.075
-    },
-    {
       "team": "Brentford FC (2026-10-25)",
       "mid": 0.585,
       "ask": 0.59,
-      "volume": 275763.0,
+      "volume": 456801.0,
       "spread_pct": 0.0169,
+      "bucket": "T-other",
+      "distance": 0.085
+    },
+    {
+      "team": "Manchester United FC (2026-10-25)",
+      "mid": 0.415,
+      "ask": 0.42,
+      "volume": 155339.0,
+      "spread_pct": 0.0238,
       "bucket": "T-other",
       "distance": 0.085
     },
@@ -278,7 +278,7 @@
       "team": "Leeds United FC (2026-10-25)",
       "mid": 0.365,
       "ask": 0.37,
-      "volume": 99564.0,
+      "volume": 110455.0,
       "spread_pct": 0.027,
       "bucket": "T-other",
       "distance": 0.135
@@ -341,7 +341,7 @@
       "team": "Sunderland AFC (2026-10-25)",
       "mid": 0.325,
       "ask": 0.33,
-      "volume": 4953.0,
+      "volume": 86302.0,
       "spread_pct": 0.0303,
       "bucket": "T-other",
       "distance": 0.175
@@ -368,7 +368,7 @@
       "team": "AFC Bournemouth (2026-10-25)",
       "mid": 0.315,
       "ask": 0.32,
-      "volume": 12559.0,
+      "volume": 55386.0,
       "spread_pct": 0.0313,
       "bucket": "T-other",
       "distance": 0.185
@@ -404,7 +404,7 @@
       "team": "Brighton & Hove Albion FC (2026-10-25)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 264482.0,
+      "volume": 289931.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -413,7 +413,7 @@
       "team": "Sunderland AFC vs. Leeds United FC (draw)",
       "mid": 0.305,
       "ask": 0.31,
-      "volume": 1215.0,
+      "volume": 2634.0,
       "spread_pct": 0.0323,
       "bucket": "T-other",
       "distance": 0.195
@@ -557,7 +557,7 @@
       "team": "Manchester United FC vs. AFC Bournemouth (draw)",
       "mid": 0.265,
       "ask": 0.27,
-      "volume": 4968.0,
+      "volume": 5847.0,
       "spread_pct": 0.037,
       "bucket": "T-other",
       "distance": 0.235
@@ -585,6 +585,15 @@
       "mid": 0.255,
       "ask": 0.26,
       "volume": 35547.0,
+      "spread_pct": 0.0385,
+      "bucket": "T-other",
+      "distance": 0.245
+    },
+    {
+      "team": "Liverpool FC vs. Brighton & Hove Albion FC (draw)",
+      "mid": 0.255,
+      "ask": 0.26,
+      "volume": 3859.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -626,15 +635,6 @@
       "distance": 0.255
     },
     {
-      "team": "Liverpool FC vs. Brighton & Hove Albion FC (draw)",
-      "mid": 0.245,
-      "ask": 0.25,
-      "volume": 2128.0,
-      "spread_pct": 0.04,
-      "bucket": "T-other",
-      "distance": 0.255
-    },
-    {
       "team": "Tottenham Hotspur FC (2026-10-10)",
       "mid": 0.235,
       "ask": 0.22,
@@ -665,7 +665,7 @@
       "team": "Hull City AFC vs. Brentford FC (draw)",
       "mid": 0.235,
       "ask": 0.24,
-      "volume": 2069.0,
+      "volume": 2371.0,
       "spread_pct": 0.0417,
       "bucket": "T-other",
       "distance": 0.265
@@ -764,7 +764,7 @@
       "team": "Hull City AFC (2026-10-25)",
       "mid": 0.185,
       "ask": 0.19,
-      "volume": 18703.0,
+      "volume": 20224.0,
       "spread_pct": 0.0526,
       "bucket": "T-other",
       "distance": 0.315

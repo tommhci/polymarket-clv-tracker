@@ -491,8 +491,8 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
         verdict = (f"🟡 PROMISING — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
                    f"n={total}. Keep collecting (target n=100).")
     else:
-        verdict = (f"✅ EDGE SUPPORTED — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
-                   f"n={total}. Scale with 0.25 Kelly.")
+        verdict = (f"✅ POSITIVE CLV PATTERN (EXPLORATORY) — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
+                   f"n={total}. Further out-of-sample validation required; no live trading implied.")
 
     return {
         "total_resolved":      total,

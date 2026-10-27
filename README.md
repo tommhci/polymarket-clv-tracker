@@ -8,7 +8,7 @@ Research scanner for public soccer prediction-market prices, order-book executio
 
 ## What it does
 
-Every 30 minutes (configurable):
+On each scheduled or manual scan (cadence depends on the scheduler and workflows):
 
 ```
 Gamma API → discover configured soccer markets
@@ -28,7 +28,7 @@ CLV records how paper entry prices compare with later market prices; the tracker
 
 ---
 
-## Setup (5 minutes)
+## Setup
 
 ### 1. Install Python dependencies
 ```bash

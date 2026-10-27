@@ -19,7 +19,7 @@ GLM_MODEL    = os.environ.get("GLM_MODEL", "glm-4-flash")
 GLM_BASE_URL = os.environ.get("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
 
 # ── Real-time grounding ────────────────────────────────────────────────────────
-# football-data.org — free, structured WC standings/results
+# football-data.org — free, structured league standings/results
 # Docs: https://docs.football-data.org/general/v4/ (May 2022)
 FOOTBALL_DATA_API_KEY = os.environ.get("FOOTBALL_DATA_API_KEY", "")
 

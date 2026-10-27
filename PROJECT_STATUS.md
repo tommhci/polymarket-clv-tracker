@@ -2,18 +2,22 @@
 
 Project: polymarket-clv-tracker
 Project ID: polymarket-clv-tracker
-AI Control Plane: C:\Users\1\ai-control-plane
+AI Control Plane: <ai-control-plane root>
 Attach tier: minimal
 Attached: 2026-08-28
 
 ## Current State
 
-- Goal: automated paper-trading scanner — Polymarket World Cup advancement
-  prices vs de-vigged sportsbook baseline; CLV calibration study across three
+- Goal: automated paper-trading scanner — prediction-market soccer match prices
+  vs de-vigged sportsbook baseline; CLV calibration study across three
   pre-registered entry strategies (A_all / B_discount / C_uncertain).
-  Paper only: no wallet, no real money, no credentials to run.
-- Working: 30-min cron scan (GitHub Actions, `scan.yml`: schedule 7,37 * * * *
-  + workflow_dispatch force path); ~451 data-scan commits landed since 2026-07;
+  Paper only: no wallet, no real orders. Scanning needs no exchange-trading
+  credentials; the optional sportsbook baseline needs an `ODDS_API_KEY`.
+  The closed World Cup sample (n=73, CLV_adj≈−0.018) hit its pre-registered
+  stop signal and is reported as legacy context only.
+- Working: 15-min cron scan (GitHub Actions, `scan.yml`: schedule
+  7,22,37,52 * * * *) plus `sweep.yml` at 10:07 and 17:07 UTC (13 scans per
+  shift); ~451 data-scan commits landed since 2026-07;
   scans persisted to SQLite (untracked by design, `*.db` gitignored);
   portable truth source = `docs/scans.csv` + `docs/paper_trades.csv`.
 - Do not change without owner approval: everything in

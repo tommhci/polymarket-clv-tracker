@@ -478,7 +478,7 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
     # Gate 1: sample too small for any read
     if total < 30:
         verdict = (f"⏳ INSUFFICIENT SAMPLE — n={total}/30. "
-                   f"World Cup alone cannot reach this threshold.")
+                   f"This sample cannot reach this threshold.")
     # Gate 2: PROJECT STOP SIGNAL (the hard termination criterion)
     elif avg_clv <= 0:
         verdict = (f"🛑 PROJECT STOP SIGNAL — "

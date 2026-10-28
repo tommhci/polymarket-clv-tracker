@@ -478,7 +478,7 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
     # Gate 1: sample too small for any read
     if total < 30:
         verdict = (f"⏳ INSUFFICIENT SAMPLE — n={total}/30. "
-                   f"World Cup alone cannot reach this threshold.")
+                   f"This sample cannot reach this threshold.")
     # Gate 2: PROJECT STOP SIGNAL (the hard termination criterion)
     elif avg_clv <= 0:
         verdict = (f"🛑 PROJECT STOP SIGNAL — "
@@ -491,8 +491,8 @@ def get_clv_summary(path: str = DB_PATH) -> dict:
         verdict = (f"🟡 PROMISING — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
                    f"n={total}. Keep collecting (target n=100).")
     else:
-        verdict = (f"✅ EDGE SUPPORTED — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
-                   f"n={total}. Scale with 0.25 Kelly.")
+        verdict = (f"✅ POSITIVE CLV PATTERN (EXPLORATORY) — clv_adj={avg_clv:+.3f}, t={t_stat:.2f}, "
+                   f"n={total}. Further out-of-sample validation required; no live trading implied.")
 
     return {
         "total_resolved":      total,

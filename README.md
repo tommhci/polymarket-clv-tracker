@@ -155,6 +155,14 @@ The current configuration includes `MIN_NET_EDGE = 0.04` and `MAX_SPREAD_PCT = 0
 
 ---
 
+## Repository history
+
+Most commits here are automated data scans written by `scan.yml` and `sweep.yml`. A high commit count is a property of the running pipeline, not of hand-edited work. The research record — pre-registration, the World Cup stop rule, the pivot to EPL, and the known caveats — is in [`FIXLOG.md`](FIXLOG.md).
+
+## License
+
+Code is released under the MIT license (see `LICENSE`). Nothing in this repository is investment advice.
+
 ## Research next steps
 
 1. Document a pre-registered evaluation window, independent observations and missing-data rules.

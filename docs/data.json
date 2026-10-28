@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-28T19:48:23.729997+00:00",
-  "last_scan": "2026-10-28T14:25:22.376709+00:00",
-  "total_scans": 11279,
+  "generated_at": "2026-10-28T23:39:02.215860+00:00",
+  "last_scan": "2026-10-28T23:38:54.019973+00:00",
+  "total_scans": 11305,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 284,
-      "rows": 8967
+      "markets": 290,
+      "rows": 8993
     }
   ],
   "histogram": [],
@@ -74,6 +74,15 @@
       "volume": 89166.0,
       "spread_pct": 0.02,
       "bucket": "T-expired",
+      "distance": 0.005
+    },
+    {
+      "team": "Aston Villa FC (2026-10-31)",
+      "mid": 0.505,
+      "ask": 0.51,
+      "volume": 37429.0,
+      "spread_pct": 0.0196,
+      "bucket": "T-other",
       "distance": 0.005
     },
     {
@@ -110,6 +119,15 @@
       "volume": 885951.0,
       "spread_pct": 0.0556,
       "bucket": "T-expired",
+      "distance": 0.025
+    },
+    {
+      "team": "Chelsea FC (2026-10-31)",
+      "mid": 0.525,
+      "ask": 0.53,
+      "volume": 13134.0,
+      "spread_pct": 0.0189,
+      "bucket": "T-other",
       "distance": 0.025
     },
     {
@@ -590,6 +608,15 @@
       "distance": 0.235
     },
     {
+      "team": "Aston Villa FC vs. Fulham FC (draw)",
+      "mid": 0.265,
+      "ask": 0.27,
+      "volume": 398.0,
+      "spread_pct": 0.037,
+      "bucket": "T-other",
+      "distance": 0.235
+    },
+    {
       "team": "Manchester United FC vs. Manchester City FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
@@ -612,6 +639,15 @@
       "mid": 0.255,
       "ask": 0.26,
       "volume": 35547.0,
+      "spread_pct": 0.0385,
+      "bucket": "T-other",
+      "distance": 0.245
+    },
+    {
+      "team": "Fulham FC (2026-10-31)",
+      "mid": 0.255,
+      "ask": 0.26,
+      "volume": 806.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
       "distance": 0.245
@@ -662,6 +698,15 @@
       "distance": 0.255
     },
     {
+      "team": "Chelsea FC vs. Manchester United FC (draw)",
+      "mid": 0.245,
+      "ask": 0.25,
+      "volume": 787.0,
+      "spread_pct": 0.04,
+      "bucket": "T-other",
+      "distance": 0.255
+    },
+    {
       "team": "Tottenham Hotspur FC (2026-10-10)",
       "mid": 0.235,
       "ask": 0.22,
@@ -695,6 +740,15 @@
       "volume": 3712.0,
       "spread_pct": 0.0417,
       "bucket": "T-1h",
+      "distance": 0.265
+    },
+    {
+      "team": "Manchester United FC (2026-10-31)",
+      "mid": 0.235,
+      "ask": 0.24,
+      "volume": 6208.0,
+      "spread_pct": 0.0417,
+      "bucket": "T-other",
       "distance": 0.265
     },
     {

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-31T14:50:19.678436+00:00",
-  "last_scan": "2026-10-31T14:50:02.568933+00:00",
-  "total_scans": 11617,
+  "generated_at": "2026-10-31T18:51:51.534063+00:00",
+  "last_scan": "2026-10-31T18:51:42.383720+00:00",
+  "total_scans": 11646,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -23,9 +23,9 @@
     "wc_legacy_n": 73,
     "wc_legacy_avg_clv_adj": -0.0178,
     "capture_rate": {
-      "match_markets_past": 204,
-      "captured_final_hour": 90,
-      "capture_rate": 0.441,
+      "match_markets_past": 222,
+      "captured_final_hour": 105,
+      "capture_rate": 0.473,
       "definition": "share of past match markets with ≥1 price point in the last hour before kickoff (the CLV entry window)"
     }
   },
@@ -37,23 +37,23 @@
     },
     {
       "bucket": "T-1h",
-      "markets": 200,
-      "rows": 209
+      "markets": 203,
+      "rows": 212
     },
     {
       "bucket": "T-24h",
       "markets": 196,
-      "rows": 356
+      "rows": 359
     },
     {
       "bucket": "T-expired",
-      "markets": 210,
-      "rows": 1589
+      "markets": 213,
+      "rows": 1592
     },
     {
       "bucket": "T-other",
       "markets": 308,
-      "rows": 9275
+      "rows": 9295
     }
   ],
   "histogram": [],
@@ -131,6 +131,15 @@
       "distance": 0.025
     },
     {
+      "team": "Aston Villa FC (2026-10-31)",
+      "mid": 0.475,
+      "ask": 0.48,
+      "volume": 333694.0,
+      "spread_pct": 0.0208,
+      "bucket": "T-1h",
+      "distance": 0.025
+    },
+    {
       "team": "Manchester United FC vs. Tottenham Hotspur FC (draw)",
       "mid": 0.455,
       "ask": 0.5,
@@ -164,15 +173,6 @@
       "volume": 47302.0,
       "spread_pct": 0.0217,
       "bucket": "T-1h",
-      "distance": 0.045
-    },
-    {
-      "team": "Aston Villa FC (2026-10-31)",
-      "mid": 0.455,
-      "ask": 0.46,
-      "volume": 169217.0,
-      "spread_pct": 0.0217,
-      "bucket": "T-other",
       "distance": 0.045
     },
     {
@@ -210,15 +210,6 @@
       "spread_pct": 0.0233,
       "bucket": "T-expired",
       "distance": 0.075
-    },
-    {
-      "team": "Tottenham Hotspur FC (2026-10-31)",
-      "mid": 0.585,
-      "ask": 0.59,
-      "volume": 82289.0,
-      "spread_pct": 0.0169,
-      "bucket": "T-other",
-      "distance": 0.085
     },
     {
       "team": "Fulham FC (2026-10-10)",
@@ -305,7 +296,7 @@
       "team": "Arsenal FC (2026-11-01)",
       "mid": 0.395,
       "ask": 0.4,
-      "volume": 19747.0,
+      "volume": 20816.0,
       "spread_pct": 0.025,
       "bucket": "T-24h",
       "distance": 0.105
@@ -449,7 +440,7 @@
       "team": "Liverpool FC (2026-11-01)",
       "mid": 0.335,
       "ask": 0.34,
-      "volume": 5785.0,
+      "volume": 6917.0,
       "spread_pct": 0.0294,
       "bucket": "T-24h",
       "distance": 0.165
@@ -602,7 +593,7 @@
       "team": "Liverpool FC vs. Arsenal FC (draw)",
       "mid": 0.285,
       "ask": 0.29,
-      "volume": 863.0,
+      "volume": 980.0,
       "spread_pct": 0.0345,
       "bucket": "T-24h",
       "distance": 0.215
@@ -698,24 +689,6 @@
       "distance": 0.225
     },
     {
-      "team": "Aston Villa FC vs. Fulham FC (draw)",
-      "mid": 0.275,
-      "ask": 0.28,
-      "volume": 2474.0,
-      "spread_pct": 0.0357,
-      "bucket": "T-other",
-      "distance": 0.225
-    },
-    {
-      "team": "Fulham FC (2026-10-31)",
-      "mid": 0.275,
-      "ask": 0.28,
-      "volume": 18219.0,
-      "spread_pct": 0.0357,
-      "bucket": "T-other",
-      "distance": 0.225
-    },
-    {
       "team": "Coventry City FC vs. Newcastle United FC (draw)",
       "mid": 0.265,
       "ask": 0.27,
@@ -779,6 +752,15 @@
       "distance": 0.235
     },
     {
+      "team": "Aston Villa FC vs. Fulham FC (draw)",
+      "mid": 0.265,
+      "ask": 0.27,
+      "volume": 9619.0,
+      "spread_pct": 0.037,
+      "bucket": "T-1h",
+      "distance": 0.235
+    },
+    {
       "team": "Manchester United FC vs. Manchester City FC (draw)",
       "mid": 0.255,
       "ask": 0.26,
@@ -812,6 +794,15 @@
       "volume": 5218.0,
       "spread_pct": 0.0385,
       "bucket": "T-other",
+      "distance": 0.245
+    },
+    {
+      "team": "Fulham FC (2026-10-31)",
+      "mid": 0.255,
+      "ask": 0.27,
+      "volume": 40974.0,
+      "spread_pct": 0.0385,
+      "bucket": "T-1h",
       "distance": 0.245
     },
     {
@@ -902,15 +893,6 @@
       "volume": 3712.0,
       "spread_pct": 0.0417,
       "bucket": "T-1h",
-      "distance": 0.265
-    },
-    {
-      "team": "Tottenham Hotspur FC vs. Crystal Palace FC (draw)",
-      "mid": 0.235,
-      "ask": 0.24,
-      "volume": 2612.0,
-      "spread_pct": 0.0417,
-      "bucket": "T-other",
       "distance": 0.265
     },
     {
@@ -1028,15 +1010,6 @@
       "volume": 42549.0,
       "spread_pct": 0.0526,
       "bucket": "T-1h",
-      "distance": 0.315
-    },
-    {
-      "team": "Crystal Palace FC (2026-10-31)",
-      "mid": 0.185,
-      "ask": 0.19,
-      "volume": 17304.0,
-      "spread_pct": 0.0526,
-      "bucket": "T-other",
       "distance": 0.315
     },
     {
@@ -1220,6 +1193,24 @@
       "distance": 0.435
     },
     {
+      "team": "Tottenham Hotspur FC vs. Crystal Palace FC (draw)",
+      "mid": 0.065,
+      "ask": 0.08,
+      "volume": 50844.0,
+      "spread_pct": 0.1429,
+      "bucket": "T-expired",
+      "distance": 0.435
+    },
+    {
+      "team": "Tottenham Hotspur FC (2026-10-31)",
+      "mid": 0.935,
+      "ask": 0.93,
+      "volume": 682077.0,
+      "spread_pct": 0.0106,
+      "bucket": "T-expired",
+      "distance": 0.435
+    },
+    {
       "team": "Arsenal FC (2026-09-12)",
       "mid": 0.96,
       "ask": 0.97,
@@ -1317,6 +1308,15 @@
       "spread_pct": 0.004,
       "bucket": "T-expired",
       "distance": 0.493
+    },
+    {
+      "team": "Crystal Palace FC (2026-10-31)",
+      "mid": 0.0045,
+      "ask": 0.0128,
+      "volume": 209652.0,
+      "spread_pct": 0.2,
+      "bucket": "T-expired",
+      "distance": 0.4955
     },
     {
       "team": "Sunderland AFC (2026-10-18)",

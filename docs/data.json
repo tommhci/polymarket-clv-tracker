@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-02T02:22:01.933949+00:00",
-  "last_scan": "2026-11-02T02:21:52.890549+00:00",
-  "total_scans": 11784,
+  "generated_at": "2026-11-02T09:41:03.256389+00:00",
+  "last_scan": "2026-11-02T09:40:54.428620+00:00",
+  "total_scans": 11807,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 311,
-      "rows": 9430
+      "rows": 9453
     }
   ],
   "histogram": [],
@@ -176,6 +176,15 @@
       "distance": 0.055
     },
     {
+      "team": "Newcastle United FC (2026-11-02)",
+      "mid": 0.445,
+      "ask": 0.45,
+      "volume": 610177.0,
+      "spread_pct": 0.0222,
+      "bucket": "T-other",
+      "distance": 0.055
+    },
+    {
       "team": "Manchester City FC (2026-10-31)",
       "mid": 0.565,
       "ask": 0.58,
@@ -200,15 +209,6 @@
       "volume": 74027.0,
       "spread_pct": 0.0233,
       "bucket": "T-expired",
-      "distance": 0.075
-    },
-    {
-      "team": "Newcastle United FC (2026-11-02)",
-      "mid": 0.425,
-      "ask": 0.43,
-      "volume": 29942.0,
-      "spread_pct": 0.0233,
-      "bucket": "T-other",
       "distance": 0.075
     },
     {
@@ -509,15 +509,6 @@
       "distance": 0.195
     },
     {
-      "team": "Everton FC (2026-11-02)",
-      "mid": 0.305,
-      "ask": 0.31,
-      "volume": 7721.0,
-      "spread_pct": 0.0323,
-      "bucket": "T-other",
-      "distance": 0.195
-    },
-    {
       "team": "Leeds United FC vs. Crystal Palace FC (draw)",
       "mid": 0.705,
       "ask": 0.76,
@@ -569,6 +560,15 @@
       "volume": 1487628.0,
       "spread_pct": 0.0333,
       "bucket": "T-expired",
+      "distance": 0.205
+    },
+    {
+      "team": "Everton FC (2026-11-02)",
+      "mid": 0.295,
+      "ask": 0.3,
+      "volume": 58592.0,
+      "spread_pct": 0.0333,
+      "bucket": "T-other",
       "distance": 0.205
     },
     {
@@ -701,7 +701,7 @@
       "team": "Newcastle United FC vs. Everton FC (draw)",
       "mid": 0.275,
       "ask": 0.28,
-      "volume": 4486.0,
+      "volume": 6995.0,
       "spread_pct": 0.0357,
       "bucket": "T-other",
       "distance": 0.225

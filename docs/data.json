@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-05T23:43:29.309378+00:00",
-  "last_scan": "2026-11-05T18:19:35.953445+00:00",
-  "total_scans": 12274,
+  "generated_at": "2026-11-06T03:42:48.423154+00:00",
+  "last_scan": "2026-11-06T03:42:38.326888+00:00",
+  "total_scans": 12303,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -52,8 +52,8 @@
     },
     {
       "bucket": "T-other",
-      "markets": 317,
-      "rows": 9902
+      "markets": 320,
+      "rows": 9931
     }
   ],
   "histogram": [],
@@ -185,10 +185,19 @@
       "distance": 0.065
     },
     {
+      "team": "Everton FC (2026-11-06)",
+      "mid": 0.565,
+      "ask": 0.57,
+      "volume": 19698.0,
+      "spread_pct": 0.0175,
+      "bucket": "T-other",
+      "distance": 0.065
+    },
+    {
       "team": "Manchester City FC (2026-11-07)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 15139.0,
+      "volume": 36723.0,
       "spread_pct": 0.0175,
       "bucket": "T-other",
       "distance": 0.065
@@ -878,6 +887,15 @@
       "distance": 0.265
     },
     {
+      "team": "Everton FC vs. Coventry City FC (draw)",
+      "mid": 0.235,
+      "ask": 0.24,
+      "volume": 2517.0,
+      "spread_pct": 0.0417,
+      "bucket": "T-other",
+      "distance": 0.265
+    },
+    {
       "team": "Nottingham Forest FC vs. Manchester City FC (draw)",
       "mid": 0.235,
       "ask": 0.24,
@@ -941,15 +959,6 @@
       "distance": 0.295
     },
     {
-      "team": "Nottingham Forest FC (2026-11-07)",
-      "mid": 0.205,
-      "ask": 0.21,
-      "volume": 17415.0,
-      "spread_pct": 0.0476,
-      "bucket": "T-other",
-      "distance": 0.295
-    },
-    {
       "team": "Liverpool FC vs. Nottingham Forest FC (draw)",
       "mid": 0.195,
       "ask": 0.2,
@@ -974,6 +983,15 @@
       "volume": 19449.0,
       "spread_pct": 0.05,
       "bucket": "T-1h",
+      "distance": 0.305
+    },
+    {
+      "team": "Nottingham Forest FC (2026-11-07)",
+      "mid": 0.195,
+      "ask": 0.2,
+      "volume": 17569.0,
+      "spread_pct": 0.05,
+      "bucket": "T-other",
       "distance": 0.305
     },
     {
@@ -1013,6 +1031,15 @@
       "distance": 0.315
     },
     {
+      "team": "Coventry City FC (2026-11-06)",
+      "mid": 0.185,
+      "ask": 0.19,
+      "volume": 4563.0,
+      "spread_pct": 0.0526,
+      "bucket": "T-other",
+      "distance": 0.315
+    },
+    {
       "team": "Hull City AFC (2026-10-17)",
       "mid": 0.175,
       "ask": 0.18,
@@ -1034,7 +1061,7 @@
       "team": "Arsenal FC (2026-11-07)",
       "mid": 0.845,
       "ask": 0.85,
-      "volume": 10689.0,
+      "volume": 11912.0,
       "spread_pct": 0.0118,
       "bucket": "T-other",
       "distance": 0.345
@@ -1124,7 +1151,7 @@
       "team": "Arsenal FC vs. Hull City AFC (draw)",
       "mid": 0.115,
       "ask": 0.12,
-      "volume": 261.0,
+      "volume": 286.0,
       "spread_pct": 0.0833,
       "bucket": "T-other",
       "distance": 0.385
@@ -1230,12 +1257,12 @@
     },
     {
       "team": "Hull City AFC (2026-11-07)",
-      "mid": 0.048,
-      "ask": 0.0494,
-      "volume": 15469.0,
-      "spread_pct": 0.0408,
+      "mid": 0.0455,
+      "ask": 0.046,
+      "volume": 15704.0,
+      "spread_pct": 0.0217,
       "bucket": "T-other",
-      "distance": 0.452
+      "distance": 0.4545
     },
     {
       "team": "Arsenal FC (2026-09-12)",

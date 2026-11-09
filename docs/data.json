@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-09T08:42:44.692298+00:00",
-  "last_scan": "2026-11-09T08:42:38.419015+00:00",
-  "total_scans": 12695,
+  "generated_at": "2026-11-09T19:13:29.985703+00:00",
+  "last_scan": "2026-11-09T19:13:20.484039+00:00",
+  "total_scans": 12715,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 338,
-      "rows": 10284
+      "rows": 10304
     }
   ],
   "histogram": [],

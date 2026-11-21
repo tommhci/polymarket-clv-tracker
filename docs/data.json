@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-21T15:33:32.914908+00:00",
-  "last_scan": "2026-11-21T15:33:18.183944+00:00",
-  "total_scans": 14241,
+  "generated_at": "2026-11-21T21:03:29.505261+00:00",
+  "last_scan": "2026-11-21T21:03:21.051060+00:00",
+  "total_scans": 14264,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -23,9 +23,9 @@
     "wc_legacy_n": 73,
     "wc_legacy_avg_clv_adj": -0.0178,
     "capture_rate": {
-      "match_markets_past": 276,
+      "match_markets_past": 279,
       "captured_final_hour": 111,
-      "capture_rate": 0.402,
+      "capture_rate": 0.398,
       "definition": "share of past match markets with ≥1 price point in the last hour before kickoff (the CLV entry window)"
     }
   },
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 359,
-      "rows": 11803
+      "rows": 11826
     }
   ],
   "histogram": [],
@@ -224,9 +224,9 @@
       "team": "Liverpool FC (2026-11-22)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 23886.0,
+      "volume": 28489.0,
       "spread_pct": 0.0175,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.065
     },
     {
@@ -1204,19 +1204,19 @@
     {
       "team": "Liverpool FC vs. Manchester United FC (draw)",
       "mid": 0.215,
-      "ask": 0.22,
-      "volume": 822.0,
+      "ask": 0.2289,
+      "volume": 841.0,
       "spread_pct": 0.0455,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.285
     },
     {
       "team": "Manchester United FC (2026-11-22)",
       "mid": 0.215,
       "ask": 0.22,
-      "volume": 9452.0,
+      "volume": 11822.0,
       "spread_pct": 0.0455,
-      "bucket": "T-24h",
+      "bucket": "T-other",
       "distance": 0.285
     },
     {

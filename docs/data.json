@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-22T01:09:39.491107+00:00",
-  "last_scan": "2026-11-22T01:09:32.063952+00:00",
-  "total_scans": 14290,
+  "generated_at": "2026-11-22T08:08:09.436227+00:00",
+  "last_scan": "2026-11-22T08:07:59.217978+00:00",
+  "total_scans": 14316,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 362,
-      "rows": 11852
+      "rows": 11878
     }
   ],
   "histogram": [],
@@ -224,7 +224,7 @@
       "team": "Liverpool FC (2026-11-22)",
       "mid": 0.565,
       "ask": 0.57,
-      "volume": 36698.0,
+      "volume": 46376.0,
       "spread_pct": 0.0175,
       "bucket": "T-other",
       "distance": 0.065
@@ -527,20 +527,20 @@
       "distance": 0.145
     },
     {
-      "team": "Brighton & Hove Albion FC (2026-11-22)",
-      "mid": 0.645,
-      "ask": 0.65,
-      "volume": 23779.0,
-      "spread_pct": 0.0154,
-      "bucket": "T-other",
-      "distance": 0.145
-    },
-    {
       "team": "Leeds United FC (2026-11-07)",
       "mid": 0.345,
       "ask": 0.35,
       "volume": 171490.0,
       "spread_pct": 0.0286,
+      "bucket": "T-other",
+      "distance": 0.155
+    },
+    {
+      "team": "Brighton & Hove Albion FC (2026-11-22)",
+      "mid": 0.655,
+      "ask": 0.66,
+      "volume": 31624.0,
+      "spread_pct": 0.0152,
       "bucket": "T-other",
       "distance": 0.155
     },
@@ -1175,6 +1175,15 @@
       "distance": 0.275
     },
     {
+      "team": "Liverpool FC vs. Manchester United FC (draw)",
+      "mid": 0.225,
+      "ask": 0.23,
+      "volume": 1503.0,
+      "spread_pct": 0.0435,
+      "bucket": "T-other",
+      "distance": 0.275
+    },
+    {
       "team": "Aston Villa FC vs. Arsenal FC (draw)",
       "mid": 0.215,
       "ask": 0.22,
@@ -1214,16 +1223,7 @@
       "team": "Hull City AFC vs. Brighton & Hove Albion FC (draw)",
       "mid": 0.215,
       "ask": 0.22,
-      "volume": 434.0,
-      "spread_pct": 0.0455,
-      "bucket": "T-other",
-      "distance": 0.285
-    },
-    {
-      "team": "Liverpool FC vs. Manchester United FC (draw)",
-      "mid": 0.215,
-      "ask": 0.2297,
-      "volume": 914.0,
+      "volume": 1088.0,
       "spread_pct": 0.0455,
       "bucket": "T-other",
       "distance": 0.285
@@ -1232,7 +1232,7 @@
       "team": "Manchester United FC (2026-11-22)",
       "mid": 0.215,
       "ask": 0.22,
-      "volume": 13257.0,
+      "volume": 62842.0,
       "spread_pct": 0.0455,
       "bucket": "T-other",
       "distance": 0.285
@@ -1502,7 +1502,7 @@
       "team": "Hull City AFC (2026-11-22)",
       "mid": 0.135,
       "ask": 0.14,
-      "volume": 3729.0,
+      "volume": 10692.0,
       "spread_pct": 0.0714,
       "bucket": "T-other",
       "distance": 0.365

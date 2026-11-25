@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-25T11:40:55.931531+00:00",
-  "last_scan": "2026-11-25T11:40:45.691880+00:00",
-  "total_scans": 14770,
+  "generated_at": "2026-11-25T20:41:35.198827+00:00",
+  "last_scan": "2026-11-25T20:41:26.488698+00:00",
+  "total_scans": 14793,
   "config": {
     "risk_free_rate": 0.053,
     "min_net_edge": 0.04
@@ -53,7 +53,7 @@
     {
       "bucket": "T-other",
       "markets": 368,
-      "rows": 12329
+      "rows": 12352
     }
   ],
   "histogram": [],
@@ -170,7 +170,7 @@
       "team": "Liverpool FC (2026-11-29)",
       "mid": 0.535,
       "ask": 0.54,
-      "volume": 26714.0,
+      "volume": 29467.0,
       "spread_pct": 0.0185,
       "bucket": "T-other",
       "distance": 0.035
@@ -1285,8 +1285,8 @@
     {
       "team": "Everton FC (2026-11-29)",
       "mid": 0.215,
-      "ask": 0.22,
-      "volume": 3346.0,
+      "ask": 0.2201,
+      "volume": 4204.0,
       "spread_pct": 0.0455,
       "bucket": "T-other",
       "distance": 0.285
